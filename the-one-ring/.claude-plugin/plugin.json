@@ -1,0 +1,10 @@
+{
+  "name": "the-one-ring",
+  "version": "0.1.0",
+  "description": "Olytic Solutions governance plugin — brand voice, company strategy, HR policies, and security policies. Installed for all employees to ensure universal alignment.",
+  "author": {
+    "name": "Olytic Solutions",
+    "email": "support@olyticsolutions.com"
+  },
+  "keywords": ["governance", "brand", "strategy", "policies", "alignment"]
+}
