@@ -1,0 +1,29 @@
+{
+  "name": "olytic-marketplace",
+  "owner": {
+    "name": "Olytic Solutions",
+    "email": "support@olyticsolutions.com"
+  },
+  "metadata": {
+    "description": "Internal plugins for Olytic Solutions",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "the-one-ring",
+      "source": "./the-one-ring",
+      "description": "Governance plugin — brand voice, company strategy, HR policies, and security policies. Installed for all employees.",
+      "version": "0.1.0",
+      "keywords": ["governance", "brand", "strategy", "policies"],
+      "category": "governance"
+    },
+    {
+      "name": "olytic-content-strategist",
+      "source": "./olytic-content-strategist",
+      "description": "Content creation and strategy — website content, GitHub integration, competitive research, GA4 analytics. Requires The One Ring.",
+      "version": "0.1.0",
+      "keywords": ["content", "website", "github", "analytics", "strategy"],
+      "category": "content"
+    }
+  ]
+}
