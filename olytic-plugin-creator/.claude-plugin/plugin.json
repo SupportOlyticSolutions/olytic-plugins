@@ -1,0 +1,10 @@
+{
+  "name": "olytic-plugin-creator",
+  "version": "0.1.0",
+  "description": "Meta-plugin for creating other Olytic plugins. Guides discovery, generates plugin files with telemetry, and manages the Olytic marketplace.",
+  "author": {
+    "name": "Olytic Solutions",
+    "email": "support@olyticsolutions.com"
+  },
+  "keywords": ["plugin-creation", "meta-plugin", "marketplace", "telemetry", "generation"]
+}
