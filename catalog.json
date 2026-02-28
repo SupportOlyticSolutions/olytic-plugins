@@ -84,6 +84,14 @@
           { "name": "brand-compliance-reviewer", "desc": "Six-dimension audit: Voice & Tone, Messaging Alignment, ICP Targeting, Competitive Differentiation, Structural Quality, CTA Appropriateness. Provides scored table and rewritten examples." }
         ]
       },
+      "successCriteria": {
+        "narrative": "The One Ring succeeds when Olytic's brand voice and policies are applied consistently across all Claude outputs without requiring manual correction. The primary signal is /brand-check pass rate on first run. Secondary signals are whether policy questions get answered correctly and whether any external content needed to be pulled back or corrected after publication.",
+        "kpis": [
+          { "metric": "/brand-check first-run pass rate", "target": ">80% of content passes all six dimensions without revision", "reporting": "Manual log in Notion after each /brand-check run. Track Pass vs. Needs Work per dimension." },
+          { "metric": "Policy question accuracy", "target": "HR and security questions answered without requiring human correction", "reporting": "Spot-check during weekly review. Note any answers that needed correction in a running issues log." },
+          { "metric": "External content retraction rate", "target": "Zero pieces of published content need to be pulled back for brand or policy violations", "reporting": "Tracked reactively. Any retraction triggers a root-cause review against brand-standards SKILL.md." }
+        ]
+      },
       "guardrails": [
         "Never write fluffy thought leadership. No 'rapidly evolving landscapes.'",
         "Never use hollow superlatives: 'best-in-class', 'world-class', 'cutting-edge'.",
@@ -174,6 +182,15 @@
           { "name": "meeting-notes-reviewer", "desc": "Extracts content ideas, ICP language patterns, and objection data from meeting transcripts." }
         ]
       },
+      "successCriteria": {
+        "narrative": "The Content Strategist succeeds when Olytic is publishing on cadence, the content maps to the right stage of the ICP journey, and organic traffic is growing. It fails silently if content is published but not measured, or if the publishing cadence drops because the workflow feels too heavy. The reporting mechanism is /content-performance, which pulls GA4 data directly and maps it to strategic purpose.",
+        "kpis": [
+          { "metric": "Publishing cadence", "target": "2 blog posts and 1 landing page per month", "reporting": "GitHub commit history on olytic-site. Count merged PRs from /push-content per month." },
+          { "metric": "Organic pageviews", "target": "Month-over-month growth on content pages", "reporting": "/content-performance command pulling GA4 Property 525690219. Reviewed monthly." },
+          { "metric": "Content-to-ICP-journey coverage", "target": "At least one piece covering each stage: Awareness, Consideration, Decision", "reporting": "content-strategist agent produces a gap analysis on demand. Run before each monthly planning session." },
+          { "metric": "Brand-check pass rate on published content", "target": "100% of content pushed via /push-content has passed /brand-check", "reporting": "Enforced by process: /brand-check is a required step before /push-content. Verified in PR description." }
+        ]
+      },
       "guardrails": [
         "Requires The One Ring. Brand voice comes from there, not here.",
         "Every piece of content must map to: build credibility, create visibility, or enable conversion.",
@@ -257,6 +274,15 @@
         ],
         "agents": [
           { "name": "plugin-builder", "desc": "End-to-end orchestrator for the 6-phase workflow: discovery, planning, generation, review, delivery, marketplace" }
+        ]
+      },
+      "successCriteria": {
+        "narrative": "The Plugin Creator succeeds when new plugins are shipped quickly, are structurally consistent with existing ones, and get actively used after delivery. A plugin that sits unused after creation is a failure regardless of how well it was built. Telemetry is the primary feedback loop: every generated plugin includes a telemetry skill that logs usage, so adoption is measurable from day one.",
+        "kpis": [
+          { "metric": "Time from requirements to delivered plugin", "target": "Under 2 hours for a standard plugin with 2-3 skills and 1-2 commands", "reporting": "Logged manually at delivery. Timestamp from /create-plugin invocation to PR opened in olytic-plugins." },
+          { "metric": "Structural compliance rate", "target": "100% of generated plugins pass the plugin-builder verification gates without manual fixes", "reporting": "Verification gate output is included in the delivery summary. Any manual fixes are noted in the PR description." },
+          { "metric": "Plugin adoption rate", "target": "At least one active user logging telemetry events within 2 weeks of delivery", "reporting": "Telemetry skill logs reviewed via the olytic-lab repo or designated telemetry dashboard. Reviewed per plugin at the 2-week mark." },
+          { "metric": "Marketplace currency", "target": "catalog.json reflects all active plugins within 24 hours of delivery", "reporting": "GitHub commit history on olytic-plugins. /update-marketplace should be run as the final step of every plugin delivery." }
         ]
       },
       "guardrails": [
