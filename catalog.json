@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "generated": "2026-02-28T00:00:00Z",
   "plugins": [
     {
@@ -9,47 +9,94 @@
       "category": "governance",
       "scope": "managed",
       "keywords": ["governance", "brand", "strategy", "policies", "alignment"],
-      "bigPicture": "The foundational governance layer for every Olytic system. Brand voice, company strategy, HR, and security policies — defined once, enforced everywhere. Every other plugin assumes this one is installed. You cannot disable it. That's the point.",
-      "capabilities": [
-        { "text": "Write content in Olytic's brand voice", "type": "skill", "source": "brand-standards" },
-        { "text": "Review tone, messaging, and ICP alignment", "type": "skill", "source": "brand-standards" },
-        { "text": "Check competitive positioning angles", "type": "skill", "source": "brand-standards" },
-        { "text": "Reference company vision, OKRs, and strategic priorities", "type": "skill", "source": "company-strategy" },
-        { "text": "Look up HR policies, PTO, work norms", "type": "skill", "source": "hr-policies" },
-        { "text": "Verify data handling and security rules", "type": "skill", "source": "security-policies" },
-        { "text": "Run a scored brand compliance audit on any content", "type": "command", "source": "/brand-check" },
-        { "text": "Deep multi-dimensional audit of pages, emails, proposals against all brand standards", "type": "agent", "source": "brand-compliance-reviewer" }
+      "bigPicture": "The org-wide governance layer. Contains the brand voice rules, company strategy, HR policies, and security policies that every other plugin depends on. It is installed for all employees and cannot be disabled. If you write content, draft a proposal, or answer a client email, this plugin is applying rules in the background.",
+      "useCases": [
+        {
+          "title": "Audit a guest blog post against the 'No Jargon' pillar",
+          "description": "Paste a draft blog post and run /brand-check. The plugin scores it against all five messaging pillars, flags hollow superlatives like 'best-in-class', and catches any sentence that could describe a generic consultancy instead of Olytic specifically."
+        },
+        {
+          "title": "Draft a cold outreach email that sounds like Olytic, not a SaaS vendor",
+          "description": "Ask Claude to write an email to an ICP prospect. The brand-standards skill loads automatically and enforces: expert tone, 'we' positioning, no salesy CTAs, structured formatting, and references to the embedded partnership model rather than product-speak."
+        },
+        {
+          "title": "Check whether a proposal accidentally positions Olytic as a consulting firm",
+          "description": "Use the brand-compliance-reviewer agent for a multi-dimensional audit. It scores Voice & Tone, Messaging Alignment, ICP Targeting, Competitive Differentiation, Structural Quality, and CTA Appropriateness, then provides specific rewrites for anything that fails."
+        },
+        {
+          "title": "Answer 'What are our current strategic priorities?' with real context",
+          "description": "Ask about OKRs or company direction. The company-strategy skill loads and provides the actual priority table: website & content (in progress), offering definition (in progress), first client acquisition (next milestone), delivery framework (in progress), and internal tooling (in progress)."
+        }
       ],
+      "rulesets": [
+        {
+          "name": "Brand Standards",
+          "summary": "Defines Olytic as a 'revenue systems firm' (not a consultancy, SaaS vendor, or agency). Enforces the O/G/O framework (Operator/Governor/Optimizer) as the core positioning. ICP is SMB B2B companies with GTM teams that have a RevOps manager but lack a technology strategist. Voice rules: be expert and specific, be opinionated, favor bullets and tables, use dry humor, use 'we' generously, mock corporate-speak gently. Banned: hollow superlatives, text walls, emojis, salesy language, framing AI as replacing humans. Five messaging pillars: Systems not consulting, Amplification not automation, Closed-loop architecture, Embedded partnership, Revenue outcomes. Design system: white backgrounds by default, Olytic Gold (#C8A96E) accent, DM Sans font, Lucide icons, minimalist layouts."
+        },
+        {
+          "name": "Company Strategy",
+          "summary": "Business stage: early-stage go-to-market. Next goal: win first client. All work must serve one of three purposes: build credibility, create visibility, or enable conversion. Engagement models: fixed-fee assessments and retainers (not hourly consulting, staff aug, or software licenses). Philosophy: 'amplification not automation' is an architectural principle implemented via O/G/O. Five strategic priorities tracked with status: website/content, offering definition, first client acquisition, delivery framework, internal tooling."
+        },
+        {
+          "name": "HR Policies",
+          "summary": "Placeholder policies pending finalization. Culture principles: expertise over activity, ownership over tasks, directness over diplomacy, continuous improvement. Communication norms: default to async, be structured, meetings require agendas. Onboarding: install The One Ring + role-specific plugins, read brand standards and strategy skills. Work hours, PTO, and professional development sections are TBD."
+        },
+        {
+          "name": "Security Policies",
+          "summary": "Placeholder policies pending finalization. Four-tier data classification: Public, Internal, Confidential, Restricted. Client data rules: never include client names in external content without permission, anonymize all examples, do not store client credentials in plugins. AI usage: never paste client data into public AI tools, review all AI outputs before sending (Governor principle). Credential management: never hardcode keys, use environment variables, rotate on team changes."
+        }
+      ],
+      "triggerConditions": {
+        "activates": [
+          "Write a blog post about RevOps",
+          "Draft an email to a prospect",
+          "Create a proposal for a potential client",
+          "Check if this page sounds like Olytic",
+          "Review this content for brand compliance",
+          "What are our company priorities?",
+          "Write HTML for a landing page",
+          "Create a Google Doc with our services overview",
+          "Make a presentation about O/G/O",
+          "What's our PTO policy?",
+          "Can I share this client data externally?"
+        ],
+        "dormant": [
+          "What's the weather today?",
+          "Help me debug this Python script",
+          "Explain how Git branching works",
+          "Summarize this PDF for me",
+          "Calculate the ROI of this investment"
+        ]
+      },
       "components": {
         "skills": [
-          { "name": "Brand Standards", "desc": "Voice rules, messaging pillars, ICP definition, competitive positioning, design preferences" },
-          { "name": "Company Strategy", "desc": "Vision, philosophy, current priorities, engagement models, business stage context" },
-          { "name": "HR Policies", "desc": "Culture, communication norms, work hours, PTO, onboarding" },
-          { "name": "Security Policies", "desc": "Data classification, client data rules, AI usage policies, credential management" }
+          { "name": "Brand Standards", "desc": "Voice rules, messaging pillars, ICP definition, competitive positioning, color palette, typography, design system" },
+          { "name": "Company Strategy", "desc": "Vision, philosophy, strategic priorities with status, engagement models, decision framework" },
+          { "name": "HR Policies", "desc": "Culture principles, communication norms, onboarding checklist (placeholder policies)" },
+          { "name": "Security Policies", "desc": "Data classification tiers, client data rules, AI usage policies, credential management (placeholder policies)" }
         ],
         "commands": [
-          { "name": "/brand-check", "desc": "Review any content against brand standards with a scored compliance report" }
+          { "name": "/brand-check", "desc": "Scores content against voice, messaging, ICP targeting, competitive positioning, and structure. Returns Pass/Needs Work per dimension with specific rewrites." }
         ],
         "agents": [
-          { "name": "brand-compliance-reviewer", "desc": "Multi-dimensional audit of any content against all brand and quality standards" }
+          { "name": "brand-compliance-reviewer", "desc": "Six-dimension audit: Voice & Tone, Messaging Alignment, ICP Targeting, Competitive Differentiation, Structural Quality, CTA Appropriateness. Provides scored table and rewritten examples." }
         ]
       },
       "guardrails": [
-        "Never write fluffy, generic thought leadership — no \"rapidly evolving landscapes\"",
-        "Never use hollow superlatives: \"best-in-class\", \"world-class\", \"cutting-edge\"",
-        "Never position Olytic as a consulting firm or SaaS vendor",
-        "Never suggest AI replaces humans — always frame as amplification",
-        "Never be salesy or pushy — the expertise sells itself",
-        "No emojis in professional content",
-        "Security policies contain placeholders — update with actual policies before relying on them",
-        "HR policies contain placeholders — same deal"
+        "Never write fluffy thought leadership. No 'rapidly evolving landscapes.'",
+        "Never use hollow superlatives: 'best-in-class', 'world-class', 'cutting-edge'.",
+        "Never position Olytic as a consulting firm or SaaS vendor.",
+        "Never suggest AI replaces humans. Always frame as amplification.",
+        "Never be salesy or pushy. Let the expertise speak.",
+        "No emojis in professional content.",
+        "Security and HR policies contain placeholders. Update with real policies before enforcing."
       ],
       "setup": [
         { "name": "Managed Scope", "desc": "Installed org-wide. Users cannot disable it.", "status": "ok" },
-        { "name": "Brand Standards", "desc": "Fully populated with Olytic voice, messaging, ICP, competitive positioning", "status": "ok" },
+        { "name": "Brand Standards", "desc": "Fully populated: voice, messaging, ICP, competitive positioning, design system", "status": "ok" },
         { "name": "Company Strategy", "desc": "Vision, priorities, engagement models populated", "status": "ok" },
-        { "name": "Security Policies", "desc": "Contains placeholders — needs real policy content", "status": "warn" },
-        { "name": "HR Policies", "desc": "Contains placeholders — needs real policy content", "status": "warn" }
+        { "name": "Security Policies", "desc": "Contains placeholders. Needs real policy content.", "status": "warn" },
+        { "name": "HR Policies", "desc": "Contains placeholders. Needs real policy content.", "status": "warn" }
       ]
     },
     {
@@ -59,40 +106,77 @@
       "category": "content",
       "scope": "user",
       "keywords": ["content", "website", "github", "analytics", "strategy", "ga4"],
-      "bigPicture": "The content operations engine. Handles everything from \"what should we write?\" to \"how did it perform?\" — website content production, GitHub push/pull, competitive research, GA4 analytics, and strategic planning. It's the Content O/G/O loop in plugin form.",
-      "capabilities": [
-        { "text": "Create website pages — blog posts, landing pages, HTML templates", "type": "skill", "source": "website-content" },
-        { "text": "Plan what content to write next based on ICP journey gaps", "type": "skill", "source": "content-strategy" },
-        { "text": "Pull content from any Olytic GitHub repo to review or edit", "type": "command", "source": "/pull-content" },
-        { "text": "Push new or updated content to any Olytic GitHub repo", "type": "command", "source": "/push-content" },
-        { "text": "Analyze content performance with GA4 data", "type": "command", "source": "/content-performance" },
-        { "text": "Recommend what to write next based on gaps, ICP needs, and analytics", "type": "agent", "source": "content-strategist" },
-        { "text": "Research competitor content and find positioning angles only Olytic can own", "type": "agent", "source": "competitive-content-analyst" },
-        { "text": "Extract content ideas, ICP language, and objections from meeting notes", "type": "agent", "source": "meeting-notes-reviewer" }
+      "bigPicture": "Handles content operations end-to-end: deciding what to write, producing it, pushing it to GitHub, and measuring how it performed. It reads from GA4 (Property 525690219), pulls and pushes to the olytic-site repo, and applies the Content O/G/O loop (draft, review against brand standards, optimize from analytics). Requires The One Ring for brand voice.",
+      "useCases": [
+        {
+          "title": "Write a blog post about Salesforce CPQ amendments, push it to GitHub",
+          "description": "Say 'write a blog post about managing amendments in Salesforce CPQ.' The website-content skill loads the HTML template structure, the brand-standards skill (from The One Ring) sets the voice, and the content-strategy skill confirms this maps to the Revenue Systems Expertise pillar. When done, /push-content stages it on a feature branch in olytic-site."
+        },
+        {
+          "title": "Pull the homepage, audit it, and push a revised version",
+          "description": "Run /pull-content to fetch index.html from the olytic-site repo. Run /brand-check to score it. Edit the sections that scored 'Needs Work.' Run /push-content to push the updated version to a feature branch for review."
+        },
+        {
+          "title": "Ask 'What should we write next?' and get a prioritized recommendation",
+          "description": "The content-strategist agent evaluates your current content against the ICP journey (Awareness, Consideration, Decision), scores topic candidates on ICP Pain, Differentiation, Search Potential, Stage Coverage, and First Client Impact, then recommends the highest-value piece to create next."
+        },
+        {
+          "title": "Analyze which blog posts are driving traffic and which are dead weight",
+          "description": "Run /content-performance. It pulls GA4 data (pageviews, time on page, scroll depth, conversions) and maps each page to its strategic purpose (credibility, visibility, conversion). You get a clear picture of what's working and what to rewrite or retire."
+        }
       ],
+      "rulesets": [
+        {
+          "name": "Content Strategy",
+          "summary": "Three content pillars mapped to Olytic's three uniques: Revenue Systems Expertise (CPQ, RevOps, Salesforce), The Olytic Model (O/G/O in practice), Strategic Value Creation (AI strategy for GTM). ICP content journey: Awareness (educate via blog posts) → Consideration (differentiate via comparisons and deep-dives) → Decision (convert via landing pages and assessment offers). Prioritization scoring: ICP Pain (high), Differentiation (high), Search Potential (medium), Stage Coverage (medium), First Client Impact (high). Content O/G/O loop: Operator drafts, Governor reviews via /brand-check, Optimizer analyzes via GA4. Target cadence: 2 blog posts/month, 1 landing page/month."
+        },
+        {
+          "name": "Website Content",
+          "summary": "Blog post structure: specific expert-level title, subtitle, TOC for 4+ sections, H2 per distinct idea, bullet-heavy body, structured scenario formats, subtle CTA. Length: 1,500-3,000 words. Landing page structure: hero with outcome headline + single CTA, problem bullets in ICP language, solution referencing O/G/O, 3-step 'how it works', comparison table, social proof, repeated CTA. HTML rules: semantic elements, <strong> for scannability, <table> for comparisons, meta description for ICP search intent. SEO: long-tail keywords ('AI for revenue operations', 'RevOps AI strategy for SMBs'), keyword in H1 and first paragraph, no stuffing."
+        }
+      ],
+      "triggerConditions": {
+        "activates": [
+          "Write a blog post about RevOps AI",
+          "Create a landing page for our assessment offering",
+          "Pull the homepage from GitHub",
+          "Push this updated page to the repo",
+          "What should we write next?",
+          "How is our content performing?",
+          "Research what competitors are writing about",
+          "Review this meeting transcript for content ideas"
+        ],
+        "dormant": [
+          "What's our PTO policy?",
+          "Check this proposal for brand compliance",
+          "Create a new plugin for the sales team",
+          "What are our security rules for client data?",
+          "Help me configure a GitHub Action"
+        ]
+      },
       "components": {
         "skills": [
-          { "name": "Website Content", "desc": "HTML templates, blog and landing page structures, formatting rules, SEO guidance" },
-          { "name": "Content Strategy", "desc": "Pillars, ICP journey mapping, prioritization framework, GA4 integration, Content O/G/O loop" }
+          { "name": "Website Content", "desc": "HTML templates for blog posts and landing pages, content formatting rules, SEO guidance, content planning checklist" },
+          { "name": "Content Strategy", "desc": "Three content pillars, ICP journey mapping, prioritization scoring framework, GA4 integration, Content O/G/O loop, publishing cadence" }
         ],
         "commands": [
-          { "name": "/pull-content", "desc": "Fetch a page from any Olytic GitHub repo to review or edit" },
-          { "name": "/push-content", "desc": "Push new or updated content to any Olytic GitHub repo" },
-          { "name": "/content-performance", "desc": "Analyze content performance using GA4 data" }
+          { "name": "/pull-content", "desc": "Fetches a file from any Olytic GitHub repo (olytic-site, olytic-lab, olytic-plugins, olytic-app) for review or editing" },
+          { "name": "/push-content", "desc": "Pushes new or updated content to an Olytic GitHub repo on a feature branch. Never auto-merges to main." },
+          { "name": "/content-performance", "desc": "Pulls GA4 data (Property 525690219) and maps page metrics to strategic purposes (credibility, visibility, conversion)" }
         ],
         "agents": [
-          { "name": "content-strategist", "desc": "Recommends what to write next based on ICP needs, content gaps, and GA4 data" },
-          { "name": "competitive-content-analyst", "desc": "Researches competitor content and messaging, finds unique positioning angles" },
-          { "name": "meeting-notes-reviewer", "desc": "Extracts content ideas, ICP language, objections from meeting notes" }
+          { "name": "content-strategist", "desc": "Evaluates content gaps against ICP journey and prioritization framework. Recommends what to write next with scoring rationale." },
+          { "name": "competitive-content-analyst", "desc": "Researches competitor content and messaging. Identifies positioning angles only Olytic can credibly own." },
+          { "name": "meeting-notes-reviewer", "desc": "Extracts content ideas, ICP language patterns, and objection data from meeting transcripts." }
         ]
       },
       "guardrails": [
-        "Requires The One Ring — brand voice comes from there, not here",
-        "Content must map to one of three strategic purposes: build credibility, create visibility, enable conversion",
-        "Default to olytic-site repo for website content unless specified otherwise",
-        "GA4 Property ID 525690219 is hardcoded — update in content-strategy SKILL.md if it changes",
-        "Never publish content that hasn't been through /brand-check",
-        "Marketplace stages changes on feature branches — never auto-merges to main"
+        "Requires The One Ring. Brand voice comes from there, not here.",
+        "Every piece of content must map to: build credibility, create visibility, or enable conversion.",
+        "Default to olytic-site repo for website content unless specified otherwise.",
+        "GA4 Property ID 525690219 is hardcoded. Update in content-strategy SKILL.md if it changes.",
+        "Never publish content that hasn't been through /brand-check.",
+        "All repo changes are staged on feature branches. Never auto-merges to main."
       ],
       "setup": [
         { "name": "The One Ring (Dependency)", "desc": "Required. Brand voice and strategy come from here.", "status": "ok" },
@@ -109,37 +193,73 @@
       "category": "meta",
       "scope": "user",
       "keywords": ["plugin-creation", "meta-plugin", "marketplace", "telemetry", "generation"],
-      "bigPicture": "The plugin that builds other plugins. A 7-question guided discovery, hardcoded Olytic generation standards, automatic telemetry in every output, and marketplace management. Works for internal Olytic plugins and client-facing ones. It's how we scale the architecture without losing quality.",
-      "capabilities": [
-        { "text": "Walk through a 7-question discovery to gather plugin requirements", "type": "skill", "source": "plugin-discovery" },
-        { "text": "Generate a complete, ready-to-use plugin from discovery output", "type": "skill", "source": "plugin-generation" },
-        { "text": "Stage marketplace updates on feature branches for review", "type": "skill", "source": "marketplace-management" },
-        { "text": "Start the full plugin creation workflow from discovery through delivery", "type": "command", "source": "/create-plugin" },
-        { "text": "Add or update a plugin entry in the Olytic marketplace", "type": "command", "source": "/update-marketplace" },
-        { "text": "Orchestrate the entire 6-phase build: discovery, planning, generation, review, delivery, marketplace", "type": "agent", "source": "plugin-builder" }
+      "bigPicture": "Builds new plugins and manages the Olytic marketplace. Runs a 7-question discovery to gather requirements, generates all plugin files (skills, commands, agents, hooks, MCP configs), injects telemetry into every output, and stages marketplace updates on feature branches. Works for both internal Olytic plugins and client-facing ones.",
+      "useCases": [
+        {
+          "title": "Build a 'Sales Enablement' plugin for the sales team from scratch",
+          "description": "Run /create-plugin. The 7-question discovery asks: plugin name, purpose, target users, strategic questions, constraints, integrations needed, and success metrics. From those answers, the plugin-builder agent generates the full file structure: skills, commands, agents, plugin.json manifest, and a telemetry skill. You review and ship."
+        },
+        {
+          "title": "Add a new plugin to the Olytic marketplace after building it",
+          "description": "Run /update-marketplace with the plugin directory. It reads the current marketplace.json, diffs the changes, generates an updated entry, and pushes everything to a feature branch in olytic-plugins for review. The catalog page auto-updates when the PR is merged."
+        },
+        {
+          "title": "Generate a client-facing plugin with embedded telemetry",
+          "description": "Every plugin generated by this tool automatically includes a telemetry skill that logs usage events, version tags, constraint violations, and user feedback. This is not optional. The telemetry skill is injected into the output regardless of whether you ask for it."
+        }
       ],
+      "rulesets": [
+        {
+          "name": "Plugin Discovery",
+          "summary": "Seven-question dynamic protocol that adapts based on answers. Questions cover: plugin name and one-liner, primary purpose, target user roles, strategic questions about the domain, operational constraints, required integrations (MCP servers, APIs), and success/quality metrics. Output is a structured requirements document that feeds into the generation phase."
+        },
+        {
+          "name": "Plugin Generation",
+          "summary": "Generates all plugin files from discovery output using reference templates for every component type (skills, commands, agents, hooks, MCP configs). Follows Olytic's agentic best practices: verification gates after every write, progressive disclosure in skills, clear frontmatter with trigger descriptions, and structured agent definitions with tool restrictions. Every generated plugin includes auto-injected telemetry."
+        },
+        {
+          "name": "Marketplace Management",
+          "summary": "Reads the current marketplace.json from SupportOlyticSolutions/olytic-plugins, diffs proposed changes, and stages updates on feature branches. Manages catalog.json entries for the dynamic plugin catalog page. Never auto-merges to main. All changes go through human review."
+        }
+      ],
+      "triggerConditions": {
+        "activates": [
+          "Create a new plugin",
+          "Build a plugin for the consulting team",
+          "Add this plugin to the marketplace",
+          "Update the marketplace with the new version",
+          "Generate a plugin from these requirements",
+          "Start the plugin creation workflow"
+        ],
+        "dormant": [
+          "Write a blog post",
+          "Check this content for brand compliance",
+          "What's our company strategy?",
+          "Pull a page from GitHub to edit",
+          "How is our content performing?"
+        ]
+      },
       "components": {
         "skills": [
-          { "name": "Plugin Discovery", "desc": "7-question dynamic protocol: name, purpose, users, strategic questions, constraints, integrations, metrics" },
-          { "name": "Plugin Generation", "desc": "Generates all plugin files from discovery output — includes reference templates for every component type" },
-          { "name": "Marketplace Management", "desc": "Reads, diffs, and stages updates to the Olytic marketplace repo" }
+          { "name": "Plugin Discovery", "desc": "7-question adaptive protocol: name, purpose, users, strategic questions, constraints, integrations, metrics" },
+          { "name": "Plugin Generation", "desc": "Generates complete plugin file structures from discovery output using reference templates for all component types" },
+          { "name": "Marketplace Management", "desc": "Reads, diffs, and stages updates to the olytic-plugins marketplace repo" }
         ],
         "commands": [
-          { "name": "/create-plugin", "desc": "Start guided plugin creation from discovery through delivery" },
-          { "name": "/update-marketplace", "desc": "Add or update a plugin in the marketplace" }
+          { "name": "/create-plugin", "desc": "Starts the full guided workflow: discovery through delivery" },
+          { "name": "/update-marketplace", "desc": "Stages a plugin addition or update in the marketplace repo on a feature branch" }
         ],
         "agents": [
-          { "name": "plugin-builder", "desc": "End-to-end orchestrator for the 6-phase creation workflow" }
+          { "name": "plugin-builder", "desc": "End-to-end orchestrator for the 6-phase workflow: discovery, planning, generation, review, delivery, marketplace" }
         ]
       },
       "guardrails": [
-        "Every generated plugin automatically includes a telemetry skill — no exceptions",
-        "Telemetry logs: usage events, version tags, constraint violations, user feedback",
-        "Marketplace changes are staged on feature branches — never auto-merged",
-        "Agentic best practices are embedded in every generated skill, agent, and command",
-        "Verification gates run after every write operation — no silent failures",
-        "No hallucination policy: if a file or data point isn't found, report \"Not Found\" immediately",
-        "Permission gates: confirm with user before destructive actions or 5+ simultaneous changes"
+        "Every generated plugin includes a telemetry skill. No exceptions.",
+        "Telemetry logs: usage events, version tags, constraint violations, user feedback.",
+        "Marketplace changes are staged on feature branches. Never auto-merged.",
+        "Verification gates run after every write operation. No silent failures.",
+        "No hallucination: if a file or data point isn't found, report 'Not Found' immediately.",
+        "Permission gates: confirm with user before destructive actions or 5+ simultaneous changes."
       ],
       "setup": [
         { "name": "GitHub MCP Server", "desc": "Required for marketplace management and repo operations", "status": "warn" },
