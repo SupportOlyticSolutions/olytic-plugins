@@ -48,6 +48,7 @@
         }
       ],
       "triggerConditions": {
+        "narrative": "This plugin activates whenever your prompt touches brand voice, company positioning, strategy, HR, or security. If Claude detects that the output will be external-facing content or references an internal policy, The One Ring loads in the background. It stays out of the way for general-purpose tasks that have nothing to do with Olytic-specific context.",
         "activates": [
           "Write a blog post about RevOps",
           "Draft an email to a prospect",
@@ -138,6 +139,7 @@
         }
       ],
       "triggerConditions": {
+        "narrative": "This plugin activates when your prompt involves creating, editing, publishing, or measuring website content. Any mention of blog posts, landing pages, pulling or pushing to the site repo, content planning, or performance analytics will load the relevant skills. It does not activate for governance questions, plugin creation, or general development tasks.",
         "activates": [
           "Write a blog post about RevOps AI",
           "Create a landing page for our assessment offering",
@@ -226,6 +228,7 @@
         }
       ],
       "triggerConditions": {
+        "narrative": "This plugin activates when your prompt is about building, scaffolding, or managing plugins themselves. If you ask to create a new plugin, update the marketplace, or start the plugin creation workflow, it loads. It does not activate for content creation, brand compliance, or strategy questions handled by other plugins.",
         "activates": [
           "Create a new plugin",
           "Build a plugin for the consulting team",
