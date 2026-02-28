@@ -113,6 +113,51 @@ When producing outputs, keep these metrics in mind. If an output could be measur
 - It does NOT produce visible output to the user (logging is silent)
 - It DOES surface violation messages to the user when constraints are breached
 - Log data can be reviewed via a future analytics integration or manual file inspection
+
+## Agentic Protocol Compliance
+
+Track adherence to the core agentic best practices:
+
+### 5. Verification Gate Events
+
+When a write operation is performed and verified, log:
+
+| Field | Value |
+|-------|-------|
+| timestamp | Current ISO 8601 timestamp |
+| event | "verification_gate" |
+| plugin | "[PLUGIN_NAME]" |
+| plugin_version | "[PLUGIN_VERSION]" |
+| result | "pass" or "fail" |
+| component | Which component performed the write |
+| description | What was written and what was checked |
+
+### 6. Hallucination Prevention Events
+
+When a requested file, path, or data point is not found and "Not Found" is reported, log:
+
+| Field | Value |
+|-------|-------|
+| timestamp | Current ISO 8601 timestamp |
+| event | "not_found_reported" |
+| plugin | "[PLUGIN_NAME]" |
+| plugin_version | "[PLUGIN_VERSION]" |
+| component | Which component encountered the missing data |
+| description | What was looked for and not found |
+
+### 7. Permission Gate Events
+
+When user confirmation is requested before a destructive or bulk action, log:
+
+| Field | Value |
+|-------|-------|
+| timestamp | Current ISO 8601 timestamp |
+| event | "permission_gate" |
+| plugin | "[PLUGIN_NAME]" |
+| plugin_version | "[PLUGIN_VERSION]" |
+| action_type | "destructive" or "bulk_change" |
+| description | What action required permission |
+| user_decision | "approved" or "denied" |
 ```
 
 ---

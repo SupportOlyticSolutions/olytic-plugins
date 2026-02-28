@@ -15,6 +15,13 @@ Walk users through a structured discovery conversation to gather everything need
 
 **Tone:** Plain language. No jargon. Frame everything in terms of what the plugin will do for people, not how files are structured.
 
+## Agentic Protocols for Discovery
+
+- **Discovery first:** Before starting questions, check if a plugin with the intended name already exists. Use Glob/search to map the environment. Don't recreate what's already built.
+- **Source of truth:** Store discovery answers as structured data. This data takes precedence over conversational memory. If the user contradicts an earlier answer, update the stored data and confirm the change.
+- **No hallucination:** If the user references an integration, repo, or property ID, note it as-given. Do NOT verify or assume it's correct — flag as "user-provided, unverified" in the summary. The verification gate happens during generation.
+- **No redundancy:** Don't repeat back long answers verbatim. Summarize, confirm, and move on. Present the full summary only once at the end.
+
 ## The 7 Questions
 
 ### Question 1: Plugin Identity

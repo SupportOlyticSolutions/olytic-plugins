@@ -35,6 +35,16 @@ These questions ensure you're using this plugin with judgment, not just mechanic
 
 [Additional domain knowledge, frameworks, templates, or reference material.]
 
+## Operating Principles
+
+These principles govern how this skill behaves:
+
+- **Discovery first:** Before taking action, assess the current state. Use search/glob to understand what exists. Never recreate existing files or structures.
+- **Source of truth:** Local files and skill content take precedence over conversational context. If a conflict exists, the file wins.
+- **Atomic operations:** Make the smallest change necessary. Use targeted edits, not full-file rewrites.
+- **Verify after writing:** Confirm output is valid after every write operation.
+- **No hallucination:** If a variable, file path, or data point is not found, report "Not Found" immediately. Never guess or estimate.
+
 ## Boundaries
 
 This skill should NOT be used for:
@@ -127,6 +137,18 @@ Before producing output, consider:
 
 [Exact template the agent should follow — tables, sections, bullet lists. Customize based on what the agent produces.]
 
+**Agentic Rules:**
+
+These rules are non-negotiable for this agent:
+
+- Map environment before acting — use search/glob to understand what exists before making changes
+- Treat skill content as authoritative over conversational context
+- Batch related operations to minimize token overhead
+- Use targeted search (Grep/Glob) over full-file reads for large files
+- Verify every write operation succeeded — confirm file structure is valid after writes
+- Never fabricate data — if a file, path, or data point is not found, report "Not Found" immediately
+- Confirm with user before destructive actions (delete/overwrite) or 5+ simultaneous file changes
+
 **Boundaries:**
 
 Do NOT:
@@ -162,20 +184,23 @@ allowed-tools: ["Tool1", "Tool2", "mcp__service__tool_name"]
 [If integrations involved: brief note about which systems are accessed.]
 
 Steps:
-1. Parse `$ARGUMENTS` for [expected input]. If missing, ask the user.
-2. [Action step — be specific about what to do]
-3. [Processing step — what to analyze, transform, or generate]
-4. [Validation step — check against constraints if applicable]
-5. Present results to the user in this format:
+1. **Discovery first:** Use Glob/Grep to check the current state before making changes. If the target already exists, report what you found and ask how to proceed.
+2. Parse `$ARGUMENTS` for [expected input]. If missing, ask the user.
+3. [Action step — be specific about what to do]
+4. [Processing step — what to analyze, transform, or generate]
+5. [Validation step — check against constraints if applicable]
+6. **No hallucination:** If any expected file, path, or data point is not found during steps 3-5, report "Not Found" immediately. Do not guess or estimate.
+7. Present results to the user in this format:
 
 ## [Output Title]
 
 [Template for the output — tables, summaries, recommendations]
 
-6. Ask the user if they want to [next logical action — save, push, refine].
+8. **Verification gate:** If this command wrote files or modified external systems, verify the operation succeeded (check file exists, validate structure, confirm API response).
+9. Ask the user if they want to [next logical action — save, push, refine].
 
 [If the command modifies external systems:]
-**Important:** Confirm with the user before making any changes to [system name].
+**Permission gate:** Confirm with the user before making any changes to [system name]. For destructive actions (delete/overwrite) or 5+ simultaneous changes, always ask for explicit confirmation.
 ```
 
 ### Mapping Discovery → Command Content
