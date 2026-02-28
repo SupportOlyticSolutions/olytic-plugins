@@ -10,6 +10,7 @@
       "scope": "managed",
       "keywords": ["governance", "brand", "strategy", "policies", "alignment"],
       "bigPicture": "The org-wide governance layer. Contains the brand voice rules, company strategy, HR policies, and security policies that every other plugin depends on. It is installed for all employees and cannot be disabled. If you write content, draft a proposal, or answer a client email, this plugin is applying rules in the background.",
+      "purpose": "Without a single source of truth for brand voice, company strategy, and operational policies, every piece of content and every decision risks drifting off-message. The One Ring exists so that anyone using Claude at Olytic gets the same positioning, the same tone, and the same policy guardrails applied automatically. It is the baseline that every other plugin inherits from.",
       "useCases": [
         {
           "title": "Audit a guest blog post against the 'No Jargon' pillar",
@@ -107,6 +108,7 @@
       "scope": "user",
       "keywords": ["content", "website", "github", "analytics", "strategy", "ga4"],
       "bigPicture": "Handles content operations end-to-end: deciding what to write, producing it, pushing it to GitHub, and measuring how it performed. It reads from GA4 (Property 525690219), pulls and pushes to the olytic-site repo, and applies the Content O/G/O loop (draft, review against brand standards, optimize from analytics). Requires The One Ring for brand voice.",
+      "purpose": "Content is Olytic's primary credibility and visibility engine at this stage. This plugin exists to close the gap between 'we should publish more' and actually doing it. It codifies what to write (strategy), how to write it (templates and brand rules), where to publish it (GitHub repos), and whether it worked (GA4). Without it, content production stalls or goes off-strategy.",
       "useCases": [
         {
           "title": "Write a blog post about Salesforce CPQ amendments, push it to GitHub",
@@ -194,6 +196,7 @@
       "scope": "user",
       "keywords": ["plugin-creation", "meta-plugin", "marketplace", "telemetry", "generation"],
       "bigPicture": "Builds new plugins and manages the Olytic marketplace. Runs a 7-question discovery to gather requirements, generates all plugin files (skills, commands, agents, hooks, MCP configs), injects telemetry into every output, and stages marketplace updates on feature branches. Works for both internal Olytic plugins and client-facing ones.",
+      "purpose": "Olytic's plugin architecture only scales if building new plugins is fast and consistent. This plugin exists to turn a set of requirements into a fully structured, telemetry-equipped plugin in one session instead of a week of manual file creation. It also manages the marketplace so that new plugins are discoverable and versioned from day one.",
       "useCases": [
         {
           "title": "Build a 'Sales Enablement' plugin for the sales team from scratch",
