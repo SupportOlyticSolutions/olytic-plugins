@@ -7,10 +7,12 @@ description: >
   or needs guidance on Olytic Solutions' brand voice, messaging, ICP targeting,
   competitive positioning, or content standards. Load this skill before creating
   or reviewing ANY external-facing content for Olytic Solutions.
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Olytic Solutions — Brand Standards
+
+> **Brand Voice Facet.** Brand standards are one facet of Olytic's governance layer. They translate the company's strategic mission and core values into external-facing communication. If you need broader strategic or values context, also load `olytic-company-strategy`.
 
 These standards apply to ALL external-facing content: website pages, blog posts, emails, proposals, support responses, social posts, presentations, and client deliverables.
 
@@ -106,11 +108,29 @@ For the full competitive landscape, see `references/competitive-landscape.md`.
 
 ## Design Preferences
 
-*[PLACEHOLDER — To be updated with color palette, typography, image style, and layout preferences when available.]*
+**Typography:**
+- **Primary font:** DM Sans — clean, modern, slightly informal without being casual
+- **Headings:** DM Sans SemiBold or Bold with appropriate hierarchy (H1 larger, H2 medium, H3 smaller)
+- **Body text:** DM Sans Regular, 16–18px on web; 11–12pt in documents
+- **Monospace / code:** System monospace for any technical strings
 
-General guidance until specified:
+**Color Palette:**
+- **Gold / Accent:** `#C8A96E` — use for highlights, key callouts, decorative rule lines, and CTA elements
+- **Surface / Background:** `#F7F7F5` — warm off-white; default page and card background
+- **Dark / Ink:** Near-black (`#1A1A1A` or equivalent) for body text and primary headings
+- **Borders / Dividers:** Light warm grays that complement the surface color; never harsh black borders
+- **Avoid:** Bright blues, greens, reds, or other colors that pull attention away from content and Gold accents
 
-- Clean, structured layouts that mirror the writing style (scannable, organized)
-- Professional but not corporate-sterile
-- Data visualizations and diagrams preferred over stock photography
+**Layout Principles:**
+- Clean, structured layouts that mirror the writing style — scannable and organized
+- Professional but not corporate-sterile; warmth comes from typography and off-white backgrounds
+- Generous whitespace between sections — content should breathe, not be crammed
+- Data visualizations, diagrams, and structured tables preferred over stock photography
 - Tables and structured comparisons over prose wherever possible
+
+**Content Design:**
+- Bold key terms inline for scannability — readers skim first, then dive
+- Section headers should be substantive, not generic: not "Introduction" but "Why Most AI Projects Fail"
+- Gold accent used sparingly: one or two highlights per page, not every other heading
+- No gradients, heavy drop shadows, or skeuomorphic effects — flat and structured
+- Icons and visual markers welcome when they aid navigation; decorative imagery is low priority

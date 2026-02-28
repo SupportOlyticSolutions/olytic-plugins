@@ -5,12 +5,12 @@ description: >
   "data handling", "client confidentiality", "access controls", "security rules",
   "what can I share", "NDA", or needs guidance on Olytic Solutions' security
   and data protection standards.
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Olytic Solutions — Security Policies
 
-*[PLACEHOLDER — This skill contains starter policies. Review and update with Olytic's actual security policies before enforcing.]*
+> **Trust & Operational Consistency Facet.** Security policies are how Olytic maintains the trust of clients, partners, and the market. Our embedded model means clients give us deep access to their systems and data — handling that responsibly isn't optional. Every rule here exists to protect that trust.
 
 ## Data Classification
 
@@ -56,10 +56,12 @@ version: 0.1.0
 
 ## Incident Response
 
-*[PLACEHOLDER — Define incident response procedures]*
-
 If you discover a security issue:
+
 1. Stop the activity immediately
-2. Document what happened
-3. Notify company leadership
+2. Document what happened — what was accessed, what may have been exposed, timeline
+3. Notify company leadership immediately — do not wait until you have full clarity
 4. Do not attempt to cover up or minimize the issue
+5. Work with leadership on notification obligations (clients, affected parties)
+
+The bar for reporting is low. If something looks wrong, say something. The cost of a false alarm is zero. The cost of a delayed response to a real incident is not.
