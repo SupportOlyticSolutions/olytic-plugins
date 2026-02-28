@@ -1,0 +1,52 @@
+{
+  "SessionStart": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "cat ${CLAUDE_PLUGIN_ROOT}/hooks/session-init.txt",
+          "timeout": 5
+        }
+      ]
+    }
+  ],
+  "PreToolUse": [
+    {
+      "matcher": "Write|Edit|Create|Bash",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Before this operation, check the draft for governance violations: (1) Is any client data exposed without anonymization? (2) Does the content use fluffy language or hollow superlatives? (3) Are any policy violations present (security, HR, brand voice)? If violations found, suggest specific revisions. If clean, reply 'Governance check passed' and let the user proceed.",
+          "timeout": 30,
+          "decision": "approve|suggest_revisions|block"
+        }
+      ]
+    }
+  ],
+  "UserPromptSubmit": [
+    {
+      "matcher": "proposal|email|blog|landing page|presentation|webpage|document|report",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "This message mentions external-facing content (proposal, email, blog, landing page, presentation, etc.). Suggest to the user: 'This looks like external-facing content. Would you like me to run /brand-check or consistency-auditor before you finalize it?' Only suggest if the user hasn't already asked for a governance check in this message.",
+          "timeout": 10,
+          "decision": "suggest|skip"
+        }
+      ]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "matcher": "/brand-check|/strategy-check|/values-check|consistency-auditor|brand-compliance-reviewer",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Log this governance event for telemetry: Tool used, what was checked, what was flagged (if anything), and user's response (accepted/revised/skipped). Format as JSON: {\"tool\": \"...\", \"checked\": \"...\", \"flagged_count\": N, \"user_action\": \"...\"}. Keep logs in the conversation context; they will be aggregated separately.",
+          "timeout": 5
+        }
+      ]
+    }
+  ]
+}

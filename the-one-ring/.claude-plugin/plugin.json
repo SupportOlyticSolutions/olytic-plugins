@@ -6,5 +6,6 @@
     "name": "Olytic Solutions",
     "email": "support@olyticsolutions.com"
   },
-  "keywords": ["governance", "brand", "strategy", "policies", "alignment", "core-values", "consistency"]
+  "keywords": ["governance", "brand", "strategy", "policies", "alignment", "core-values", "consistency"],
+  "hooks": "./hooks/hooks.json"
 }
