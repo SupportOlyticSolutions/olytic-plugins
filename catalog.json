@@ -5,50 +5,50 @@
     {
       "id": "the-one-ring",
       "name": "The One Ring",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "category": "governance",
       "scope": "managed",
-      "keywords": ["governance", "brand", "strategy", "policies", "alignment"],
-      "bigPicture": "The org-wide governance layer. Contains the brand voice rules, company strategy, HR policies, and security policies that every other plugin depends on. It is installed for all employees and cannot be disabled. If you write content, draft a proposal, or answer a client email, this plugin is applying rules in the background.",
-      "purpose": "Without a single source of truth for brand voice, company strategy, and operational policies, every piece of content and every decision risks drifting off-message. The One Ring exists so that anyone using Claude at Olytic gets the same positioning, the same tone, and the same policy guardrails applied automatically. It is the baseline that every other plugin inherits from.",
+      "keywords": ["governance", "brand", "strategy", "policies", "alignment", "core-values", "consistency"],
+      "bigPicture": "The org-wide governance layer. Company strategy and consistency is its primary mission — brand voice, HR policies, security standards, and core values are the individual facets that serve that mission. Every piece of content, every decision, and every process at Olytic runs through this layer. It is installed for all employees and cannot be disabled.",
+      "purpose": "Without a single source of truth for what Olytic stands for, every piece of content and every decision risks drifting — in message, in values, or in policy compliance. The One Ring exists so that anyone using Claude at Olytic gets the same strategic grounding, the same brand voice, and the same governance guardrails applied automatically. It is the baseline that makes every other plugin coherent.",
       "useCases": [
         {
-          "title": "Audit a guest blog post against the 'No Jargon' pillar",
+          "title": "Audit a guest blog post against brand standards",
           "description": "Paste a draft blog post and run /brand-check. The plugin scores it against all five messaging pillars, flags hollow superlatives like 'best-in-class', and catches any sentence that could describe a generic consultancy instead of Olytic specifically."
         },
         {
-          "title": "Draft a cold outreach email that sounds like Olytic, not a SaaS vendor",
-          "description": "Ask Claude to write an email to an ICP prospect. The brand-standards skill loads automatically and enforces: expert tone, 'we' positioning, no salesy CTAs, structured formatting, and references to the embedded partnership model rather than product-speak."
+          "title": "Check whether a strategic decision aligns with current priorities",
+          "description": "Describe a decision or action and run /strategy-check. It evaluates strategic fit (does this serve our current stage?), message alignment (does this differentiate us?), and values alignment (would we be proud of this at meeting #20?)."
         },
         {
-          "title": "Check whether a proposal accidentally positions Olytic as a consulting firm",
-          "description": "Use the brand-compliance-reviewer agent for a multi-dimensional audit. It scores Voice & Tone, Messaging Alignment, ICP Targeting, Competitive Differentiation, Structural Quality, and CTA Appropriateness, then provides specific rewrites for anything that fails."
+          "title": "Run a full governance scan on a client proposal",
+          "description": "Use the consistency-auditor agent before sending any high-stakes document. It covers all five facets: brand voice, strategy alignment, core values, HR norms, and security standards — and presents a summary scorecard before diving into detailed recommendations."
         },
         {
-          "title": "Answer 'What are our current strategic priorities?' with real context",
-          "description": "Ask about OKRs or company direction. The company-strategy skill loads and provides the actual priority table: website & content (in progress), offering definition (in progress), first client acquisition (next milestone), delivery framework (in progress), and internal tooling (in progress)."
+          "title": "Orient a new team member on everything that matters",
+          "description": "Run the onboarding-guide agent. It asks whether the person is full-time, a contractor, or returning — and calibrates its walkthrough accordingly. Covers what Olytic is (and isn't), where we are right now, core values in practice, communication norms, and key rules."
         }
       ],
       "rulesets": [
         {
-          "name": "Brand Standards",
-          "summary": "Defines Olytic as a 'revenue systems firm' (not a consultancy, SaaS vendor, or agency). Enforces the O/G/O framework (Operator/Governor/Optimizer) as the core positioning. ICP is SMB B2B companies with GTM teams that have a RevOps manager but lack a technology strategist. Voice rules: be expert and specific, be opinionated, favor bullets and tables, use dry humor, use 'we' generously, mock corporate-speak gently. Banned: hollow superlatives, text walls, emojis, salesy language, framing AI as replacing humans. Five messaging pillars: Systems not consulting, Amplification not automation, Closed-loop architecture, Embedded partnership, Revenue outcomes. Design system: white backgrounds by default, Olytic Gold (#C8A96E) accent, DM Sans font, Lucide icons, minimalist layouts."
+          "name": "Company Strategy & Core Values",
+          "summary": "Primary governance skill. Business stage: early-stage GTM, next goal is first client. All work serves one of three purposes: build credibility, create visibility, enable conversion. Five strategic priorities with status: website/content, offering definition, first client acquisition, delivery framework, internal tooling. Core Values: Clarity over noise, Embedded partnership, Amplification not automation, Systems thinking, Earned expertise. Engagement models: fixed-fee assessments and retainers — no hourly consulting, staff aug, or software licenses. O/G/O philosophy: 'amplification not automation' is an architectural principle, not a tagline."
         },
         {
-          "name": "Company Strategy",
-          "summary": "Business stage: early-stage go-to-market. Next goal: win first client. All work must serve one of three purposes: build credibility, create visibility, or enable conversion. Engagement models: fixed-fee assessments and retainers (not hourly consulting, staff aug, or software licenses). Philosophy: 'amplification not automation' is an architectural principle implemented via O/G/O. Five strategic priorities tracked with status: website/content, offering definition, first client acquisition, delivery framework, internal tooling."
+          "name": "Brand Standards",
+          "summary": "Defines Olytic as a 'revenue systems firm' (not a consultancy, SaaS vendor, or agency). Enforces O/G/O as core positioning. ICP: SMB B2B with GTM teams, has RevOps manager but lacks tech strategy. Voice: expert and specific, opinionated, dry humor, structured (bullets/tables), 'we' positioning, mocks corporate-speak gently. Banned: hollow superlatives, text walls, emojis, salesy language, framing AI as replacing humans. Five messaging pillars: Systems not consulting, Amplification not automation, Closed-loop architecture, Embedded partnership, Revenue outcomes. Design: DM Sans font, Gold (#C8A96E) accent, warm off-white surfaces (#F7F7F5), near-black ink, clean flat layouts."
         },
         {
           "name": "HR Policies",
-          "summary": "Placeholder policies pending finalization. Culture principles: expertise over activity, ownership over tasks, directness over diplomacy, continuous improvement. Communication norms: default to async, be structured, meetings require agendas. Onboarding: install The One Ring + role-specific plugins, read brand standards and strategy skills. Work hours, PTO, and professional development sections are TBD."
+          "summary": "Culture: expertise over activity, ownership over tasks, directness over diplomacy, continuous improvement. Communication: default async, structured (bullets/headers), respond within 24h, meetings need agendas, document decisions. Work: fully remote, async-first, no mandated core hours, client-facing roles align to client hours. PTO: unlimited/flexible with advance notice. Sick leave: take it when needed. Holidays: US federal + regional with notice. Onboarding: access setup, plugin install, read company-strategy + brand-standards + security-policies, onboarding call with leadership. Professional development: budget exists, learning is expected, share knowledge back to team."
         },
         {
           "name": "Security Policies",
-          "summary": "Placeholder policies pending finalization. Four-tier data classification: Public, Internal, Confidential, Restricted. Client data rules: never include client names in external content without permission, anonymize all examples, do not store client credentials in plugins. AI usage: never paste client data into public AI tools, review all AI outputs before sending (Governor principle). Credential management: never hardcode keys, use environment variables, rotate on team changes."
+          "summary": "Four-tier data classification: Public (website/social, unrestricted), Internal (strategy/OKRs, Olytic-only), Confidential (client data/pricing, authorized only), Restricted (credentials/PII, encrypted, need-to-know). Client data: never expose without permission, anonymize all examples, don't store credentials in plugins. AI usage: never paste client data into public AI tools, always be the final quality gate (Governor principle). Credentials: never hardcode, use environment variables, rotate on team changes. Incident response: stop, document, notify leadership immediately — low bar for reporting."
         }
       ],
       "triggerConditions": {
-        "narrative": "This plugin activates whenever your prompt touches brand voice, company positioning, strategy, HR, or security. If Claude detects that the output will be external-facing content or references an internal policy, The One Ring loads in the background. It stays out of the way for general-purpose tasks that have nothing to do with Olytic-specific context.",
+        "narrative": "This plugin activates whenever your prompt touches company strategy, brand voice, core values, HR norms, or security rules. If Claude detects that the output will be external-facing content or references an internal policy or decision, The One Ring loads in the background. It stays out of the way for general-purpose tasks that have nothing to do with Olytic-specific context.",
         "activates": [
           "Write a blog post about RevOps",
           "Draft an email to a prospect",
@@ -56,9 +56,9 @@
           "Check if this page sounds like Olytic",
           "Review this content for brand compliance",
           "What are our company priorities?",
-          "Write HTML for a landing page",
-          "Create a Google Doc with our services overview",
-          "Make a presentation about O/G/O",
+          "Does this decision align with our values?",
+          "Run a full governance scan on this document",
+          "Orient this new hire on how we work",
           "What's our PTO policy?",
           "Can I share this client data externally?"
         ],
@@ -72,24 +72,30 @@
       },
       "components": {
         "skills": [
-          { "name": "Brand Standards", "desc": "Voice rules, messaging pillars, ICP definition, competitive positioning, color palette, typography, design system" },
-          { "name": "Company Strategy", "desc": "Vision, philosophy, strategic priorities with status, engagement models, decision framework" },
-          { "name": "HR Policies", "desc": "Culture principles, communication norms, onboarding checklist (placeholder policies)" },
-          { "name": "Security Policies", "desc": "Data classification tiers, client data rules, AI usage policies, credential management (placeholder policies)" }
+          { "name": "Company Strategy & Core Values", "desc": "Vision, core values, current business stage, strategic priorities with status, engagement models, decision framework. The primary skill — load first." },
+          { "name": "Brand Standards", "desc": "Voice rules, messaging pillars, ICP definition, competitive positioning, design system (color, typography, layout)" },
+          { "name": "HR Policies", "desc": "Culture principles, communication norms, work hours, PTO, onboarding checklist, professional development, escalation guidance" },
+          { "name": "Security Policies", "desc": "Data classification tiers, client data rules, AI usage policies, credential management, incident response" }
         ],
         "commands": [
-          { "name": "/brand-check", "desc": "Scores content against voice, messaging, ICP targeting, competitive positioning, and structure. Returns Pass/Needs Work per dimension with specific rewrites." }
+          { "name": "/brand-check", "desc": "Scores content against voice & tone, messaging alignment, ICP targeting, competitive differentiation, structure, and CTA. Returns Pass/Needs Work with specific rewrites." },
+          { "name": "/strategy-check", "desc": "Reviews any work product or decision against strategic fit, message alignment, and core values. Returns a scored table with specific recommendations for anything off-track." },
+          { "name": "/policy-lookup", "desc": "Answers a specific HR or security policy question. Returns the rule, rationale, source section, and the right action for the user's situation." },
+          { "name": "/values-check", "desc": "Quick gut-check against each of the five core values. Returns a pass/flag per value with a one-line rationale. Escalates to consistency-auditor for a full scan." }
         ],
         "agents": [
-          { "name": "brand-compliance-reviewer", "desc": "Six-dimension audit: Voice & Tone, Messaging Alignment, ICP Targeting, Competitive Differentiation, Structural Quality, CTA Appropriateness. Provides scored table and rewritten examples." }
+          { "name": "brand-compliance-reviewer", "desc": "Six-dimension brand audit: Voice & Tone, Messaging Alignment, ICP Targeting, Competitive Differentiation, Structural Quality, CTA. Verification gate before full report. Rewrite examples for all failures." },
+          { "name": "consistency-auditor", "desc": "Full cross-dimensional governance scan: brand voice, strategy alignment, core values, HR norms, security standards. Presents summary scorecard first, then drills into flagged dimensions on request." },
+          { "name": "onboarding-guide", "desc": "Interactive orientation for new team members and collaborators. Calibrates depth by role (full-time, contractor, returning). Covers strategy, values, brand voice, communication norms, and key policies." }
         ]
       },
       "successCriteria": {
-        "narrative": "The One Ring succeeds when Olytic's brand voice and policies are applied consistently across all Claude outputs without requiring manual correction. The primary signal is /brand-check pass rate on first run. Secondary signals are whether policy questions get answered correctly and whether any external content needed to be pulled back or corrected after publication.",
+        "narrative": "The One Ring succeeds when Olytic's brand voice, strategic alignment, and policies are applied consistently across all outputs without requiring manual correction. The primary signal is governance scan pass rate. Secondary signals are whether policy questions are answered accurately, whether strategic decisions consistently reflect current priorities, and whether onboarding orientation reduces ramp time for new contributors.",
         "kpis": [
-          { "metric": "/brand-check first-run pass rate", "target": ">80% of content passes all six dimensions without revision", "reporting": "Manual log in Notion after each /brand-check run. Track Pass vs. Needs Work per dimension." },
+          { "metric": "/brand-check first-run pass rate", "target": ">80% of content passes all dimensions without revision", "reporting": "Manual log after each /brand-check run. Track Pass vs. Needs Work per dimension in a running Notion table." },
+          { "metric": "consistency-auditor scan pass rate", "target": ">90% of high-stakes documents pass all five governance facets on first scan", "reporting": "Log summary scorecard output after each consistency-auditor run. Track by document type (proposal, email, landing page)." },
           { "metric": "Policy question accuracy", "target": "HR and security questions answered without requiring human correction", "reporting": "Spot-check during weekly review. Note any answers that needed correction in a running issues log." },
-          { "metric": "External content retraction rate", "target": "Zero pieces of published content need to be pulled back for brand or policy violations", "reporting": "Tracked reactively. Any retraction triggers a root-cause review against brand-standards SKILL.md." }
+          { "metric": "External content retraction rate", "target": "Zero published pieces need to be pulled back for brand or policy violations", "reporting": "Tracked reactively. Any retraction triggers a root-cause review against the relevant skill." }
         ]
       },
       "guardrails": [
@@ -99,14 +105,14 @@
         "Never suggest AI replaces humans. Always frame as amplification.",
         "Never be salesy or pushy. Let the expertise speak.",
         "No emojis in professional content.",
-        "Security and HR policies contain placeholders. Update with real policies before enforcing."
+        "Never expose client data or credentials in any output."
       ],
       "setup": [
         { "name": "Managed Scope", "desc": "Installed org-wide. Users cannot disable it.", "status": "ok" },
-        { "name": "Brand Standards", "desc": "Fully populated: voice, messaging, ICP, competitive positioning, design system", "status": "ok" },
-        { "name": "Company Strategy", "desc": "Vision, priorities, engagement models populated", "status": "ok" },
-        { "name": "Security Policies", "desc": "Contains placeholders. Needs real policy content.", "status": "warn" },
-        { "name": "HR Policies", "desc": "Contains placeholders. Needs real policy content.", "status": "warn" }
+        { "name": "Company Strategy & Core Values", "desc": "Vision, priorities, engagement models, and Core Values populated", "status": "ok" },
+        { "name": "Brand Standards", "desc": "Voice, messaging, ICP, competitive positioning, and design system fully specified", "status": "ok" },
+        { "name": "HR Policies", "desc": "Working defaults populated for all sections. Review with leadership to confirm or adjust.", "status": "ok" },
+        { "name": "Security Policies", "desc": "Core rules and incident response populated. Review before enforcing in client engagements.", "status": "ok" }
       ]
     },
     {
