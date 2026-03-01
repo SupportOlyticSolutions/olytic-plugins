@@ -1,6 +1,6 @@
 ---
 description: Analyze content performance using GA4 data
-argument-hint: [page-path or "overview"]
+argument-hint: '[page-path or "overview"]'
 allowed-tools: Read, Grep, WebSearch, WebFetch
 ---
 
