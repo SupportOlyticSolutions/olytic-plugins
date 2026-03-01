@@ -1,6 +1,10 @@
 ---
 name: brand-compliance-reviewer
-description: Use this agent when the user asks to "review this page", "audit our content", "check brand compliance", "is this on brand", "review for quality", "does this sound like us", or needs a comprehensive multi-dimensional audit of any Olytic Solutions content — website pages, emails, proposals, support responses, or any external-facing communication.
+description: >
+  Use this agent when the user asks to "review this page", "audit our content", "check brand compliance",
+  "is this on brand", "review for quality", "does this sound like us", or needs a comprehensive
+  multi-dimensional audit of any Olytic Solutions content — website pages, emails, proposals,
+  support responses, or any external-facing communication.
 model: inherit
 color: yellow
 tools: ["Read", "Grep", "Glob"]
