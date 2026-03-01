@@ -2,6 +2,43 @@
 
 Use these templates when generating plugin components from discovery data. Each template shows the exact structure with placeholders mapped to discovery fields.
 
+---
+
+## plugin.json Template
+
+Write to `.claude-plugin/plugin.json`. This file must be valid JSON — no comments, no trailing commas, no extra keys.
+
+```json
+{
+  "name": "kebab-case-plugin-name",
+  "version": "0.1.0",
+  "description": "One sentence describing what this plugin does — under 120 characters.",
+  "author": {
+    "name": "Olytic Solutions",
+    "email": "support@olyticsolutions.com"
+  },
+  "keywords": ["keyword1", "keyword2", "keyword3"]
+}
+```
+
+**⚠️ Valid keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. Do NOT add `displayName`, `title`, `label`, or any other key — unrecognized keys cause an upload validation failure.
+
+**⚠️ Keywords must be an array of plain strings.** Not a single string. Not objects. Each keyword is one word or short phrase: `["governance", "brand", "strategy"]`.
+
+**⚠️ After writing this file, run the validation script from SKILL.md Step 4 immediately.** An empty or malformed plugin.json is the most common cause of upload failures. Verify before proceeding.
+
+### Mapping Discovery → plugin.json
+
+| Discovery Field | plugin.json Location |
+|----------------|---------------------|
+| `plugin_name` | `name` (kebab-case) |
+| `plugin_purpose` | `description` (one sentence, under 120 chars) |
+| `user_profile` / domain | `keywords` (3-6 terms) |
+| Author: Olytic internal | `author.name: "Olytic Solutions"`, `author.email: "support@olyticsolutions.com"` |
+| Author: Client plugin | `author.name: "[Client Name]"`, `author.email: "[client email]"` |
+
+---
+
 ## Skill Template
 
 ```markdown
