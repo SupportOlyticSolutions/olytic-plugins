@@ -1,6 +1,6 @@
 ---
 description: Review any content against Olytic brand standards
-argument-hint: [file-path or paste content]
+argument-hint: "[file-path or paste content]"
 allowed-tools: Read, Grep
 ---
 
