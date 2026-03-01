@@ -1,6 +1,10 @@
 ---
 name: plugin-builder
-description: Use this agent when the user wants to "create a plugin", "build a plugin", "design a new plugin", "make a plugin from scratch", or needs an end-to-end guided experience for plugin creation — from discovery through generation, review, and delivery.
+description: >
+  Use this agent when the user wants to "create a plugin", "build a plugin",
+  "design a new plugin", "make a plugin from scratch", or needs an end-to-end
+  guided experience for plugin creation — from discovery through generation,
+  review, and delivery.
 model: inherit
 color: magenta
 tools: ["Read", "Write", "Glob", "Grep", "Bash", "mcp__github__get_file_contents", "mcp__github__create_or_update_file", "mcp__github__create_branch"]
@@ -93,11 +97,13 @@ Write all files to the working directory.
 **Verification gate** — Before presenting to the user, validate:
 1. Use Glob to confirm all expected files were created
 2. Verify plugin.json is valid JSON with required fields
-3. Verify plugin-telemetry/SKILL.md exists (mandatory)
-4. Verify every skill has SKILL.md with valid YAML frontmatter
-5. **Verify every agent file for correct frontmatter structure:** Extract the block between the first and second `---` delimiters. It must contain only valid YAML key-value pairs (`name`, `description`, `model`, `color`, `tools`). If `<example>` tags appear anywhere inside the frontmatter block, the file has the wrong structure — move them to after the closing `---` and fix before proceeding. This is the most common plugin generation error and will cause upload failures if not caught here.
-6. Verify every command has frontmatter with description, argument-hint, allowed-tools
-7. If any check fails, fix it before presenting to the user
+3. **Verify plugin.json contains ONLY valid keys:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. The key `displayName` is NOT valid and will cause an "Unrecognized key in plugin.json" upload failure. Remove any keys not in this list before proceeding.
+4. Verify plugin-telemetry/SKILL.md exists (mandatory)
+5. Verify every skill has SKILL.md with valid YAML frontmatter
+6. **Verify every agent file for correct frontmatter structure:** Extract the block between the first and second `---` delimiters. It must contain only valid YAML key-value pairs (`name`, `description`, `model`, `color`, `tools`). If `<example>` tags appear anywhere inside the frontmatter block, the file has the wrong structure — move them to after the closing `---` and fix before proceeding. This is a common plugin generation error and will cause upload failures if not caught here.
+7. **Verify every agent description for unquoted colons:** Read each agent's `description` value. If it contains `: ` (a colon followed by a space), it MUST use `description: >` block scalar format — not a single-line quoted or unquoted string. A colon in a single-line description will cause a "mapping values are not allowed here" YAML parse error on upload. Fix any violations before proceeding.
+8. Verify every command has frontmatter with description, argument-hint, allowed-tools
+9. If any check fails, fix it before presenting to the user
 
 Then present the generated plugin:
 
