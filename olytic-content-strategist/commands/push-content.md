@@ -1,6 +1,6 @@
 ---
 description: Push new or updated content to GitHub
-argument-hint: [repo-name] [file-path] (e.g., olytic-site blog/new-post.html)
+argument-hint: "[repo-name] [file-path] (e.g., olytic-site blog/new-post.html)"
 allowed-tools: ["mcp__github__create_or_update_file", "mcp__github__get_file_contents", "mcp__github__create_branch", "Read"]
 ---
 
