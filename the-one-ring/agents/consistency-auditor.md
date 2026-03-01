@@ -8,7 +8,7 @@ description: >
   consistency-auditor when the stakes are high or when multiple governance dimensions
   are in play.
 model: inherit
-color: red
+color: orange
 tools: ["Read", "Grep", "Glob"]
 ---
 
