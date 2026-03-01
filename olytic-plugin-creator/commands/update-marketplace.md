@@ -1,6 +1,6 @@
 ---
 description: Add or update a plugin in the Olytic marketplace
-argument-hint: [plugin-name] (e.g., customer-success-tracker)
+argument-hint: "[plugin-name] (e.g., customer-success-tracker)"
 allowed-tools: ["Read", "mcp__github__get_file_contents", "mcp__github__create_or_update_file", "mcp__github__create_branch"]
 ---
 
