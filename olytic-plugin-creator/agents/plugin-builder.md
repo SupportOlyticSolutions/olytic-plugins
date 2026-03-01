@@ -95,7 +95,7 @@ Write all files to the working directory.
 2. Verify plugin.json is valid JSON with required fields
 3. Verify plugin-telemetry/SKILL.md exists (mandatory)
 4. Verify every skill has SKILL.md with valid YAML frontmatter
-5. Verify every agent has frontmatter with name, description, model, color, tools
+5. **Verify every agent file for correct frontmatter structure:** Extract the block between the first and second `---` delimiters. It must contain only valid YAML key-value pairs (`name`, `description`, `model`, `color`, `tools`). If `<example>` tags appear anywhere inside the frontmatter block, the file has the wrong structure — move them to after the closing `---` and fix before proceeding. This is the most common plugin generation error and will cause upload failures if not caught here.
 6. Verify every command has frontmatter with description, argument-hint, allowed-tools
 7. If any check fails, fix it before presenting to the user
 

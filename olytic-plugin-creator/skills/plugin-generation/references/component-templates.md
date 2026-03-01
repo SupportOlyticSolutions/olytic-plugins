@@ -78,10 +78,16 @@ Telemetry: This skill logs all invocations via plugin-telemetry.
 
 ## Agent Template
 
+> ⚠️ **YAML structure rule:** The YAML frontmatter (between the `---` delimiters) must contain ONLY valid YAML key-value pairs. The `<example>` blocks are NOT valid YAML and must be placed AFTER the closing `---`. Putting examples inside the frontmatter causes a YAML parse failure and breaks plugin upload.
+
 ```markdown
 ---
 name: [role]-[responsibility]
 description: Use this agent when the user asks to "[key_function as action phrase]", "[related action]", "[broader context trigger]", or needs [discovery.plugin_purpose as user need requiring multi-step reasoning].
+model: inherit
+color: [assigned color from olytic-patterns.md]
+tools: [tools needed — Read, Write, Grep, Glob, plus any MCP tools from discovery.integrations]
+---
 
 <example>
 Context: [Realistic scenario from discovery.user_profile's typical day]
@@ -100,11 +106,6 @@ assistant: "Let me use the [agent-name] agent to [what it will do]."
 [Why this agent handles this better than a simple skill or command.]
 </commentary>
 </example>
-
-model: inherit
-color: [assigned color from olytic-patterns.md]
-tools: [tools needed — Read, Write, Grep, Glob, plus any MCP tools from discovery.integrations]
----
 
 You are [organization]'s [role description]. [One sentence about what you do and why.]
 

@@ -163,7 +163,7 @@ For each domain skill, generate using the pattern from `references/component-tem
 
 For each agent, generate using the pattern from `references/component-templates.md`. Key rules:
 
-- **Frontmatter** includes `name`, `description` with trigger phrases, 2 `<example>` blocks with `<commentary>`, `model: inherit`, `color`, `tools` list
+- **Frontmatter YAML structure (critical):** The `---` frontmatter block must contain ONLY valid YAML key-value pairs: `name`, `description`, `model`, `color`, `tools`. The `<example>` blocks are NOT valid YAML and must be placed AFTER the closing `---`, not inside it. Placing examples inside the frontmatter causes a YAML parse error that breaks plugin upload.
 - **Color assignment:** Pick from yellow, magenta, cyan, green, orange — no two agents in the same plugin share a color
 - **Tools list** should match what the agent actually needs (Read, Write, Grep, Glob, WebSearch, WebFetch, plus any MCP tools from integrations)
 - **Body** includes: role description, core responsibilities (3-6 bullets), analysis process (numbered steps), output format (exact template)
@@ -267,7 +267,7 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
    - Use Glob to confirm all expected files exist
    - Verify plugin.json is valid JSON
    - Verify every skill has a SKILL.md with valid frontmatter
-   - Verify every agent has valid frontmatter (name, description, model, color, tools)
+   - **Verify every agent file: extract the content between the first and second `---` delimiters and confirm it contains only valid YAML key-value pairs (name, description, model, color, tools). If `<example>` tags appear inside the frontmatter, the file is invalid — fix it before proceeding.**
    - Verify every command has valid frontmatter (description, argument-hint, allowed-tools)
    - Verify plugin-telemetry/SKILL.md exists (mandatory)
    - If any verification fails, fix the issue before proceeding
