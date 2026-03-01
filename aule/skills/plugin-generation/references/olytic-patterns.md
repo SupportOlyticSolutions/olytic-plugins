@@ -2,6 +2,79 @@
 
 Hard-coded standards that every Aulë-generated plugin must follow. These are non-negotiable.
 
+---
+
+## Olytic Business Context
+
+When generating **Olytic-internal plugins** (audience: `olytic-internal`), ground all content in Olytic's current business reality. This context informs how skills, agents, and commands are framed, what ICP they reference, and what strategic questions they embed.
+
+*Last updated: March 2026 — reflects the Complete Business Plan.*
+
+### What Olytic Does
+
+Olytic Solutions is an **AI implementation and optimization platform** — a Claude Cowork implementation and managed service specialist. The two products are:
+
+- **Claude OS Implementation** — fixed-fee (6–8 week) engagement that installs a functioning AI operating system inside a client's organization. Pricing: $15K standard / $25K complex / $10K case study rate (first 3 clients).
+- **Claude OS Care** — 12-month managed service retainer ($2,000–$2,500/mo) that keeps the client's AI OS current and improving, powered by the Optimizer.
+
+The **Optimizer** is Olytic's proprietary technology: a weekly AI agent that pulls client analytics, CRM data, and competitive intelligence, then surfaces plugin update recommendations and content briefs automatically. This is the defensible moat — a freelance AI consultant can't replicate it.
+
+Long-term, Olytic accumulates a **cross-client behavioral dataset** (how SMBs adopt AI tools) that becomes a standalone data intelligence product sold to PE firms, agencies, and MarTech platforms.
+
+### Current Business Stage
+
+Pre-launch, targeting first implementation clients July 2026. Goals in priority order:
+1. Win 3 case study clients at $10K to prove the model
+2. Convert implementations to Claude OS Care managed retainers (target: 60% conversion)
+3. Reach 15 managed clients (Threshold 1, ~late 2028) — benchmark data unlocks at this point
+4. Reach 30 managed clients → launch 'State of SMB AI Adoption' annual report
+5. Reach 50 managed clients → full data licensing (~$245K/yr near-pure-margin revenue)
+
+5-year total revenue target: $6.8M across 144 implementation clients and 66 managed clients at Y5.
+
+### Olytic's ICP
+
+When a plugin is for client-facing work or serves the sales/marketing function, this is who we're targeting:
+
+- **Company size:** 20–100 employees
+- **Industries:** Marketing/PR agencies, consulting firms, recruiting, financial advisory, specialty e-commerce
+- **Mindset:** Disappointed AI early adopter — tried ChatGPT, got nothing, still believes in AI but frustrated
+- **Decision-maker:** Founder or COO who can say yes over lunch
+- **Content/ops profile:** Knowledge-work heavy — lots of content, client deliverables, or repeatable internal processes
+
+We are **avoiding** enterprises (>200 employees) in this phase due to procurement cycles.
+
+### Olytic's Unfair Advantages (Reference in Plugin Content Where Relevant)
+
+- **We've done it ourselves first** — built three internal Claude plugins before selling anything
+- **The Optimizer** — proprietary weekly AI agent; not replicable by freelance consultants
+- **Compounding data asset** — cross-client behavioral data built as a byproduct of managed service; zero marginal cost to collect
+- **Consulting DNA** — strategy, discovery, change management skills most AI vendors lack
+
+### Strategic Questions for Olytic-Internal Plugins (Q3 Reference)
+
+When building plugins for Olytic's internal operations (proposals, delivery, sales, content), these are the right strategic questions to embed:
+
+*Proposal / sales:*
+- "Is this prospect a realistic ICP fit (20–100 employees, knowledge-work heavy, founder or COO as DM)?"
+- "Are we leading with the proof that we've done it ourselves — before pitching the methodology?"
+- "Are we positioning against freelance AI consultants and generic tools, not against each other?"
+- "Is this a case study candidate? Should we offer the $10K rate to build proof?"
+
+*Client delivery:*
+- "Does the client understand what they're getting and what they need to maintain?"
+- "Is the Optimizer set up to run on this client's data?"
+- "Are we capturing client_id and plugin_type tags from day one for the data asset?"
+- "Does this align with the SOW and the agreed plugin architecture?"
+
+*Content / marketing:*
+- "Does this build credibility, visibility, or conversion — and which one do we need most right now?"
+- "Does this capitalize on the Claude Cowork market window (open now, won't stay open long)?"
+- "Would a generic AI consultant say the same thing? If yes, rewrite it."
+- "Does this speak to a disappointed AI adopter's actual pain — not a theoretical AI skeptic?"
+
+---
+
 ## Naming Conventions
 
 | Component | Pattern | Examples |
