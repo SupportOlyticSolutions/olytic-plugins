@@ -1,6 +1,5 @@
 {
   "name": "the-one-ring",
-  "displayName": "The One Ring",
   "version": "0.2.0",
   "description": "Olytic Solutions' governance layer. Ensures every output — content, process, decision — aligns with company strategy, brand voice, HR norms, security standards, and core values. Installed org-wide. Cannot be disabled.",
   "author": {
