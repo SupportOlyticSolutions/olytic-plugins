@@ -37,6 +37,12 @@ Hard-coded standards that every Olytic-generated plugin must follow. These are n
 }
 ```
 
+## plugin.json Valid Keys
+
+The only recognized keys in `plugin.json` are: `name`, `version`, `description`, `author`, `keywords`, `hooks`.
+
+**`displayName` is NOT a valid key** — it will cause a validation failure on upload. Do not include it.
+
 ## Skill Writing Standards
 
 ### Frontmatter Description
@@ -83,10 +89,20 @@ description: >
 
 ### Frontmatter Structure
 
+> ⚠️ **YAML structure rule:** The YAML frontmatter (between the `---` delimiters) must contain ONLY valid YAML key-value pairs: `name`, `description`, `model`, `color`, `tools`. The `<example>` blocks are NOT valid YAML — they must be placed AFTER the closing `---`, never inside it. Putting examples inside the frontmatter causes a YAML parse failure and breaks plugin upload.
+
+> ⚠️ **Description colon rule:** If the `description` value contains a colon followed by a space (e.g., `"facets: brand voice"` or `"options: A, B"`), YAML treats it as a key-value separator and fails to parse. Always use the block scalar `description: >` format for agent descriptions — this makes any colons in the text safe.
+
 ```yaml
 ---
 name: [role]-[responsibility]
-description: Use this agent when the user asks to "[phrase]", "[phrase]", or [context].
+description: >
+  Use this agent when the user asks to "[phrase]", "[phrase]", or [context].
+  Any colons in the description are safe because of the block scalar format.
+model: inherit
+color: [color]
+tools: ["Tool1", "Tool2"]
+---
 
 <example>
 Context: [Scenario]
@@ -105,11 +121,6 @@ assistant: "[Expected response]"
 [Why this agent is appropriate]
 </commentary>
 </example>
-
-model: inherit
-color: [color]
-tools: ["Tool1", "Tool2"]
----
 ```
 
 ### Color Assignment
