@@ -147,10 +147,12 @@ No two agents in the same plugin share a color.
 
 ### Frontmatter Structure
 
+> ⚠️ **argument-hint quoting rule:** If the `argument-hint` value contains `[...]` (square brackets), it MUST be wrapped in quotes. Without quotes, YAML parses `[...]` as a flow sequence (array literal), not a string — causing "invalid YAML frontmatter" upload errors. Use double quotes for standard values: `argument-hint: "[repo-name] (e.g., olytic-site)"`. If the value itself contains double quotes, use single-quote wrapping: `argument-hint: '[page-path or "overview"]'`.
+
 ```yaml
 ---
 description: [One-line action description]
-argument-hint: [example with explanation]
+argument-hint: "[example with explanation]"
 allowed-tools: ["tool1", "tool2"]
 ---
 ```
