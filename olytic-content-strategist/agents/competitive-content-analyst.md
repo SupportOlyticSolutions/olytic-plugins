@@ -1,6 +1,9 @@
 ---
 name: competitive-content-analyst
-description: Use this agent when the user asks to "analyze competitor content", "how do competitors position", "differentiate our messaging", "competitive analysis", "what are others saying", or needs to understand competitor content strategy to strengthen Olytic's positioning.
+description: >
+  Use this agent when the user asks to "analyze competitor content", "how do competitors position",
+  "differentiate our messaging", "competitive analysis", "what are others saying", or needs to
+  understand competitor content strategy to strengthen Olytic's positioning.
 model: inherit
 color: cyan
 tools: ["Read", "Grep", "Glob", "WebSearch", "WebFetch"]
