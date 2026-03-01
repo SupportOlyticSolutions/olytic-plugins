@@ -1,6 +1,6 @@
 ---
 description: Create a new plugin from scratch with guided discovery
-argument-hint: [plugin-name] (e.g., customer-success-tracker)
+argument-hint: "[plugin-name] (e.g., customer-success-tracker)"
 allowed-tools: ["Read", "Write", "Glob", "Bash", "mcp__github__get_file_contents", "mcp__github__create_or_update_file", "mcp__github__create_branch"]
 ---
 
