@@ -104,6 +104,8 @@ Create this directory structure:
 
 #### plugin.json
 
+Write to `.claude-plugin/plugin.json`. Use ONLY these keys — no others:
+
 ```json
 {
   "name": "[kebab-case-name]",
@@ -113,11 +115,45 @@ Create this directory structure:
     "name": "[Olytic Solutions for internal, client name for client plugins]",
     "email": "[support@olyticsolutions.com for internal, client email for client plugins]"
   },
-  "keywords": ["[3-6 relevant keywords from discovery]"]
+  "keywords": ["keyword1", "keyword2", "keyword3"]
 }
 ```
 
-**⚠️ Valid plugin.json keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. Do NOT include `displayName` or any other key — unrecognized keys will cause an upload validation failure.
+**⚠️ Valid keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. Do NOT include `displayName` or any other key — unrecognized keys cause upload failure. Keywords must be an array of plain strings, not a single placeholder string.
+
+**Immediately after writing plugin.json**, run this validation bash command to confirm the file was written correctly. Do NOT proceed until this passes:
+
+```bash
+python3 -c "
+import json, sys
+try:
+    with open('.claude-plugin/plugin.json') as f:
+        content = f.read()
+    if not content.strip():
+        print('FAIL: plugin.json is empty — rewrite the file')
+        sys.exit(1)
+    data = json.loads(content)
+    valid_keys = {'name','version','description','author','keywords','hooks'}
+    bad_keys = [k for k in data if k not in valid_keys]
+    missing = [k for k in ['name','version','description','author'] if k not in data]
+    if bad_keys:
+        print('FAIL: unrecognized keys:', bad_keys)
+        sys.exit(1)
+    if missing:
+        print('FAIL: missing required fields:', missing)
+        sys.exit(1)
+    print('OK — plugin.json is valid')
+    print(json.dumps(data, indent=2))
+except json.JSONDecodeError as e:
+    print('FAIL: invalid JSON —', e)
+    sys.exit(1)
+except FileNotFoundError:
+    print('FAIL: .claude-plugin/plugin.json not found — check the write path')
+    sys.exit(1)
+"
+```
+
+If this script exits with an error, fix the file and re-run before continuing.
 
 #### .mcp.json (only if integrations exist)
 
@@ -263,23 +299,43 @@ Total files: [count]
 
 Ask: "Does this look right? Any components to add, remove, or change before I generate the files?"
 
-### Step 6: Write Files and Package
+### Step 6: Write Files, Validate, and Package
 
-1. Create all files in the plugin directory
-2. **Verification gate:** After writing all files, verify the plugin structure:
-   - Use Glob to confirm all expected files exist
-   - Verify plugin.json is valid JSON
-   - **Verify plugin.json contains ONLY valid keys:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. Keys like `displayName` are NOT valid and will cause an "Unrecognized key in plugin.json" upload failure — remove any unrecognized keys before proceeding.
-   - Verify every skill has a SKILL.md with valid frontmatter
-   - **Verify every agent file for correct frontmatter structure:** Extract the content between the first and second `---` delimiters and confirm it contains only valid YAML key-value pairs (`name`, `description`, `model`, `color`, `tools`). If `<example>` tags appear inside the frontmatter, the file is invalid — move them to after the closing `---` before proceeding.
-   - **Verify every agent description for unquoted colons:** Read each agent's `description` value. If it contains `: ` (a colon followed by a space), it MUST use `description: >` block scalar format — not a single-line string. A colon in a single-line description causes "mapping values are not allowed here" on upload. Fix any violations before proceeding.
-   - Verify every command has valid frontmatter (description, argument-hint, allowed-tools)
-   - Verify plugin-telemetry/SKILL.md exists (mandatory)
-   - If any verification fails, fix the issue before proceeding
-3. Package as `.plugin` file:
+1. **Write all files** using the Write tool with absolute paths. plugin.json goes at `.claude-plugin/plugin.json` inside the plugin directory.
+
+2. **Run the plugin.json validation script** (shown in Step 4 above) immediately after writing it. Fix and rewrite if it fails. Do not skip this step.
+
+3. **Verify all required files exist:**
    ```bash
-   cd /path/to/plugin-dir && zip -r /tmp/[name].plugin . -x "*.DS_Store" && cp /tmp/[name].plugin /path/to/outputs/[name].plugin
+   ls .claude-plugin/plugin.json README.md skills/plugin-telemetry/SKILL.md
    ```
-4. Present the `.plugin` file to the user
-5. Ask: "Want me to add this to the Olytic marketplace?"
+   If any file is missing, write it now.
+
+4. **Verify agent files** (if the plugin has agents):
+   - **Frontmatter structure:** Confirm the block between `---` delimiters contains only `name`, `description`, `model`, `color`, `tools`. If `<example>` tags appear inside the frontmatter, move them to after the closing `---`.
+   - **Unquoted colons in descriptions:** If any agent's `description` value contains `: ` (colon followed by space) on a single line, convert it to `description: >` block scalar format.
+   - **Valid keys in plugin.json:** Confirm no `displayName` or other non-standard keys exist.
+
+5. **Package the plugin.** Run this from INSIDE the plugin directory (not its parent):
+   ```bash
+   cd /absolute/path/to/[plugin-name] && \
+   zip -r /tmp/[plugin-name].plugin . -x "*.DS_Store" -x ".git/*" && \
+   echo "Packaged successfully"
+   ```
+   **Critical:** The `cd` must go INTO the plugin directory (e.g., `/sessions/.../outputs/my-plugin`), not the parent. If you zip from the parent, the zip will have a subfolder wrapper and the validator will not find `.claude-plugin/plugin.json`.
+
+6. **Verify the zip contains the right structure:**
+   ```bash
+   unzip -l /tmp/[plugin-name].plugin | grep -E "plugin\.json|SKILL\.md"
+   ```
+   The output must show `.claude-plugin/plugin.json` at the root (not inside a subdirectory). If you see `my-plugin/.claude-plugin/plugin.json`, the zip is wrong — you ran it from the parent directory. Fix the cd path and repackage.
+
+7. **Copy to outputs:**
+   ```bash
+   cp /tmp/[plugin-name].plugin /path/to/outputs/[plugin-name].plugin
+   ```
+
+8. Present the `.plugin` file to the user.
+
+9. Ask: "Want me to add this to the Olytic marketplace?"
    - If yes, invoke the marketplace-management skill
