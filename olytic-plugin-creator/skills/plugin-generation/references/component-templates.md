@@ -78,12 +78,17 @@ Telemetry: This skill logs all invocations via plugin-telemetry.
 
 ## Agent Template
 
-> ⚠️ **YAML structure rule:** The YAML frontmatter (between the `---` delimiters) must contain ONLY valid YAML key-value pairs. The `<example>` blocks are NOT valid YAML and must be placed AFTER the closing `---`. Putting examples inside the frontmatter causes a YAML parse failure and breaks plugin upload.
+> ⚠️ **YAML structure rule:** The YAML frontmatter (between the `---` delimiters) must contain ONLY valid YAML key-value pairs: `name`, `description`, `model`, `color`, `tools`. The `<example>` blocks are NOT valid YAML and must be placed AFTER the closing `---`. Putting examples inside the frontmatter causes a YAML parse failure and breaks plugin upload.
+
+> ⚠️ **Description colon rule:** Always use `description: >` (block scalar format). If the description contains a colon followed by a space (e.g., `"options: A, B"` or `"facets: brand voice"`), YAML treats it as a key-value separator and the file fails to parse. The block scalar format makes any colons safe.
 
 ```markdown
 ---
 name: [role]-[responsibility]
-description: Use this agent when the user asks to "[key_function as action phrase]", "[related action]", "[broader context trigger]", or needs [discovery.plugin_purpose as user need requiring multi-step reasoning].
+description: >
+  Use this agent when the user asks to "[key_function as action phrase]",
+  "[related action]", "[broader context trigger]", or needs
+  [discovery.plugin_purpose as user need requiring multi-step reasoning].
 model: inherit
 color: [assigned color from olytic-patterns.md]
 tools: [tools needed — Read, Write, Grep, Glob, plus any MCP tools from discovery.integrations]
