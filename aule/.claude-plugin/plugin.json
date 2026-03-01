@@ -1,0 +1,10 @@
+{
+  "name": "aule",
+  "version": "0.2.0",
+  "description": "Olytic's plugin forge. Guides discovery, generates production-ready plugins with integrity and telemetry, and manages the marketplace.",
+  "author": {
+    "name": "Olytic Solutions",
+    "email": "support@olyticsolutions.com"
+  },
+  "keywords": ["plugin-creation", "meta-plugin", "marketplace", "telemetry", "generation", "integrity", "augmentation"]
+}

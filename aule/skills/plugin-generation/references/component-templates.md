@@ -41,14 +41,30 @@ Write to `.claude-plugin/plugin.json`. This file must be valid JSON — no comme
 
 ## Skill Template
 
+> ⚠️ **Natural language trigger rule (mandatory):** The `description` field is not documentation — it is the activation mechanism. Claude reads this field to decide whether to load this skill. Write it in the user's language, not the developer's. It must contain at least 4–6 specific phrases that a real user would actually say to Claude. Generic or technical descriptions will cause the skill to never activate.
+>
+> **Good triggers** (specific, user-language, action-oriented):
+> - "review this blog post against brand standards"
+> - "check if this content sounds like us"
+> - "is this copy on-brand"
+> - "audit this proposal for tone"
+>
+> **Bad triggers** (generic, technical, describes the feature not the moment):
+> - "use this skill when brand review is needed"
+> - "for brand compliance checking purposes"
+> - "when the user wants to do brand things"
+>
+> Every plugin enforces business policy or best practice. That only works if it activates at the right moment. Weak triggers = the plugin never fires = the policy is never enforced.
+
 ```markdown
 ---
 name: [discovery.key_functions[0] as kebab-case identifier]
 description: >
-  This skill should be used when the user asks to "[key_function_1 as natural phrase]",
-  "[key_function_2 as natural phrase]", "[key_function_3 as natural phrase]",
-  or needs guidance on [discovery.plugin_purpose paraphrased as user need].
-  [If Olytic internal: "Assumes The One Ring plugin is installed for brand standards."]
+  This skill should be used when the user asks to "[key_function_1 — exact user phrase from Q8]",
+  "[key_function_2 — exact user phrase from Q8]", "[key_function_3 — exact user phrase from Q8]",
+  "[key_function_4 — exact user phrase from Q8]", or needs [discovery.plugin_purpose as concrete
+  user need — what would prompt someone to reach for this].
+  [If Olytic internal: "Assumes The One Ring plugin is installed for brand and strategy context."]
 version: 0.1.0
 ---
 
@@ -119,13 +135,16 @@ Telemetry: This skill logs all invocations via plugin-telemetry.
 
 > ⚠️ **Description colon rule:** Always use `description: >` (block scalar format). If the description contains a colon followed by a space (e.g., `"options: A, B"` or `"facets: brand voice"`), YAML treats it as a key-value separator and the file fails to parse. The block scalar format makes any colons safe.
 
+> ⚠️ **Natural language trigger rule (mandatory):** Same as skills — the `description` field is the activation mechanism, not documentation. Use the exact phrases collected in discovery Q8. Minimum 4 specific, user-language trigger phrases. Agents handle complex multi-step workflows, so their triggers should reflect the higher-stakes moments where someone would say something like "run a full audit", "analyze this end to end", or "handle the whole process for me."
+
 ```markdown
 ---
 name: [role]-[responsibility]
 description: >
-  Use this agent when the user asks to "[key_function as action phrase]",
-  "[related action]", "[broader context trigger]", or needs
-  [discovery.plugin_purpose as user need requiring multi-step reasoning].
+  Use this agent when the user asks to "[exact trigger phrase from Q8]",
+  "[exact trigger phrase from Q8]", "[exact trigger phrase from Q8]",
+  "[exact trigger phrase from Q8]", or needs [discovery.plugin_purpose as
+  a high-stakes user need that requires multi-step reasoning or orchestration].
 model: inherit
 color: [assigned color from olytic-patterns.md]
 tools: [tools needed — Read, Write, Grep, Glob, plus any MCP tools from discovery.integrations]
@@ -299,6 +318,25 @@ When using this plugin, always consider:
 This plugin should NOT be used for:
 
 [discovery.constraints + discovery.out_of_scope as bullet list]
+
+## Memory Scope
+
+- **Type:** [discovery.memory_scope — ephemeral, persistent, or retrieval]
+- **What is retained:** [discovery.memory_details]
+[If persistent or retrieval:]
+- **Retention period:** [discovery.data_lifecycle]
+- **Justification:** [discovery.memory_justification]
+
+## Permissions Manifest
+
+| Declaration | Details |
+|------------|---------|
+| **Tools accessed** | [List of local tools: Read, Write, Grep, Glob, etc.] |
+| **MCP servers** | [List from .mcp.json: GitHub, GA4, etc.] |
+| **Data read** | [What the plugin reads: files, APIs, databases] |
+| **Data written** | [What the plugin creates or modifies] |
+| **External services** | [External APIs called] |
+| **Human-in-the-loop** | [Actions requiring user confirmation before execution] |
 
 ## Success Metrics
 

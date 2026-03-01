@@ -1,6 +1,6 @@
-# Olytic Plugin Patterns
+# Aulë Plugin Patterns
 
-Hard-coded standards that every Olytic-generated plugin must follow. These are non-negotiable.
+Hard-coded standards that every Aulë-generated plugin must follow. These are non-negotiable.
 
 ## Naming Conventions
 
@@ -21,11 +21,11 @@ Hard-coded standards that every Olytic-generated plugin must follow. These are n
 
 ## Author Information
 
-**Olytic internal plugins:**
+**Aulë internal plugins:**
 ```json
 "author": {
-  "name": "Olytic Solutions",
-  "email": "support@olyticsolutions.com"
+  "name": "Aulë Solutions",
+  "email": "support@aulesolutions.com"
 }
 ```
 
@@ -69,7 +69,7 @@ description: >
 6. **Reference links** — point to `references/` files for detailed material
 7. **Telemetry note** — "Telemetry: This skill logs all invocations via plugin-telemetry"
 
-### Voice (Olytic Internal Only)
+### Voice (Aulë Internal Only)
 
 - Expert, opinionated, structured, practical
 - Use "we" to position as teammate
@@ -166,7 +166,7 @@ allowed-tools: ["tool1", "tool2"]
 
 ## Dependency Declaration
 
-### Internal Olytic Plugins
+### Internal Aulë Plugins
 
 If the plugin depends on The One Ring (most internal plugins do):
 - Note in plugin.json description: "Requires The One Ring governance plugin."
@@ -186,3 +186,66 @@ Client plugins are typically standalone. If they depend on a governance plugin b
 5. `.mcp.json` — only if integrations exist
 6. `commands/` — only if repeatable actions exist
 7. `agents/` — only if multi-step workflows exist
+
+## Permissions Manifest (Every Plugin)
+
+Every generated plugin's README must include a Permissions Manifest section that declares:
+
+| Declaration | Description |
+|------------|-------------|
+| **Tools accessed** | Which MCP tools and local tools the plugin uses (e.g., "GitHub API via mcp__github, Google Analytics via mcp__ga4") |
+| **Data read** | What data the plugin reads (e.g., "marketplace.json, GA4 analytics, user-uploaded documents") |
+| **Data written** | What data the plugin creates or modifies (e.g., "plugin files, marketplace entries, telemetry logs") |
+| **External services** | Which external systems are called (e.g., "GitHub API, Google Analytics API") |
+| **Human-in-the-loop checkpoints** | Which actions require user confirmation before execution (e.g., "publishing content, modifying external systems, deleting files") |
+
+This manifest serves as a transparency and governance tool. It allows users and administrators to understand exactly what a plugin can do before installing it.
+
+## Memory Scope Declaration (Every Plugin)
+
+Every generated plugin's README must include a Memory Scope section that declares:
+
+- **Scope type:** ephemeral (session-only), persistent (retained between sessions), or retrieval (searches large knowledge bases)
+- **What is retained:** specific data or context the plugin stores
+- **Retention period:** how long data is kept (if persistent)
+- **Data lifecycle:** when and how stored data is purged
+- **Justification:** why persistent or retrieval memory is needed (if applicable)
+
+Default is ephemeral. Persistent memory requires explicit justification during discovery.
+
+## Integrity Controls
+
+### Prompt Injection Defenses
+
+Plugins that process external content (user uploads, web data, third-party API responses) must include:
+- **Input validation:** Verify that external content matches expected formats before processing
+- **Instruction boundary:** Clear separation between trusted plugin instructions and untrusted external data
+- **Output filtering:** Validate that outputs don't contain injected instructions or unexpected behaviors
+
+### Human-in-the-Loop Checkpoints
+
+For high-stakes domains (finance, legal, HR, security), generated plugins should include configurable human confirmation steps:
+- Before publishing or sending content externally
+- Before modifying external systems (databases, APIs, repositories)
+- Before actions that cannot be easily reversed
+- The checkpoint mechanism should be configurable: users can enable/disable specific checkpoints based on their risk tolerance
+
+## Composability Convention
+
+Plugins should be designed as composable building blocks that can work together:
+- Skills should be loadable independently — no implicit dependencies between skills in the same plugin
+- Agents should be able to reference skills from other installed plugins using standard patterns
+- Commands should produce outputs in formats that other plugins can consume
+- The README should note which other plugins this one works well with (if applicable)
+
+## Augmentation Framing
+
+Plugin descriptions and README content should emphasize what new capabilities the plugin creates, not just what tasks it speeds up:
+
+**Good:** "Enables content teams to maintain brand consistency across all channels simultaneously — something that previously required manual review of each piece."
+**Bad:** "Automates brand compliance checking."
+
+**Good:** "Gives junior sales reps access to senior-level deal preparation by synthesizing insights from past successful proposals."
+**Bad:** "Speeds up proposal writing."
+
+This framing is informed by the augmentation test in discovery Q6. If the augmentation signal was weak, the README should acknowledge this and suggest potential augmentation opportunities.

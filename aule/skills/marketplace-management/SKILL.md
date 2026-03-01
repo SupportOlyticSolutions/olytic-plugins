@@ -5,10 +5,10 @@ description: >
   the marketplace", "register a plugin", "update marketplace.json", "manage the
   Olytic plugin registry", or needs to stage changes to the SupportOlyticSolutions/olytic-plugins
   marketplace repository. Handles reading, diffing, and staging marketplace.json updates.
-version: 0.1.0
+version: 0.2.0
 ---
 
-# Marketplace Management — Olytic Plugins
+# Marketplace Management — Aulë
 
 Manage the Olytic plugin marketplace at `SupportOlyticSolutions/olytic-plugins`. This skill handles adding new plugins, updating existing entries, and staging changes for review.
 
@@ -42,7 +42,7 @@ Each plugin entry in the `plugins` array follows this format:
 - `engineering` — development and technical
 - `delivery` — client delivery and consulting
 - `operations` — internal operations
-- `meta` — plugin management tools (like this plugin)
+- `meta` — plugin management tools (like Aulë)
 
 ## How to Add a New Plugin
 

@@ -4,9 +4,9 @@ description: >
   Use this skill after completing plugin discovery, when you need to generate the
   actual plugin files. Takes the discovery summary and produces a complete, ready-to-use
   plugin following Olytic conventions. Every generated plugin automatically includes
-  telemetry, proper structure, and documentation.
+  telemetry, integrity controls, permissions manifest, and documentation.
   See references/ for templates and patterns.
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Plugin Generation
@@ -60,13 +60,16 @@ Map discovery answers to component types:
 | Strategic questions defined | Embedded in skills and agents | Guide decision-making within components |
 | Constraints defined | Embedded in skills + telemetry | Enforced as guardrails and tracked as violations |
 | Success metrics + data sources | Performance command (if data source is accessible) | Enable self-measurement |
+| Memory scope declared (from Q5) | Memory declaration in skill + README | Plugin declares its context retention requirements |
+| Workflow context mapped (from Q6) | Augmentation framing in README + skill descriptions | Positions plugin around new capabilities, not just task speedup |
+| Augmentation signal weak | Advisory note in README | Flags the plugin as primarily an accelerator, suggests augmentation opportunities |
 
 **Rules:**
 - Every plugin gets at least ONE skill (the primary domain skill)
 - Every plugin gets the telemetry skill (non-negotiable — see `references/telemetry-template.md`)
 - Only create agents if the workflow genuinely requires multi-step orchestration
 - Only create commands if there's a clear, repeatable user-initiated action
-- Create a performance/metrics command if at least one data source from Q7 is programmatically accessible
+- Create a performance/metrics command if at least one data source from Q8 is programmatically accessible
 
 ### Step 2: Name Components
 
@@ -178,7 +181,7 @@ For integrations without a known MCP server URL, add a comment in README noting 
 - `[PLUGIN_NAME]` → actual plugin name
 - `[PLUGIN_VERSION]` → "0.1.0"
 - `[CONSTRAINTS]` → constraints from discovery Q4
-- `[SUCCESS_METRICS]` → metrics from discovery Q6
+- `[SUCCESS_METRICS]` → metrics from discovery Q8
 
 #### Domain Skills
 
@@ -188,6 +191,8 @@ For each domain skill, generate using the pattern from `references/component-tem
 - **Body** starts with a context paragraph explaining scope
 - **Strategic questions** from Q3 are embedded as a "Before You Start" or "Decision Framework" section
 - **Constraints** from Q4 are embedded as a "Boundaries" or "Out of Scope" section
+- **Memory scope** (from Q5): If the skill requires context persistence or retrieval, include a Memory Scope section declaring what information must be retained across sessions and for how long. If discovery Q5 indicates 'retrieval' memory scope, include retrieval configuration in the skill: what sources to search, freshness requirements, and fallback behavior when sources are unavailable.
+- **Content processing security** (from Q7): If the plugin processes external content (user uploads, web data, third-party API responses), include prompt injection defense patterns: input validation, output filtering, and clear boundaries between trusted instructions and untrusted data.
 - **Operating Principles** section must be included (from `references/agentic-best-practices.md`):
   - Discovery first: Assess current state before taking action
   - Source of truth: Local files and skill content take precedence over conversation
@@ -228,6 +233,45 @@ For each command, generate using the pattern from `references/component-template
 - **Permission gate:** Commands that perform destructive actions or make 5+ simultaneous changes must ask for user confirmation
 - **No hallucination:** Commands must report "Not Found" for missing files/data rather than guessing
 
+### Step 4a: Generate Permissions Manifest
+
+**This is mandatory for every generated plugin.** Create a new section in the README (see Step 4's README.md template below).
+
+The permissions manifest is a structured declaration of:
+
+- **Tools accessed:** Which Claude tools does the plugin use? (Read, Write, Grep, Glob, WebSearch, WebFetch, etc.)
+- **MCP servers:** What external systems does it connect to? (GitHub, Slack, databases, APIs, etc.)
+- **Data reads:** What data sources does the plugin read from? (local files, APIs, databases, user uploads)
+- **Data writes:** What does it write to? (files, external APIs, logs, caches)
+- **External services called:** Third-party APIs, webhooks, or cloud services
+- **Human-in-the-loop checkpoints:** Which operations require user confirmation before execution? (destructive actions, payments, access grants, data transmission)
+
+Example structure:
+
+```markdown
+## Permissions Manifest
+
+### Tools
+- Read: Local filesystem access
+- Write: Skill and command file creation
+- Grep: Code searching
+- Glob: Directory traversal
+- WebFetch: External documentation fetching
+
+### Integrations
+- GitHub API: Read repository contents, create issues
+
+### Data Access
+**Reads:** Repository files, issue metadata
+**Writes:** Local skill cache, telemetry logs
+**Retention:** Telemetry logs stored for 90 days
+
+### Human-in-the-Loop Checkpoints
+- ✓ Required before creating issues
+- ✓ Required before modifying repository permissions
+- ✓ Required before sharing analysis results externally
+```
+
 #### README.md
 
 Generate from discovery data:
@@ -235,7 +279,7 @@ Generate from discovery data:
 ```markdown
 # [Plugin Name]
 
-[plugin_purpose — one paragraph]
+Enables [user] to [new capability] — [one paragraph describing what makes this augmentation valuable, not just what it automates].
 
 **Audience:** [user_profile]
 **Requires:** [dependencies — e.g., "The One Ring governance plugin" if Olytic internal]
@@ -264,6 +308,17 @@ When using this plugin, always consider:
 
 This plugin should NOT be used for:
 [constraints as bullet list]
+
+## Memory Scope
+
+This plugin [retains/does not retain] context across sessions:
+- [What information is retained]
+- [Retention period or conditions]
+- [How to clear retained context if needed]
+
+## Permissions Manifest
+
+[See Step 4a — structured declaration of tools, integrations, data access, and human-in-the-loop checkpoints]
 
 ## Success Metrics
 

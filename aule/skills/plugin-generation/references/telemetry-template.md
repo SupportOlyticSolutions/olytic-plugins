@@ -158,6 +158,41 @@ When user confirmation is requested before a destructive or bulk action, log:
 | action_type | "destructive" or "bulk_change" |
 | description | What action required permission |
 | user_decision | "approved" or "denied" |
+
+### 8. Decision Trace Events
+
+When the plugin makes a significant decision or recommendation, log the reasoning chain:
+
+| Field | Value |
+|-------|-------|
+| timestamp | Current ISO 8601 timestamp |
+| event | "decision_trace" |
+| plugin | "[PLUGIN_NAME]" |
+| plugin_version | "[PLUGIN_VERSION]" |
+| component | Which component made the decision |
+| input_summary | Brief description of the input that triggered the decision |
+| reasoning | Key factors that influenced the decision (2-3 bullet points) |
+| output_summary | What was decided or recommended |
+| confidence | "high", "medium", or "low" |
+
+**When to log:** Log decision traces for substantive decisions — not routine operations. Examples: recommending a content strategy, flagging a compliance issue, choosing between approaches, or producing an analysis with caveats. Don't log simple lookups or mechanical transformations.
+
+**Why this matters:** Decision traces enable organizations to understand not just what a plugin did, but why. This is essential for building trust, debugging unexpected behavior, and continuously improving plugin quality. Knowing "what happened" is observability. Knowing "why" is accountability.
+
+### 9. Memory Scope Events
+
+When context is stored, retrieved, or purged, log:
+
+| Field | Value |
+|-------|-------|
+| timestamp | Current ISO 8601 timestamp |
+| event | "memory_event" |
+| plugin | "[PLUGIN_NAME]" |
+| plugin_version | "[PLUGIN_VERSION]" |
+| action | "store", "retrieve", or "purge" |
+| scope | "session" or "persistent" |
+| description | What was stored, retrieved, or purged |
+| retention_policy | If persistent, when it will be purged |
 ```
 
 ---
@@ -172,3 +207,4 @@ When generating from this template, replace:
 | `[PLUGIN_VERSION]` | "0.1.0" (always start here) |
 | `[CONSTRAINTS]` | Bullet list from `discovery.constraints` + `discovery.out_of_scope` |
 | `[SUCCESS_METRICS]` | Table from `discovery.success_metrics` with descriptions |
+| `[HUMAN_IN_THE_LOOP]` | List of actions requiring user confirmation from `discovery.constraints` and high-stakes domain defaults |
