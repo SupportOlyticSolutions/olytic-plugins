@@ -90,13 +90,47 @@ Generate all plugin files using the `plugin-generation` skill and its reference 
 - `references/olytic-patterns.md` for naming and structure conventions
 - `references/component-templates.md` for component file templates
 
-Write all files to the working directory.
+Write all files to the working directory using the Write tool with absolute paths.
+
+**After writing plugin.json**, immediately run this validation to confirm it was written correctly. Do NOT continue until this passes:
+
+```bash
+python3 -c "
+import json, sys
+try:
+    with open('.claude-plugin/plugin.json') as f:
+        content = f.read()
+    if not content.strip():
+        print('FAIL: plugin.json is empty — rewrite the file')
+        sys.exit(1)
+    data = json.loads(content)
+    valid_keys = {'name','version','description','author','keywords','hooks'}
+    bad_keys = [k for k in data if k not in valid_keys]
+    missing = [k for k in ['name','version','description','author'] if k not in data]
+    if bad_keys:
+        print('FAIL: unrecognized keys:', bad_keys)
+        sys.exit(1)
+    if missing:
+        print('FAIL: missing required fields:', missing)
+        sys.exit(1)
+    print('OK — plugin.json is valid')
+    print(json.dumps(data, indent=2))
+except json.JSONDecodeError as e:
+    print('FAIL: invalid JSON —', e)
+    sys.exit(1)
+except FileNotFoundError:
+    print('FAIL: .claude-plugin/plugin.json not found — check the write path')
+    sys.exit(1)
+"
+```
+
+If this exits with an error, fix the file and re-run before continuing to the next file.
 
 ## Phase 4: Review & Verification
 
 **Verification gate** — Before presenting to the user, validate:
 1. Use Glob to confirm all expected files were created
-2. Verify plugin.json is valid JSON with required fields
+2. Run the plugin.json validation script (from Phase 3 above) if not already done
 3. **Verify plugin.json contains ONLY valid keys:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. The key `displayName` is NOT valid and will cause an "Unrecognized key in plugin.json" upload failure. Remove any keys not in this list before proceeding.
 4. Verify plugin-telemetry/SKILL.md exists (mandatory)
 5. Verify every skill has SKILL.md with valid YAML frontmatter
@@ -121,14 +155,27 @@ Loop until the user is satisfied.
 
 ## Phase 5: Delivery
 
-Package the plugin:
+Package the plugin. Follow these steps exactly — the zip command path matters:
 
-1. Create a `.plugin` zip file in `/tmp/` first, then copy to the outputs directory
-2. Present the `.plugin` file to the user with a link
+1. **Run the zip from INSIDE the plugin directory** (not its parent). If you run it from the parent, the zip will contain a subdirectory wrapper and the validator will not find `.claude-plugin/plugin.json`:
+   ```bash
+   cd /absolute/path/to/[plugin-name] && \
+   zip -r /tmp/[plugin-name].plugin . -x "*.DS_Store" -x ".git/*" && \
+   echo "Packaged"
+   ```
 
-```bash
-cd [plugin-directory] && zip -r /tmp/[plugin-name].plugin . -x "*.DS_Store" && cp /tmp/[plugin-name].plugin [outputs-directory]/[plugin-name].plugin
-```
+2. **Verify the zip structure before delivering:**
+   ```bash
+   unzip -l /tmp/[plugin-name].plugin | grep -E "plugin\.json|SKILL\.md"
+   ```
+   The output must show `.claude-plugin/plugin.json` at the root — not `[plugin-name]/.claude-plugin/plugin.json`. If you see it inside a subdirectory, the cd path was wrong. Fix the path and repackage.
+
+3. **Copy to outputs:**
+   ```bash
+   cp /tmp/[plugin-name].plugin [outputs-directory]/[plugin-name].plugin
+   ```
+
+4. Present the `.plugin` file to the user with a link.
 
 ## Phase 6: Marketplace (Optional)
 
