@@ -1,6 +1,10 @@
 ---
 name: meeting-notes-reviewer
-description: Use this agent when the user asks to "review meeting notes", "extract insights from a meeting", "pull content ideas from notes", "what did we discuss", "meeting recap", or wants to extract actionable content insights, messaging feedback, or ICP intelligence from meeting notes, transcripts, or Google Meet recordings.
+description: >
+  Use this agent when the user asks to "review meeting notes", "extract insights from a meeting",
+  "pull content ideas from notes", "what did we discuss", "meeting recap", or wants to extract
+  actionable content insights, messaging feedback, or ICP intelligence from meeting notes,
+  transcripts, or Google Meet recordings.
 model: inherit
 color: green
 tools: ["Read", "Grep", "Glob"]
