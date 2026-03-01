@@ -1,6 +1,6 @@
 ---
 description: Look up the relevant HR or security policy for a specific situation
-argument-hint: [describe your situation or question]
+argument-hint: "[describe your situation or question]"
 allowed-tools: Read, Grep
 ---
 
