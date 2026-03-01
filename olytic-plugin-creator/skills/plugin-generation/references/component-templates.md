@@ -215,10 +215,12 @@ If a request falls outside scope, explain why and redirect.
 
 ## Command Template
 
+> ⚠️ **argument-hint quoting rule:** If the `argument-hint` value contains `[...]` (square brackets), it MUST be wrapped in double or single quotes. Without quotes, YAML parses `[...]` as a flow sequence (array literal), not a string — causing "invalid YAML frontmatter" errors on upload. Always write: `argument-hint: "[example-arg] (e.g., value)"`. If the value itself contains double quotes, use single-quote wrapping instead: `argument-hint: '[page-path or "overview"]'`.
+
 ```markdown
 ---
 description: [One-line description of the action — verb phrase]
-argument-hint: [example-arg] (e.g., [concrete example with explanation])
+argument-hint: "[example-arg] (e.g., concrete example here)"
 allowed-tools: ["Tool1", "Tool2", "mcp__service__tool_name"]
 ---
 
