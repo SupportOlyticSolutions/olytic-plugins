@@ -117,6 +117,8 @@ Create this directory structure:
 }
 ```
 
+**⚠️ Valid plugin.json keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. Do NOT include `displayName` or any other key — unrecognized keys will cause an upload validation failure.
+
 #### .mcp.json (only if integrations exist)
 
 Generate MCP server entries for each integration from discovery Q5. Common patterns:
@@ -164,6 +166,7 @@ For each domain skill, generate using the pattern from `references/component-tem
 For each agent, generate using the pattern from `references/component-templates.md`. Key rules:
 
 - **Frontmatter YAML structure (critical):** The `---` frontmatter block must contain ONLY valid YAML key-value pairs: `name`, `description`, `model`, `color`, `tools`. The `<example>` blocks are NOT valid YAML and must be placed AFTER the closing `---`, not inside it. Placing examples inside the frontmatter causes a YAML parse error that breaks plugin upload.
+- **Agent description format (critical):** Always write agent descriptions using the `description: >` block scalar format. Never use a single-line unquoted description. A single-line description containing `: ` (colon + space) will cause a "mapping values are not allowed here" YAML parse error on upload.
 - **Color assignment:** Pick from yellow, magenta, cyan, green, orange — no two agents in the same plugin share a color
 - **Tools list** should match what the agent actually needs (Read, Write, Grep, Glob, WebSearch, WebFetch, plus any MCP tools from integrations)
 - **Body** includes: role description, core responsibilities (3-6 bullets), analysis process (numbered steps), output format (exact template)
@@ -266,8 +269,10 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
 2. **Verification gate:** After writing all files, verify the plugin structure:
    - Use Glob to confirm all expected files exist
    - Verify plugin.json is valid JSON
+   - **Verify plugin.json contains ONLY valid keys:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. Keys like `displayName` are NOT valid and will cause an "Unrecognized key in plugin.json" upload failure — remove any unrecognized keys before proceeding.
    - Verify every skill has a SKILL.md with valid frontmatter
-   - **Verify every agent file: extract the content between the first and second `---` delimiters and confirm it contains only valid YAML key-value pairs (name, description, model, color, tools). If `<example>` tags appear inside the frontmatter, the file is invalid — fix it before proceeding.**
+   - **Verify every agent file for correct frontmatter structure:** Extract the content between the first and second `---` delimiters and confirm it contains only valid YAML key-value pairs (`name`, `description`, `model`, `color`, `tools`). If `<example>` tags appear inside the frontmatter, the file is invalid — move them to after the closing `---` before proceeding.
+   - **Verify every agent description for unquoted colons:** Read each agent's `description` value. If it contains `: ` (a colon followed by a space), it MUST use `description: >` block scalar format — not a single-line string. A colon in a single-line description causes "mapping values are not allowed here" on upload. Fix any violations before proceeding.
    - Verify every command has valid frontmatter (description, argument-hint, allowed-tools)
    - Verify plugin-telemetry/SKILL.md exists (mandatory)
    - If any verification fails, fix the issue before proceeding
