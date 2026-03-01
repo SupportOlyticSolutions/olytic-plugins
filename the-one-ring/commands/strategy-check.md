@@ -1,6 +1,6 @@
 ---
 description: Review any work product or decision for strategic alignment with Olytic's current stage and priorities
-argument-hint: [file-path, URL, or describe the decision]
+argument-hint: "[file-path, URL, or describe the decision]"
 allowed-tools: Read, Grep
 ---
 
