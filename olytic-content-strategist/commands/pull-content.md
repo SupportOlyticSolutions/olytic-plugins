@@ -1,6 +1,6 @@
 ---
 description: Pull a page from GitHub to review or edit
-argument-hint: [repo-name] [file-path] (e.g., olytic-site blog/post.html)
+argument-hint: "[repo-name] [file-path] (e.g., olytic-site blog/post.html)"
 allowed-tools: ["mcp__github__get_file_contents", "Read", "Write"]
 ---
 
