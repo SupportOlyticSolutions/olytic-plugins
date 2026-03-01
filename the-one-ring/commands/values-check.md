@@ -1,6 +1,6 @@
 ---
 description: Quick gut-check — does this output or decision align with Olytic's core values?
-argument-hint: [describe the decision or action, or paste content]
+argument-hint: "[describe the decision or action, or paste content]"
 allowed-tools: Read
 ---
 
