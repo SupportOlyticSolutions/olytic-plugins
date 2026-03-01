@@ -1,6 +1,12 @@
 ---
 name: consistency-auditor
-description: Use this agent when the user wants a full governance scan of any work product — content, decision, proposal, or process. Covers all five governance facets: brand voice, company strategy, core values, HR norms, and security standards. More comprehensive than brand-compliance-reviewer, which focuses on brand and messaging only. Use consistency-auditor when the stakes are high or when multiple governance dimensions are in play.
+description: >
+  Use this agent when the user wants a full governance scan of any work product — content,
+  decision, proposal, or process. Covers all five governance facets (brand voice, company
+  strategy, core values, HR norms, and security standards). More comprehensive than
+  brand-compliance-reviewer, which focuses on brand and messaging only. Use
+  consistency-auditor when the stakes are high or when multiple governance dimensions
+  are in play.
 model: inherit
 color: red
 tools: ["Read", "Grep", "Glob"]
