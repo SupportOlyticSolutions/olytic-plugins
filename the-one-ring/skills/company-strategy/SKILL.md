@@ -182,6 +182,65 @@ At Y5, base resale valuation: **$8.1M** (with data platform, potentially $10.4M)
 
 ---
 
+## Go-to-Market Strategy: The Zero Case Study Playbook
+
+*Source: Internal GTM Strategy Document, March 2026 v1.0*
+
+Olytic's GTM strategy is called **The Zero Case Study Playbook** — a deliberate approach to winning our first client through interactive utility content instead of waiting for case studies, SEO compounding, or traditional inbound.
+
+### Core Philosophy: Proof Through Utility
+
+The guiding principle: **replace proof of past performance with proof of present competence.** Instead of saying "look what we did for others," we say "look what we can do for you, right now."
+
+Every piece of marketing should **do** something for the prospect — not just **say** something about Olytic. Interactive utility content over static authority content.
+
+### The Three Pillars
+
+1. **The Interactive Assessment (AI Strategy Architect)** — an interactive tool that serves as lead magnet, proof of competence, and sales qualification engine in one. Prospects take an 8–12 question branching assessment, receive an AI-generated personalized strategy report, and immediately experience Olytic's quality of thinking. Meanwhile, Olytic gets a fully-qualified lead profile. The bridge to paid: "This is the 10-minute version. The full AI Strategy Blueprint goes deeper."
+
+2. **The O/G/O Framework as Publishable IP** — a dedicated framework page (not a blog post) that positions the Operator / Governor / Optimizer methodology as a named, citable methodology. Think how IDEO owns "Design Thinking." This IS the credential when there are no case studies: "We don't have a portfolio of past clients. We have a methodology we've pressure-tested."
+
+3. **Opinionated Content** — not "5 Tips for AI." Every piece should make the reader think "this person has actually done this work." Contrarian, specific, practical positions.
+
+### The Objection Neutralizer
+
+The most likely objection: **"Have you done this before?"**
+
+The reframe: "We've run this exact motion — strategy blueprinting, technology implementation, change management, value creation — across dozens of Salesforce transformations. AI is a new technology, but the problem is the same: **how do you design and implement a technology system that creates real business value?** The technology changed. The discipline didn't."
+
+This reframes expertise from "AI experience" to "transformation experience" — which is what actually matters.
+
+### Channel Strategy
+
+- **LinkedIn Organic (primary):** 4–5 short-form posts per week. Contrarian, specific, opinionated. Each ends with a soft CTA to the interactive tool. This outperforms paid LinkedIn at the current budget.
+- **Google Ads ($500/mo):** 3–5 exact-match keywords pointing to the interactive tool landing page. Targets: "AI strategy assessment," "AI readiness for business," "AI consulting SMB." Expected: 7–12 qualified leads/month.
+- **GEO (AI Answer Engine Optimization):** 3–4 definitive long-form pages answering the exact questions the ICP asks AI assistants. First-mover window of 6–12 months before citation graphs stabilize.
+- **Warm Outreach (Day 25–30):** Personal outreach to 20 warm LinkedIn connections with the tool link. Not a pitch — "built this, thought you'd find it interesting."
+
+### Strategic Windows & Time Sensitivity
+
+| Insight | Window | Action |
+|---------|--------|--------|
+| 2026 urgency gap — buyers feel urgency but haven't committed to a vendor | 12–24 months | Move fast. Build credibility now. |
+| Interactive tool as proof | Ongoing, but diminishing uniqueness | Invest in the thinking behind it, not just the UI. |
+| Judgment over tools — market pays for strategic judgment as AI becomes table-stakes | Long-term advantage | Resist becoming a technical implementation shop. |
+| GEO citation window — AI assistants building citation graphs now | 6–12 months | Publish named frameworks and definitive answers immediately. |
+| Transformation credential bridge — Salesforce/RevOps background as credibility | 18–24 months | Use aggressively now; replace with AI track record. |
+| PE scale play — portfolio rollout model via PE operating partners | Month 3–6+ | Document the methodology as if writing for a stranger. |
+
+### Secondary ICP (Month 3+)
+
+**Private equity operating partners** looking to create value across portfolio companies by rolling out a repeatable AI strategy framework. This is the scale play — requires proof from the primary ICP first. Park it for now but document the O/G/O methodology with PE readability in mind.
+
+### Day 1–30 Launch Roadmap
+
+- **Week 1 (Strategy & Design):** Finalize ICP persona + messaging, design interactive assessment question flow and scoring, write prompt engineering for LLM-generated report
+- **Week 2 (Build):** Build interactive tool (web form + LLM orchestration + report generation + lead capture), build landing page, internal testing with 5 fake personas
+- **Week 3 (Content & Site):** Write O/G/O Framework page, "Working With Us" page, first 5 LinkedIn posts, set up Google Ads campaign
+- **Week 4 (Launch):** End-to-end testing, launch LinkedIn organic + Google Ads, personal outreach to 20 connections, first analytics baseline
+
+---
+
 ## How This Informs Work
 
 When producing any work product, consider:

@@ -1,10 +1,10 @@
 {
-  "name": "olytic-content-strategist",
-  "version": "0.1.0",
-  "description": "Content creation and strategy plugin for Olytic Solutions — website content, GitHub integration, competitive research, GA4 analytics, and content best practices. Requires The One Ring governance plugin.",
+  "name": "magneto",
+  "version": "0.2.0",
+  "description": "Content creation and strategy plugin for Olytic Solutions — website content, LinkedIn posts, GEO optimization, GitHub integration, competitive research, GA4 analytics, and content best practices. Requires The One Ring governance plugin.",
   "author": {
     "name": "Olytic Solutions",
     "email": "support@olyticsolutions.com"
   },
-  "keywords": ["content", "website", "github", "analytics", "strategy", "ga4"]
+  "keywords": ["content", "website", "github", "analytics", "strategy", "ga4", "linkedin", "geo", "seo"]
 }

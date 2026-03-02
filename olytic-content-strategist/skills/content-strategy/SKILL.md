@@ -25,6 +25,55 @@ Every piece of content should map to at least one of these. If it doesn't, quest
 
 **Current phase context:** Olytic is targeting first implementation clients starting July 2026, building proof-of-concept case studies. Content right now must either win case study clients or establish Olytic as the recognized Cowork implementation specialist.
 
+## GTM Content Funnel (The Zero Case Study Playbook)
+
+*Source: Internal GTM Strategy, March 2026. This funnel supersedes generic content planning until case studies are live.*
+
+The GTM strategy replaces traditional case-study-dependent marketing with **proof through utility** — every piece of marketing should **do** something for the prospect, not just say something about Olytic.
+
+### TOFU (Awareness): LinkedIn + GEO
+
+- **LinkedIn Organic** is the primary channel. Short-form posts (not articles). Contrarian, specific, opinionated. 4–5 posts per week. Each ends with a soft CTA to the interactive assessment tool.
+- **Sample post themes:** "Your AI pilot failed because nobody asked the revenue question first," "The 'Head of AI' role is a trap for companies under $50M," "Salesforce Agentforce is not an AI strategy. It's a feature."
+- **GEO long-form pages** — definitive answers to questions the ICP asks AI assistants (see GEO section below)
+
+### MOFU (Consideration): Interactive Tool + Framework + Playbook
+
+- **The AI Strategy Architect** (interactive assessment) — the centerpiece asset. Lead magnet, proof of competence, and sales qualification engine in one.
+- **The O/G/O Framework Page** — methodology, not marketing. Detailed enough that a smart operator understands the architecture. This IS the credential.
+- **The Transformation Playbook Page** — how Olytic has run technology transformations before (Salesforce era), positioned as methodology proof.
+
+### BOFU (Decision): Convert
+
+- **Personalized assessment report** — AI-generated, demonstrates quality of thinking
+- **"Working With Us" page** — engagement models, what to expect, how the engagement starts
+- **"Build vs. Hire vs. Partner" comparison page** — positions the embedded model against the three alternatives the ICP is actually weighing (buy a tool, hire a Head of AI, wing it)
+
+---
+
+## GEO: AI Answer Engine Optimization
+
+GEO is about being the source that AI assistants cite when the ICP asks questions. Different dynamics than traditional SEO:
+
+| Traditional SEO | GEO |
+|----------------|-----|
+| Optimize for Google's ranking algorithm | Optimize for AI assistants selecting you as a source |
+| Keyword density and backlinks matter most | Specificity, authority, and structured answers matter most |
+| Compete on domain authority | Compete on answer quality |
+| Requires 6–12 months to compound | Can be indexed and cited much faster |
+
+**GEO content to create (3–4 definitive long-form pages):**
+- "How should a mid-market B2B company approach AI strategy?"
+- "What's the ROI of AI consulting for SMBs?"
+- "What should a company without a Head of AI do first?"
+- "How to evaluate AI readiness for a $20M B2B company"
+
+**Structure:** Clear headings, specific numbers, opinionated positions. AI assistants prefer specificity and structured data over generality. Be the most useful answer, not the most comprehensive one.
+
+**First-mover window:** 6–12 months. As AI search matures, citation graphs stabilize. The O/G/O framework as a named, citable methodology is a direct GEO asset. **Name things. Define them. Publish them now.**
+
+---
+
 ## Content Pillars
 
 Content should cluster around Olytic's products, unfair advantages, and the Claude Cowork market opportunity:
@@ -101,12 +150,58 @@ This isn't theoretical — it's literally how we produce content. Every piece sh
 
 ### Content Cadence
 
-Recommended starting cadence for the current pre-launch phase (through July 2026):
-- 2 blog posts per month — credibility and ICP pain content targeting the Cowork adoption wave
+Recommended cadence for the current Zero Case Study Playbook phase:
+
+**Weekly:**
+- 4–5 LinkedIn short-form posts — contrarian takes, framework snippets, direct links to the interactive assessment tool
+
+**Monthly:**
+- 2 blog posts — credibility and ICP pain content
+- 1 GEO long-form page — definitive answers for AI assistant citation
+
+**Priority pages to build (Day 1–30 Roadmap):**
+- Interactive assessment tool landing page (Week 2)
+- O/G/O Framework page (Week 3)
+- "Working With Us" page (Week 3)
+- Assessment service page (Week 3)
 - Core landing pages — service descriptions for Claude OS Implementation and Claude OS Care
+- "Build vs. Hire vs. Partner" comparison page
 - Case study pages — add as first clients complete implementations
 
+**Channel allocation:**
+- Google Ads: $500/mo on 3–5 exact-match keywords pointing to the interactive tool. Expected: 7–12 qualified leads/month.
+- LinkedIn Ads: Skip at this budget (minimum viable is $2K+/mo). Revisit at Month 3.
+- Warm outreach: 20 personal LinkedIn connections with tool link at launch.
+
 Once case studies are live, shift emphasis from awareness to conversion content.
+
+## Content Production Constraints
+
+These constraints apply to all content produced through Magneto. They are non-negotiable:
+
+### Pre-Writing
+- **A content brief is required before drafting.** Use the `magneto-content-brief` skill or the `/content-brief` command. No exceptions for pieces longer than a LinkedIn post.
+- **Funnel stage must be declared** in the brief. If the stage is unclear, stop and clarify before writing.
+- **The core argument must be written in one sentence.** If it can't be, the angle isn't ready.
+
+### Pre-Publishing
+- **All external content must pass a brand check** before being pushed to GitHub. Run `/brand-check` (from The One Ring) before any `/push-content` call.
+- **Every page must have a meta description** — written, not placeholder. ≤155 characters, speaks to ICP pain.
+- **Every piece must have an explicit CTA** that connects to a specific funnel action.
+
+### Content Quality Gates
+- The argument could not have been published by a generic AI consultant → if it could, sharpen the angle
+- At least one Olytic-specific concept is named and defined → O/G/O, AI Readiness Score, Zero Case Study Playbook, etc.
+- The ICP pain is written in the ICP's language, not Olytic's internal framing
+- For GEO pages: at least one specific number per major section; H1 answers the target query directly
+
+### LinkedIn-Specific Constraints
+- No emojis
+- No hollow superlatives (best-in-class, game-changing, innovative)
+- Hook must take a position — a hook that could apply to any company is not a hook
+- CTA must be soft — never a hard pitch or direct demo request
+
+---
 
 ## GitHub Repository Map
 

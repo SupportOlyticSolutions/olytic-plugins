@@ -57,6 +57,33 @@ This is not "build it once and now you're empowered." The beauty of these AI sys
 
 When writing for the ICP, speak to their reality: they're smart operators who are overwhelmed by AI noise. They need clarity and a partner, not another pitch.
 
+### GTM Positioning Statement
+
+> **"The embedded AI strategy partner for companies too smart to wing it and too lean to staff it."**
+
+This positions against every alternative in one sentence:
+- **vs. consultants:** "We don't advise and leave — we build and stay."
+- **vs. tool vendors:** "We don't sell software — we design the system that makes your software work."
+- **vs. hiring:** "You get a senior team for less than one senior hire."
+
+### ICP Emotional State & Trigger
+
+The primary buyer is a CEO or COO at a B2B company ($5M–$50M revenue, 20–200 employees). They're a smart operator who built a real business — but AI is the first technology wave where they feel genuinely behind. They can't afford a "Head of AI" hire. They know they need to act. They don't know where to start.
+
+**Trigger event:** The 2026 breakthrough — AI moved from "interesting noise" to "we can't wait." Board mandates, competitor moves, or simply running out of excuses.
+
+**Emotional state:** A competent leader feeling incompetent in one specific domain. Uncomfortable — and motivated to resolve it fast.
+
+### The Objection Neutralizer
+
+When a prospect asks "Have you done this before?" — reframe expertise from "AI experience" to "transformation experience":
+
+> "We've run this exact motion — strategy blueprinting, technology implementation, change management, value creation — across dozens of Salesforce transformations. AI is a new technology, but the problem is the same: how do you design and implement a technology system that creates real business value? The technology changed. The discipline didn't."
+
+### Proof Through Utility Principle
+
+In the Zero Case Study Playbook phase, every piece of marketing should **do** something for the prospect — not just **say** something about Olytic. Replace proof of past performance with proof of present competence. The interactive assessment tool IS the proof. The strategy report a prospect receives IS the demonstration of expertise.
+
 ## Brand Voice & Writing Style
 
 Olytic's voice is expert, specific, creative, with a dry sense of humor. It can speak corporate fluently but also mocks corporate-speak at the same time.

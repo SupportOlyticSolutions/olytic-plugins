@@ -42,6 +42,20 @@ Use these when you need a quick competitive contrast:
 - "Fractional leadership tells you what to do. We do it — and keep doing it."
 - "Our engagement doesn't end at go-live. That's where it starts."
 
+## The ICP's Actual Competitive Frame (GTM Context)
+
+The ICP isn't comparing Olytic to McKinsey. They're weighing three specific alternatives:
+
+| Alternative | Why They'll Consider It | Why It Falls Short |
+|-------------|------------------------|-------------------|
+| **Buy a tool** (Salesforce Agentforce, generic AI platforms) | Seems turnkey. Vendor does the selling for you. | They've already been pitched Agentforce. Weren't impressed. Tools without strategy are expensive shelf-ware. |
+| **Hire a "Head of AI"** | Would give them internal ownership. | $200K+ fully loaded. At SMB scale, this is a budget they don't have for a bet they can't de-risk. |
+| **Wing it** (ChatGPT + hope) | Free. No commitment. | No architecture, no integration, no measurement. Experiments that never become systems. |
+
+Use this frame in BOFU content and sales conversations. It reflects how the ICP actually thinks.
+
+---
+
 ## The White Space
 
 The gap Olytic occupies: **embedded, closed-loop AI systems for SMB go-to-market teams.** No one else combines:

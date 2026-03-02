@@ -76,6 +76,20 @@ Olytic sits in the white space between all of these: we build and operate embedd
 
 ---
 
+## The ICP's Actual Competitive Frame (GTM Context)
+
+The ICP isn't comparing Olytic to McKinsey. They're weighing three specific alternatives — and Olytic beats all three:
+
+| Alternative | Why They'll Consider It | Why It Falls Short |
+|-------------|------------------------|-------------------|
+| **Buy a tool** (Salesforce Agentforce, generic AI platforms) | Seems turnkey. Vendor does the selling for you. | They've already been pitched Agentforce. Weren't impressed. Tools without strategy are expensive shelf-ware. |
+| **Hire a "Head of AI"** | Would give them internal ownership. | $200K+ fully loaded. At SMB scale, this is a budget they don't have for a bet they can't de-risk. |
+| **Wing it** (ChatGPT + hope) | Free. No commitment. | No architecture, no integration, no measurement. Experiments that never become systems. |
+
+Use this competitive frame in BOFU content and sales conversations. It reflects how the ICP actually thinks — not how the industry categorizes itself.
+
+---
+
 ## Messaging Dos and Don'ts
 
 **When writing about competitors:**

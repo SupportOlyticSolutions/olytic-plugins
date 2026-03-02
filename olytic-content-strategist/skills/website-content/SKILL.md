@@ -46,6 +46,49 @@ Use this skill when producing website content. Brand voice, ICP, and messaging r
 - **Social proof:** Client outcomes, metrics, or testimonials (when available)
 - **CTA section:** Repeat primary CTA with brief reinforcing line
 
+### GTM-Specific Page Types
+
+The Zero Case Study Playbook introduces several priority page types beyond standard blog posts and landing pages:
+
+**Interactive Assessment Tool Landing Page:**
+- Hero: outcome-focused headline about getting a personalized AI strategy in 10 minutes
+- Value proposition: what the prospect gets (AI Readiness Score, 3 prioritized opportunities, quick win they can start in 30 days)
+- Social proof placeholder (completion count, average readiness score once data exists)
+- Clear CTA to start the assessment
+- Brief "what happens next" — the bridge to the paid AI Strategy Blueprint
+
+**O/G/O Framework Page:**
+- NOT a blog post — a framework page. Think "Design Thinking" by IDEO or Salesforce's V2MOM.
+- Detailed enough that a smart operator can understand the architecture
+- This IS the credential when there are no case studies
+- Sections: the three layers (Operator, Governor, Optimizer), how the closed loop works, how it applies to their business, the philosophy ("amplification, not automation")
+
+**"Working With Us" Page:**
+- Engagement models: assessments vs. retainers, what to expect
+- How the engagement starts — frictionless entry
+- What the first 30 days look like
+- Pricing transparency where appropriate
+
+**"Build vs. Hire vs. Partner" Comparison Page:**
+- Positions the embedded model against three alternatives the ICP actually weighs:
+  - Buy a tool (Salesforce Agentforce, generic AI platforms) — tools without strategy are shelf-ware
+  - Hire a "Head of AI" — $200K+ for a bet they can't de-risk
+  - Wing it (ChatGPT + hope) — experiments that never become systems
+- Use a structured comparison table
+- End with Olytic's positioning: "embedded AI strategy partner for companies too smart to wing it and too lean to staff it"
+
+**GEO Long-Form Pages (AI Answer Engine Optimization):**
+- 3–4 definitive pages answering questions the ICP asks AI assistants
+- Target queries: "How should a mid-market B2B company approach AI strategy?", "What's the ROI of AI consulting for SMBs?", "What should a company without a Head of AI do first?", "How to evaluate AI readiness for a $20M B2B company"
+- Structure with clear headings, specific numbers, opinionated positions
+- AI assistants prefer specificity and structured data over generality
+- Be the most useful answer, not the most comprehensive one
+
+**Transformation Playbook Page:**
+- How Olytic has run technology transformations before (Salesforce era)
+- Positioned as methodology proof: "Here's how we've done this motion before. Here's how we do it now."
+- Bridges "transformation experience" to "AI expertise" — the objection neutralizer in page form
+
 ### General HTML Guidelines
 
 - Clean, semantic HTML (`<article>`, `<section>`, `<header>`, `<nav>`)

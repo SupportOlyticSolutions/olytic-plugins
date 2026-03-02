@@ -1,0 +1,72 @@
+{
+  "PreToolUse": [
+    {
+      "matcher": "push-content|mcp__github__create_or_update_file",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "The user is about to push content to GitHub. Before allowing this, check: Has a brand check been run on this content in the current session (i.e., was /brand-check, brand-compliance-reviewer, or consistency-auditor used)? If YES, proceed normally. If NO, block the push and respond: 'Before pushing to GitHub, this content needs a brand check. Run /brand-check from The One Ring first, then push.' Do not let the push proceed without brand check confirmation.",
+          "timeout": 15,
+          "decision": "approve|block"
+        }
+      ]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "matcher": "push-content|mcp__github__create_or_update_file",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Content was just pushed to GitHub. Log this publication event: Extract (1) page title or file path, (2) content type (blog post / landing page / GEO page / LinkedIn / other), (3) funnel stage (TOFU / MOFU / BOFU / unknown), (4) target keyword or query if mentioned, (5) repo and branch. Format as JSON: {\"event\": \"content_published\", \"title\": \"...\", \"type\": \"...\", \"funnel_stage\": \"...\", \"keyword\": \"...\", \"repo\": \"...\", \"branch\": \"...\", \"timestamp\": \"[ISO date]\"}. Store in conversation context for session summary.",
+          "timeout": 10
+        }
+      ]
+    },
+    {
+      "matcher": "content-performance",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "A content performance analysis just completed. After presenting results, proactively suggest: (1) If any high-traffic pages have low conversion — flag as a CTA optimization opportunity. (2) If any pages in the content strategy prioritization framework are missing entirely from the site — flag as a content gap. (3) If overall performance is strong — suggest which content pillar to invest in next based on the GTM funnel stage with the weakest coverage. Keep the suggestion to 2-3 bullet points, concise.",
+          "timeout": 15
+        }
+      ]
+    }
+  ],
+  "UserPromptSubmit": [
+    {
+      "matcher": "linkedin|post|social|feed",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "The user's message mentions LinkedIn, posts, or social content. If they're asking to write or draft a LinkedIn post and haven't already loaded the linkedin-content skill or used /linkedin-post, suggest: 'For LinkedIn posts, use /linkedin-post [topic] — it'll draft three options with different angles in Olytic's voice.' Only suggest if the user is asking to create content, not just discussing LinkedIn strategy.",
+          "timeout": 10,
+          "decision": "suggest|skip"
+        }
+      ]
+    },
+    {
+      "matcher": "brief|plan.*content|content.*plan|before.*writ|outline",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "The user's message suggests they want to plan or brief content before writing. If they haven't already used /content-brief or the content-brief skill, suggest: 'Before drafting, run /content-brief [topic] to generate a structured brief — it forces the funnel stage, ICP pain, and core argument to be explicit before any writing starts.' Only suggest once per session; skip if already suggested.",
+          "timeout": 10,
+          "decision": "suggest|skip"
+        }
+      ]
+    },
+    {
+      "matcher": "geo|ai search|answer engine|perplexity|cited|citation",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "The user's message mentions GEO, AI search, or content citation. If they're asking to write GEO content and haven't loaded the geo-content skill, suggest: 'For GEO pages, the magneto-geo-content skill has the full structural requirements — GEO pages have different rules than blog posts and it's worth loading it first.' Only suggest if they appear to be about to write, not just asking a strategy question.",
+          "timeout": 10,
+          "decision": "suggest|skip"
+        }
+      ]
+    }
+  ]
+}

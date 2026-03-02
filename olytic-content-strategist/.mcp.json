@@ -3,6 +3,14 @@
     "github": {
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "ahrefs": {
+      "type": "http",
+      "url": "https://api.ahrefs.com/mcp/mcp"
+    },
+    "windsor-ai": {
+      "type": "http",
+      "url": "https://mcp.windsor.ai"
     }
   }
 }
