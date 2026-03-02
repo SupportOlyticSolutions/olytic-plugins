@@ -1,0 +1,10 @@
+{
+  "name": "gaudi",
+  "version": "0.1.0",
+  "description": "Gaudi architects Olytic's plugin metadata platform — designing data models, security layers, product strategy, and the optimization loop.",
+  "author": {
+    "name": "Olytic Solutions",
+    "email": "support@olyticsolutions.com"
+  },
+  "keywords": ["data-architecture", "metadata-platform", "security", "data-governance", "optimization"]
+}
