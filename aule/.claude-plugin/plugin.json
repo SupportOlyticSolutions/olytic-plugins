@@ -7,5 +7,7 @@
     "email": "support@olyticsolutions.com"
   },
   "keywords": ["plugin-creation", "meta-plugin", "marketplace", "telemetry", "generation", "integrity", "augmentation"],
-  "hooks": "hooks/hooks.json"
+  "hooks": "hooks/hooks.json",
+  "sublabel": "Subcreator",
+  "icon": "🔨"
 }

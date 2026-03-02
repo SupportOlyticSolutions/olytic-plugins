@@ -17,11 +17,17 @@ Write to `.claude-plugin/plugin.json`. This file must be valid JSON — no comme
     "name": "Olytic Solutions",
     "email": "support@olyticsolutions.com"
   },
-  "keywords": ["keyword1", "keyword2", "keyword3"]
+  "keywords": ["keyword1", "keyword2", "keyword3"],
+  "sublabel": "1–3 Word Descriptor",
+  "icon": "🔨"
 }
 ```
 
-**⚠️ Valid keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. Do NOT add `displayName`, `title`, `label`, or any other key — unrecognized keys cause an upload validation failure.
+**⚠️ Valid keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`, `sublabel`, `icon`. Do NOT add `displayName`, `title`, `label`, or any other key — unrecognized keys cause an upload validation failure.
+
+**⚠️ Sublabel rules:** 1–3 words, title case, describes what the plugin *does* (not what it *is*). Must be unique across the Olytic plugin catalog.
+
+**⚠️ Icon rules:** Single emoji, thematically relevant to the plugin's function, unique across the Olytic plugin catalog. Verify uniqueness before assigning.
 
 **⚠️ Keywords must be an array of plain strings.** Not a single string. Not objects. Each keyword is one word or short phrase: `["governance", "brand", "strategy"]`.
 

@@ -135,11 +135,17 @@ Write to `.claude-plugin/plugin.json`. Use ONLY these keys — no others:
     "name": "[Olytic Solutions for internal, client name for client plugins]",
     "email": "[support@olyticsolutions.com for internal, client email for client plugins]"
   },
-  "keywords": ["keyword1", "keyword2", "keyword3"]
+  "keywords": ["keyword1", "keyword2", "keyword3"],
+  "sublabel": "[1–3 words describing what the plugin does — unique across the catalog]",
+  "icon": "[single emoji — thematically relevant, unique across the catalog]"
 }
 ```
 
-**⚠️ Valid keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. Do NOT include `displayName` or any other key — unrecognized keys cause upload failure. Keywords must be an array of plain strings, not a single placeholder string.
+**⚠️ Valid keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`, `sublabel`, `icon`. Do NOT include `displayName` or any other key — unrecognized keys cause upload failure. Keywords must be an array of plain strings, not a single placeholder string.
+
+**⚠️ Sublabel:** 1–3 words, title case, describes what the plugin *does*. Must be unique across the Olytic plugin catalog. Check `references/olytic-patterns.md` for current catalog values before assigning.
+
+**⚠️ Icon:** Single emoji character, thematically relevant to the plugin's function. Must be unique across the Olytic plugin catalog. Check `references/olytic-patterns.md` for current catalog values before assigning.
 
 **Immediately after writing plugin.json**, run this validation bash command to confirm the file was written correctly. Do NOT proceed until this passes:
 
@@ -153,7 +159,7 @@ try:
         print('FAIL: plugin.json is empty — rewrite the file')
         sys.exit(1)
     data = json.loads(content)
-    valid_keys = {'name','version','description','author','keywords','hooks'}
+    valid_keys = {'name','version','description','author','keywords','hooks','sublabel','icon'}
     bad_keys = [k for k in data if k not in valid_keys]
     missing = [k for k in ['name','version','description','author'] if k not in data]
     if bad_keys:

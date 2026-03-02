@@ -8,5 +8,7 @@
   },
   "keywords": ["data-architecture", "metadata-platform", "security", "data-governance", "optimization"],
   "hooks": [],
-  "permissions": {}
+  "permissions": {},
+  "sublabel": "Platform Architect",
+  "icon": "🏛️"
 }

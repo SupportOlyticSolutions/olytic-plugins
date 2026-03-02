@@ -113,9 +113,14 @@ When building plugins for Olytic's internal operations (proposals, delivery, sal
 
 ## plugin.json Valid Keys
 
-The only recognized keys in `plugin.json` are: `name`, `version`, `description`, `author`, `keywords`, `hooks`.
+The only recognized keys in `plugin.json` are: `name`, `version`, `description`, `author`, `keywords`, `hooks`, `sublabel`, `icon`.
+
+- **`sublabel`** — 1–3 word descriptor shown beneath the plugin name in the UI. Describes what the plugin *does* in plain language. Must be unique across the Olytic plugin catalog. Example: `"Content Marketing"`, `"Platform Architect"`, `"Subcreator"`.
+- **`icon`** — A single emoji character used as the plugin's visual identity in the UI. Must be thematically relevant and unique across the Olytic plugin catalog. Example: `"🧲"`, `"🏛️"`, `"🔨"`.
 
 **`displayName` is NOT a valid key** — it will cause a validation failure on upload. Do not include it.
+
+**Sublabel + icon uniqueness rule:** No two plugins in the Olytic catalog may share the same sublabel or the same icon. Before assigning either, verify against the current catalog.
 
 ## Skill Writing Standards
 

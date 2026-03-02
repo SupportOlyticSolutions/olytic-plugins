@@ -8,5 +8,7 @@
   },
   "keywords": ["content", "website", "github", "analytics", "strategy", "ga4", "linkedin", "geo", "seo"],
   "hooks": [],
-  "permissions": {}
+  "permissions": {},
+  "sublabel": "Content Marketing",
+  "icon": "🧲"
 }
