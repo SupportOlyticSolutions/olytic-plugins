@@ -180,7 +180,7 @@ Once case studies are live, shift emphasis from awareness to conversion content.
 These constraints apply to all content produced through Magneto. They are non-negotiable:
 
 ### Pre-Writing
-- **A content brief is required before drafting.** Use the `magneto-content-brief` skill or the `/content-brief` command. No exceptions for pieces longer than a LinkedIn post.
+- **A content brief is required before drafting.** Use the `magneto-content-brief-standards` skill or the `/content-brief` command. No exceptions for pieces longer than a LinkedIn post.
 - **Funnel stage must be declared** in the brief. If the stage is unclear, stop and clarify before writing.
 - **The core argument must be written in one sentence.** If it can't be, the angle isn't ready.
 

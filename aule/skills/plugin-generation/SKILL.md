@@ -80,6 +80,22 @@ Follow Olytic naming conventions from `references/olytic-patterns.md`:
 - **Commands:** `[verb]-[object]` (e.g., `pull-metrics`, `score-health`, `review-proposal`)
 - **Agents:** `[role]-[responsibility]` (e.g., `deal-analyst`, `proposal-reviewer`)
 
+### Step 2a: Validate Component Name Uniqueness
+
+Before proceeding to file generation, check that **no two components share the same name** across skills, commands, and agents. Skills, commands, and agents share the same qualified namespace (`plugin-name:component-name`), so names must be unique across all three types within a plugin.
+
+Collect all planned names:
+- Skill directory names (e.g., `proposal-standards`)
+- Command file names without `.md` (e.g., `review-proposal`)
+- Agent file names without `.md` (e.g., `proposal-reviewer`)
+
+If any duplicates exist, rename the component with the weaker claim to the name:
+- **Skills** (knowledge/standards) should add a suffix like `-standards`, `-guide`, or `-framework`
+- **Commands** (actions) keep the verb-object name since users invoke them directly
+- **Agents** (roles) keep the role-responsibility name
+
+**This check is non-negotiable.** A duplicate will cause the plugin to register the same qualified name for two different components, creating unpredictable behavior.
+
 ### Step 3: Generate Plugin Structure
 
 Create this directory structure:
@@ -366,12 +382,35 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
    ```
    If any file is missing, write it now.
 
-4. **Verify agent files** (if the plugin has agents):
+4. **Verify no duplicate component names** across skills, commands, and agents:
+   ```bash
+   python3 -c "
+   import os, sys
+   skills = [d for d in os.listdir('skills') if os.path.isdir(f'skills/{d}')] if os.path.isdir('skills') else []
+   commands = [f.replace('.md','') for f in os.listdir('commands') if f.endswith('.md')] if os.path.isdir('commands') else []
+   agents = [f.replace('.md','') for f in os.listdir('agents') if f.endswith('.md')] if os.path.isdir('agents') else []
+   all_names = skills + commands + agents
+   dupes = [n for n in set(all_names) if all_names.count(n) > 1]
+   if dupes:
+       print('FAIL: duplicate component names found:', dupes)
+       print('  Skills:', skills)
+       print('  Commands:', commands)
+       print('  Agents:', agents)
+       sys.exit(1)
+   print('OK — all component names are unique across skills, commands, and agents')
+   print(f'  Skills ({len(skills)}):', skills)
+   print(f'  Commands ({len(commands)}):', commands)
+   print(f'  Agents ({len(agents)}):', agents)
+   "
+   ```
+   If this fails, rename the conflicting component (see Step 2a rules) and rewrite the affected files.
+
+5. **Verify agent files** (if the plugin has agents):
    - **Frontmatter structure:** Confirm the block between `---` delimiters contains only `name`, `description`, `model`, `color`, `tools`. If `<example>` tags appear inside the frontmatter, move them to after the closing `---`.
    - **Unquoted colons in descriptions:** If any agent's `description` value contains `: ` (colon followed by space) on a single line, convert it to `description: >` block scalar format.
    - **Valid keys in plugin.json:** Confirm no `displayName` or other non-standard keys exist.
 
-5. **Package the plugin.** Run this from INSIDE the plugin directory (not its parent):
+6. **Package the plugin.** Run this from INSIDE the plugin directory (not its parent):
    ```bash
    cd /absolute/path/to/[plugin-name] && \
    zip -r /tmp/[plugin-name].plugin . -x "*.DS_Store" -x ".git/*" && \
@@ -379,18 +418,18 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
    ```
    **Critical:** The `cd` must go INTO the plugin directory (e.g., `/sessions/.../outputs/my-plugin`), not the parent. If you zip from the parent, the zip will have a subfolder wrapper and the validator will not find `.claude-plugin/plugin.json`.
 
-6. **Verify the zip contains the right structure:**
+7. **Verify the zip contains the right structure:**
    ```bash
    unzip -l /tmp/[plugin-name].plugin | grep -E "plugin\.json|SKILL\.md"
    ```
    The output must show `.claude-plugin/plugin.json` at the root (not inside a subdirectory). If you see `my-plugin/.claude-plugin/plugin.json`, the zip is wrong — you ran it from the parent directory. Fix the cd path and repackage.
 
-7. **Copy to outputs:**
+8. **Copy to outputs:**
    ```bash
    cp /tmp/[plugin-name].plugin /path/to/outputs/[plugin-name].plugin
    ```
 
-8. Present the `.plugin` file to the user.
+9. Present the `.plugin` file to the user.
 
-9. Ask: "Want me to add this to the Olytic marketplace?"
-   - If yes, invoke the marketplace-management skill
+10. Ask: "Want me to add this to the Olytic marketplace?"
+    - If yes, invoke the marketplace-management skill

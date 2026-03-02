@@ -1,5 +1,5 @@
 ---
-name: magneto-content-brief
+name: magneto-content-brief-standards
 description: >
   This skill should be used when the user asks for a "content brief", "brief me on this topic",
   "plan this article before writing", "what should I cover in this post", "create a brief for",

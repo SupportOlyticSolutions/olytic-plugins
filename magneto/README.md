@@ -16,7 +16,7 @@ Content creation and strategy plugin for Olytic Solutions. Handles website conte
 | **magneto-content-strategy** | Content strategy framework: GTM content funnel (TOFU/MOFU/BOFU), GEO strategy, LinkedIn strategy, content pillars, ICP journey mapping, prioritization framework, GA4 integration (Property ID: 525690219), Content O/G/O loop, production constraints. |
 | **magneto-linkedin-content** | LinkedIn short-form post anatomy, hook formulas, body structures, CTA patterns, voice checklist, and post themes aligned to the Zero Case Study Playbook. |
 | **magneto-geo-content** | GEO (AI Answer Engine Optimization) long-form page structure and strategy. Different requirements from blog posts — answer-first format, named concepts, structured excerptability, target queries. |
-| **magneto-content-brief** | Required pre-writing planning format. Defines all mandatory fields (funnel stage, ICP pain, thesis, differentiator, CTA, meta description) before drafting begins. |
+| **magneto-content-brief-standards** | Required pre-writing planning format. Defines all mandatory fields (funnel stage, ICP pain, thesis, differentiator, CTA, meta description) before drafting begins. |
 
 ### Commands
 
@@ -73,7 +73,7 @@ This plugin assumes The One Ring is always installed. Here's how they interact:
 | Content strategy framework | This plugin → `magneto-content-strategy` |
 | LinkedIn post drafting | This plugin → `magneto-linkedin-content` + `/linkedin-post` command |
 | GEO content creation | This plugin → `magneto-geo-content` + `/geo-check` command |
-| Content planning | This plugin → `magneto-content-brief` + `/content-brief` command |
+| Content planning | This plugin → `magneto-content-brief-standards` + `/content-brief` command |
 | GitHub push/pull | This plugin → `/pull-content` and `/push-content` commands |
 | GA4 analytics | This plugin → `/content-performance` command |
 
@@ -120,7 +120,7 @@ Share notes to trigger the meeting-notes-reviewer agent.
 - **Content strategy framework:** Edit `skills/content-strategy/SKILL.md`
 - **LinkedIn voice rules:** Edit `skills/linkedin-content/SKILL.md`
 - **GEO structure rules:** Edit `skills/geo-content/SKILL.md`
-- **Brief required fields:** Edit `skills/content-brief/SKILL.md`
+- **Brief required fields:** Edit `skills/content-brief-standards/SKILL.md`
 - **Hooks:** Edit `hooks/hooks.json`
 - **GA4 property:** Update the property ID in `skills/content-strategy/SKILL.md` if it changes
 - **Repo map:** Update the GitHub repo list in `skills/content-strategy/SKILL.md` if repos are added

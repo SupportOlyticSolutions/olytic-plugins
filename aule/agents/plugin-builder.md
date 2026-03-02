@@ -215,7 +215,8 @@ If this exits with an error, fix the file and re-run before continuing to the ne
 9. **Verify natural language triggers exist on every skill and agent:** Read the `description` field of each skill's and agent's frontmatter. It must contain at least 4 specific, user-language trigger phrases — things a real user would actually say (e.g., "review my proposal", "check this content against brand standards"). Generic placeholders like "use this skill when needed" or descriptions that only explain what the component does (rather than when to use it) are not sufficient. If any component has weak or missing triggers, fix the description before presenting to the user. This is a functional requirement: without good triggers, the plugin will not activate in natural conversation.
 10. Verify permissions manifest section exists in README — listing tools accessed, data read/written, external services called, and human-in-the-loop checkpoints.
 11. Verify memory scope declaration exists in README.
-12. If any check fails, fix it before presenting to the user
+12. **Verify component name uniqueness** — no skill directory name, command file name (without `.md`), or agent file name (without `.md`) may duplicate another within the plugin. Run the duplicate check script from the `plugin-generation` skill Step 4.
+13. If any check fails, fix it before presenting to the user
 
 Then present the generated plugin:
 
@@ -366,6 +367,28 @@ Verify the README lists what the plugin accesses: tools accessed, data read/writ
 
 **Check 10 — Augmentation framing:**
 Verify the README describes the plugin's augmentation — what new capabilities it enables beyond task automation. Does it explain what users can do with Claude that they couldn't before?
+
+**Check 11 — Component name uniqueness:**
+Verify that no two components share the same name across skills, commands, and agents. Skills, commands, and agents share the same qualified namespace (`plugin-name:component-name`), so a skill directory named `content-brief` and a command file named `content-brief.md` would both resolve to `plugin:content-brief` — creating unpredictable behavior.
+Run this validation:
+```bash
+python3 -c "
+import os, sys
+skills = [d for d in os.listdir('skills') if os.path.isdir(f'skills/{d}')] if os.path.isdir('skills') else []
+commands = [f.replace('.md','') for f in os.listdir('commands') if f.endswith('.md')] if os.path.isdir('commands') else []
+agents = [f.replace('.md','') for f in os.listdir('agents') if f.endswith('.md')] if os.path.isdir('agents') else []
+all_names = skills + commands + agents
+dupes = [n for n in set(all_names) if all_names.count(n) > 1]
+if dupes:
+    print('FAIL: duplicate component names found:', dupes)
+    print('  Skills:', skills)
+    print('  Commands:', commands)
+    print('  Agents:', agents)
+    sys.exit(1)
+print('OK — all component names unique')
+"
+```
+Flag as **High severity** if duplicates are found. Fix by renaming the skill (add `-standards`, `-guide`, or `-framework` suffix) since commands and agents have stronger claims to their names (users invoke commands directly, agents are role-based).
 
 ## Update Phase 2: Present Audit Report
 

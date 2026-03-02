@@ -51,7 +51,7 @@
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "The user's message suggests they want to plan or brief content before writing. If they haven't already used /content-brief or the content-brief skill, suggest: 'Before drafting, run /content-brief [topic] to generate a structured brief — it forces the funnel stage, ICP pain, and core argument to be explicit before any writing starts.' Only suggest once per session; skip if already suggested.",
+          "prompt": "The user's message suggests they want to plan or brief content before writing. If they haven't already used /content-brief or the content-brief-standards skill, suggest: 'Before drafting, run /content-brief [topic] to generate a structured brief — it forces the funnel stage, ICP pain, and core argument to be explicit before any writing starts.' Only suggest once per session; skip if already suggested.",
           "timeout": 10,
           "decision": "suggest|skip"
         }

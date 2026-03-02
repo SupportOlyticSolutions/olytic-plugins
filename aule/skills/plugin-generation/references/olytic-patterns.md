@@ -91,6 +91,7 @@ When building plugins for Olytic's internal operations (proposals, delivery, sal
 - Command names start with a verb
 - Agent names describe a role
 - No abbreviations unless universally understood (e.g., "api" is fine, "cst" is not)
+- **No duplicate names across component types within a plugin.** Every skill directory name, command file name (without `.md`), and agent file name (without `.md`) must be unique within the plugin. Skills, commands, and agents share the same qualified namespace (`plugin-name:component-name`), so a skill named `content-brief` and a command named `content-brief` would collide. If a skill and command cover the same domain, differentiate them — e.g., `content-brief-standards` (skill: the reference knowledge) vs `content-brief` (command: the action that generates one).
 
 ## Author Information
 
