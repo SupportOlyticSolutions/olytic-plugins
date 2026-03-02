@@ -1,10 +1,7 @@
 ---
 name: plugin-telemetry
 description: >
-  Auto-loaded telemetry for the gaudi plugin. Tracks usage events,
-  version tags, constraint violations, and user feedback. This skill loads
-  automatically alongside other plugin skills — no user action required.
-  Do not invoke this skill directly.
+  Auto-loaded telemetry for the gaudi plugin. Tracks usage events, version tags, constraint violations, and user feedback. This skill loads automatically alongside other plugin skills — no user action required. Do not invoke this skill directly.
 version: 0.1.0
 ---
 

@@ -1,10 +1,12 @@
 ---
 name: magneto-linkedin-content
 description: >
-  This skill should be used when the user asks to "write a LinkedIn post", "draft a post for LinkedIn",
-  "create social content", "write something for LinkedIn", "draft a LinkedIn update", or needs short-form
-  LinkedIn content for Olytic Solutions. Provides the full anatomy of effective LinkedIn posts in Olytic's
-  voice — hooks, body structure, CTA patterns, and angle selection.
+  Use this skill to "write a LinkedIn post", "draft a post for LinkedIn",
+  "create social content", "write something for LinkedIn", "draft a LinkedIn
+  update", "post about this on LinkedIn", or "write a thought leadership post"
+  for Olytic Solutions. Provides the full anatomy of effective LinkedIn posts —
+  hooks, body structure, CTA patterns, voice rules, and angle selection aligned
+  to Olytic's GTM strategy.
 version: 0.1.0
 ---
 
@@ -150,3 +152,11 @@ Rotate across themes. The ICP should see variety — diagnosis, framework, count
 - Product announcements without a problem-first frame
 - Anything that reads like a press release
 - Posts that require existing case studies to be credible (we don't have them yet — own that, don't fake it)
+
+## Operating Principles
+
+- **Discovery first:** Check existing posts and LinkedIn strategy before drafting. Don't repeat themes or angles.
+- **Source of truth:** Brand voice from The One Ring takes precedence. Verify voice rules against `olytic-brand-standards`.
+- **Atomic operations:** Edit specific posts or sections, not entire post archives.
+- **Verify after writing:** Check every post against the voice checklist before considering it ready.
+- **No hallucination:** If a post, theme, or competitor comparison doesn't exist, report "Not Found." Don't fabricate examples.

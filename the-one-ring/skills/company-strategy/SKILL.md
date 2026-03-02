@@ -1,11 +1,11 @@
 ---
 name: olytic-company-strategy
 description: >
-  This skill should be used when the user asks about "company strategy",
-  "our vision", "our priorities", "what are we working on", "OKRs",
-  "strategic direction", "company goals", "core values", "what do we stand for",
-  or needs context on Olytic Solutions' current strategic priorities, vision,
-  business stage, or values to inform any work product.
+  Use this skill when the user asks about "company strategy", "our vision", "our priorities",
+  "what are we working on", "OKRs", "strategic direction", "company goals", "core values",
+  "what do we stand for", "what's our focus this quarter", or "remind me of our strategy".
+  Load this skill to understand Olytic's strategic mission, business stage, core values,
+  and current priorities before building any work product or making strategic decisions.
 version: 0.3.0
 ---
 

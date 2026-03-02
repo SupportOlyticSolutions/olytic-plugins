@@ -1,11 +1,7 @@
 ---
 name: data-privacy
 description: >
-  This skill should be used when the user asks to "how do we anonymize the data",
-  "what's our privacy architecture", "design the consent framework",
-  "how do we handle PII", "what data can we actually license", or needs guidance
-  on anonymization techniques, consent management, PII handling, and designing
-  privacy-preserving data collection for the metadata platform.
+  Use this skill for privacy architecture and consent design: "how do we anonymize the data", "what's our privacy architecture", "design the consent framework", "how do we handle PII", "what data can we actually license", "GDPR compliance approach", "data minimization strategy", or when planning anonymization techniques, consent management, privacy-first data collection, and designing privacy-preserving systems for the metadata platform.
 version: 0.1.0
 ---
 

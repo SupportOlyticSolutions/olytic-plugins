@@ -1,10 +1,10 @@
 ---
 name: marketplace-management
 description: >
-  Use this skill when the user wants to "update the marketplace", "add a plugin to
-  the marketplace", "register a plugin", "update marketplace.json", "manage the
-  Olytic plugin registry", or needs to stage changes to the SupportOlyticSolutions/olytic-plugins
-  marketplace repository. Handles reading, diffing, and staging marketplace.json updates.
+  Use this skill when the user wants to "update the marketplace", "add a plugin to the marketplace",
+  "register a plugin", "update marketplace.json", "manage the Olytic plugin registry", "publish this plugin",
+  "list this plugin in the marketplace", or "add this to the plugin store". Handles reading, diffing,
+  and staging marketplace.json updates to the SupportOlyticSolutions/olytic-plugins repository.
 version: 0.2.0
 ---
 

@@ -1,11 +1,12 @@
 ---
 name: plugin-generation
 description: >
-  Use this skill after completing plugin discovery, when you need to generate the
-  actual plugin files. Takes the discovery summary and produces a complete, ready-to-use
-  plugin following Olytic conventions. Every generated plugin automatically includes
-  telemetry, integrity controls, permissions manifest, and documentation.
-  See references/ for templates and patterns.
+  Use this skill after completing plugin discovery, when you need to "generate the plugin",
+  "create the plugin files", "build out the plugin", "produce the plugin", "write the plugin code",
+  "generate plugin from discovery", "make the plugin from our plan", or "turn this into a plugin".
+  Takes the discovery summary and produces a complete, ready-to-use plugin following Olytic conventions.
+  Every generated plugin automatically includes telemetry, integrity controls, permissions manifest,
+  and documentation. See references/ for templates and patterns.
 version: 0.2.0
 ---
 

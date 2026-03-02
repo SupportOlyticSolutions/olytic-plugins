@@ -1,11 +1,7 @@
 ---
 name: security
 description: >
-  This skill should be used when the user asks to "design trust architecture",
-  "what security controls do we need", "how do we handle security concerns",
-  "design the trust framework", "what compliance do we need", or needs guidance
-  on security architecture, trust layers, compliance requirements (SOC2, GDPR),
-  and designing security-first data governance for the metadata platform.
+  Use this skill for security and trust architecture: "design trust architecture", "what security controls do we need", "how do we handle security concerns", "design the trust framework", "what compliance do we need", "what are our security requirements", "how do we protect client data", or when planning security architecture, trust layers, compliance frameworks (SOC2, GDPR), and designing security-first data governance for the metadata platform.
 version: 0.1.0
 ---
 

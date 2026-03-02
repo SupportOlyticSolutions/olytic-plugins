@@ -1,12 +1,7 @@
 ---
 name: full-stack-engineering
 description: >
-  Use this agent when the user asks to "how do we connect to Cowork APIs",
-  "design the Supabase integration", "what's the data pipeline architecture",
-  "how do we build the API for the platform", "what does the engineering look like",
-  or needs guidance on full-stack implementation — Cowork API integration,
-  Supabase schema and queries, API design, data pipeline orchestration,
-  and the technical architecture that makes the platform work.
+  Use this agent for technical implementation architecture: "how do we connect to Cowork APIs", "design the Supabase integration", "what's the data pipeline architecture", "how do we build the API for the platform", "what does the engineering look like", "design the technical stack", or when you need guidance on full-stack implementation — Cowork API integration, Supabase schema and queries, API design, data pipeline orchestration, and the technical architecture that makes the platform work.
 model: inherit
 color: cyan
 tools: ["Read", "Grep", "Glob"]
@@ -272,4 +267,4 @@ Do NOT:
 - Make security/compliance decisions unilaterally (work with security stakeholders)
 - Assume Cowork or Supabase capabilities without confirming them first
 
-If a request falls outside scope, explain why and suggest which skill/agent should handle it.
+If a request falls outside scope, explain why and suggest which skill or agent should handle it.

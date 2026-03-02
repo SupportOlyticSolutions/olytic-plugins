@@ -1,16 +1,12 @@
 ---
 name: plugin-builder
 description: >
-  Use this agent when the user wants to "create a plugin", "build a plugin",
-  "design a new plugin", "make a plugin from scratch", or needs an end-to-end
-  guided experience for plugin creation — from discovery through generation,
-  review, and delivery.
-  Also use this agent when the user wants to "update a plugin", "update these plugins",
-  "improve a plugin", "fix a plugin", "refresh a plugin", "apply latest best practices
-  to a plugin", "revise a plugin", "upgrade a plugin", "check a plugin against current
-  patterns", "update the plugin creator", or wants to bring any existing plugin up to
-  current standards. Whenever the user mentions updating, fixing, or improving an
-  existing plugin file or directory, this agent handles it.
+  Use this agent when the user wants to "create a plugin", "build a plugin", "design a new plugin",
+  "make a plugin from scratch", or needs an end-to-end guided experience for plugin creation from
+  discovery through generation, review, and delivery. Also use when the user wants to "update a plugin",
+  "update these plugins", "improve a plugin", "fix a plugin", "refresh a plugin", "apply latest best practices
+  to a plugin", "revise a plugin", "upgrade a plugin", "check a plugin against current patterns",
+  or wants to bring any existing plugin up to current standards.
 model: inherit
 color: magenta
 tools: ["Read", "Write", "Glob", "Grep", "Bash", "mcp__github__get_file_contents", "mcp__github__create_or_update_file", "mcp__github__create_branch"]
@@ -367,28 +363,6 @@ Verify the README lists what the plugin accesses: tools accessed, data read/writ
 
 **Check 10 — Augmentation framing:**
 Verify the README describes the plugin's augmentation — what new capabilities it enables beyond task automation. Does it explain what users can do with Claude that they couldn't before?
-
-**Check 11 — Component name uniqueness:**
-Verify that no two components share the same name across skills, commands, and agents. Skills, commands, and agents share the same qualified namespace (`plugin-name:component-name`), so a skill directory named `content-brief` and a command file named `content-brief.md` would both resolve to `plugin:content-brief` — creating unpredictable behavior.
-Run this validation:
-```bash
-python3 -c "
-import os, sys
-skills = [d for d in os.listdir('skills') if os.path.isdir(f'skills/{d}')] if os.path.isdir('skills') else []
-commands = [f.replace('.md','') for f in os.listdir('commands') if f.endswith('.md')] if os.path.isdir('commands') else []
-agents = [f.replace('.md','') for f in os.listdir('agents') if f.endswith('.md')] if os.path.isdir('agents') else []
-all_names = skills + commands + agents
-dupes = [n for n in set(all_names) if all_names.count(n) > 1]
-if dupes:
-    print('FAIL: duplicate component names found:', dupes)
-    print('  Skills:', skills)
-    print('  Commands:', commands)
-    print('  Agents:', agents)
-    sys.exit(1)
-print('OK — all component names unique')
-"
-```
-Flag as **High severity** if duplicates are found. Fix by renaming the skill (add `-standards`, `-guide`, or `-framework` suffix) since commands and agents have stronger claims to their names (users invoke commands directly, agents are role-based).
 
 ## Update Phase 2: Present Audit Report
 

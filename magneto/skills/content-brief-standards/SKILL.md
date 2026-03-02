@@ -1,10 +1,11 @@
 ---
 name: magneto-content-brief-standards
 description: >
-  This skill should be used when the user asks for a "content brief", "brief me on this topic",
-  "plan this article before writing", "what should I cover in this post", "create a brief for",
-  or needs a structured planning document before writing any piece of content.
-  Establishes the required fields every piece of content must define before drafting begins.
+  Use this skill to "create a content brief", "brief me on this topic",
+  "plan this article before writing", "what should I cover in this post",
+  "give me a brief for", "outline this piece before we write it", or "what's
+  the structure for this content". Establishes the required fields every piece
+  of content must define before drafting begins.
 version: 0.1.0
 ---
 
@@ -108,3 +109,11 @@ Before moving to drafting, confirm:
 3. **Is the ICP pain specific?** "They want to use AI" is not a pain. "They ran a ChatGPT pilot that produced generic outputs and now the CEO is skeptical" is a pain.
 4. **Is the CTA appropriate for the funnel stage?** TOFU content shouldn't ask for a sales conversation. BOFU content should.
 5. **Is the priority score honest?** Don't inflate priority to justify writing something interesting but strategically low-value.
+
+## Operating Principles
+
+- **Discovery first:** Check existing briefs and published content to understand what's already been covered. Don't create briefs for duplicate angles.
+- **Source of truth:** ICP pain and strategic priorities from The One Ring take precedence. Verify against `olytic-brand-standards` and company strategy.
+- **Atomic operations:** Create or edit individual briefs. Don't bulk-rewrite the entire brief archive.
+- **Verify after writing:** Validate that every required field is complete before considering the brief ready for drafting.
+- **No hallucination:** If a competitor claim, ICP quote, or Olytic differentiator can't be verified, report "Not Found." Don't fabricate competitive intelligence.

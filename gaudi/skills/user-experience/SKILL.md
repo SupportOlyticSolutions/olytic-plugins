@@ -1,11 +1,7 @@
 ---
 name: user-experience
 description: >
-  This skill should be used when the user asks to "design the client-facing dashboard",
-  "what should the data platform UI look like", "how do we onboard clients to the platform",
-  "design the experience for clients accessing their data", "what flows should we include",
-  or needs guidance on client-facing UI/UX design, dashboard architecture, onboarding flows,
-  and the customer experience of the data platform product.
+  Use this skill for client experience and UI design: "design the client-facing dashboard", "what should the data platform UI look like", "how do we onboard clients to the platform", "design the experience for clients accessing their data", "what flows should we include", "UX for the analytics platform", or when planning client-facing UI/UX, dashboard architecture, onboarding flows, and the customer experience that builds trust in the data platform product.
 version: 0.1.0
 ---
 

@@ -1,0 +1,27 @@
+{
+  "PostToolUse": [
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "A file was just written or edited. Check if the file path contains any of these Aule core files: 'skills/plugin-generation', 'skills/plugin-discovery', 'skills/marketplace-management', 'agents/plugin-builder', 'commands/', 'references/olytic-patterns', 'references/component-templates', 'references/agentic-best-practices', 'references/telemetry-template'. If YES — an Aule standard has changed. Automatically invoke the trashbot agent with this message: 'Aule was just updated ([file path that changed]). Run trashbot to sweep all other plugins and bring them up to the new standards.' If NO — the file is not an Aule standard, no action needed.",
+          "timeout": 20
+        }
+      ]
+    }
+  ],
+  "UserPromptSubmit": [
+    {
+      "matcher": "trashbot|close the loop|sweep.*plugin|plugin.*sweep|sync.*plugin|plugin.*out.of.date|bring.*plugin.*current|update.*all.*plugin",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "The user is asking to run trashbot or sweep all plugins. Invoke the trashbot agent immediately. Do not ask clarifying questions — trashbot is designed to run autonomously. Say: 'Running trashbot — auditing all plugins in the workspace against current Aule standards.'",
+          "timeout": 10,
+          "decision": "approve|skip"
+        }
+      ]
+    }
+  ]
+}

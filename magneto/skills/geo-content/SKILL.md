@@ -1,11 +1,12 @@
 ---
 name: magneto-geo-content
 description: >
-  This skill should be used when the user asks to "write a GEO page", "optimize for AI search",
-  "write a long-form answer page", "create content for AI assistants to cite", "write for GEO",
-  "optimize for ChatGPT or Perplexity", or needs to produce content specifically structured to be
-  cited by AI answer engines. GEO pages have distinct structural and strategic requirements from
-  standard blog posts and landing pages.
+  Use this skill to "write a GEO page", "optimize for AI search",
+  "write a long-form answer page", "create content for AI assistants to cite",
+  "write for GEO", "optimize for ChatGPT or Perplexity", or "make this page
+  answer engine ready" for AI-native content optimization. GEO pages have
+  distinct structural and strategic requirements from standard blog posts and
+  landing pages — structured for AI citation and discoverability.
 version: 0.1.0
 ---
 
@@ -139,3 +140,11 @@ GEO pages are more formal and definitive than LinkedIn posts, but not dry. Apply
 - **Internal links:** Link to the O/G/O Framework page, the assessment tool, and relevant blog posts
 - **Schema markup:** If the site supports it, use FAQ schema on the question-structured sections
 - **Page URL:** Match the query: `/ai-strategy-for-mid-market-companies` or `/no-head-of-ai-what-to-do-first`
+
+## Operating Principles
+
+- **Discovery first:** Check existing GEO pages to avoid duplication. Research what competitors and AI assistants currently cite.
+- **Source of truth:** Brand voice from The One Ring takes precedence. Verify positioned claims against `olytic-brand-standards`.
+- **Atomic operations:** Edit specific sections of GEO pages. Don't rewrite entire pages unless the structure is broken.
+- **Verify after writing:** Validate against GEO criteria — numbered concepts, specificity, AI-excerptability.
+- **No hallucination:** If a competitor page, query, or Olytic framework reference doesn't exist, report "Not Found." Don't fabricate citations or query data.

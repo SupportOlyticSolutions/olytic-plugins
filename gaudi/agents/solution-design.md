@@ -1,12 +1,7 @@
 ---
 name: solution-design
 description: >
-  Use this agent when the user asks to "walk me through the full architecture",
-  "how do we engineer the connection between plugin usage and the database",
-  "design the end-to-end flow from Aulë to the metadata platform",
-  "what does the Optimizer plugin workflow look like", or needs a comprehensive
-  architectural design of the entire metadata platform — from data collection
-  through analysis through the optimization feedback loop.
+  Use this agent for end-to-end architectural thinking: "walk me through the full architecture", "how do we engineer the connection between plugin usage and the database", "design the end-to-end flow from Aulë to the metadata platform", "what does the Optimizer plugin workflow look like", "design the complete solution", or when you need comprehensive architectural design of the entire metadata platform — from data collection through analysis through the optimization feedback loop.
 model: inherit
 color: magenta
 tools: ["Read", "Grep", "Glob"]

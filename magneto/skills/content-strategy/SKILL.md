@@ -1,11 +1,11 @@
 ---
 name: olytic-content-strategy
 description: >
-  This skill should be used when the user asks about "content strategy",
-  "what should I write", "content calendar", "content plan", "SEO strategy",
-  "content priorities", "analytics insights", or needs guidance on Olytic Solutions'
-  approach to content planning, performance measurement, and strategic content decisions.
-  Assumes The One Ring plugin is installed for brand and strategy context.
+  Use this skill when the user asks "what should I write about", "content strategy",
+  "content calendar", "content plan", "SEO strategy", "content priorities",
+  "analytics insights", "what topics should we prioritize", or "what's our
+  content roadmap" for Olytic Solutions. Provides guidance on content planning,
+  performance measurement, and strategic content decisions aligned to GTM.
 version: 0.2.0
 ---
 
@@ -216,3 +216,11 @@ All repos under the `SupportOlyticSolutions` org:
 | **olytic-sandbox** | Sandbox / testing | Not for production content |
 
 Default to `olytic-site` for website content unless otherwise specified.
+
+## Operating Principles
+
+- **Discovery first:** Audit existing content before recommending new pieces. Check GA4, GitHub repos, and published content to avoid duplication.
+- **Source of truth:** Brand standards and strategic priorities from The One Ring take precedence. Verify all claims against company strategy.
+- **Atomic operations:** Recommend specific pieces or update specific sections. Don't bulk-rewrite content strategy.
+- **Verify after writing:** Validate content against the Content Quality Gates before considering it ready.
+- **No hallucination:** If a GA4 metric, competitor claim, or Olytic differentiator can't be verified, report "Not Found." Don't estimate analytics data.

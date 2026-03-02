@@ -1,11 +1,7 @@
 ---
 name: bi-reporting
 description: >
-  This skill should be used when the user asks to "what should our dashboards show",
-  "design the reporting structure", "what analytics do customers want to see",
-  "how do we present outcomes to clients", or needs guidance on dashboard design,
-  BI architecture, reporting frameworks, and the analytics that drive client
-  engagement with the metadata platform.
+  Use this skill for reporting and analytics design: "what should our dashboards show", "design the reporting structure", "what analytics do customers want to see", "how do we present outcomes to clients", "what metrics should we track", "design our reporting layer", "what KPIs matter", or when planning dashboard architecture, BI frameworks, client reporting cadences, and analytics that drive engagement with the metadata platform.
 version: 0.1.0
 ---
 

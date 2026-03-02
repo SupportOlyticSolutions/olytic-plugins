@@ -2,7 +2,16 @@
 
 Named for the Vala of craft and making, Aulë is Olytic's meta-plugin for creating other plugins. It guides a structured discovery process, generates complete plugin files with automatic telemetry and integrity controls, and manages the Olytic plugin marketplace.
 
+## Augmentation
+
 Every plugin Aulë creates is designed around **augmentation, not automation** — giving people new capabilities rather than just speeding up existing tasks. This philosophy is embedded in the discovery process, generation templates, and success metrics.
+
+**What Aulë enables:**
+- **Democratized plugin creation:** Non-developers can now design, build, and deploy AI capabilities tailored to their team's workflows without writing code. Discovery guides you through strategic requirements before generation, not after.
+- **Self-improving plugin ecosystem:** Trashbot automatically keeps every plugin current as standards evolve. When Aulë improves, the entire ecosystem follows — no manual updates, no plugin drift.
+- **Integrity from day one:** Every generated plugin includes permissions manifests, telemetry, memory scope declarations, and human-in-the-loop checkpoints. Security and observability are not added later — they're baked in from generation.
+- **Augmentation-driven design:** Aulë's discovery process explicitly probes for new capabilities (what people can do with Claude that they couldn't before) rather than just task speedup. This prevents "duct tape" solutions that never deliver ROI.
+- **Reusable standards:** Every plugin follows the same naming conventions, architecture patterns, and best practices. Plugins compose together because they speak the same language.
 
 Works for both Olytic internal plugins and client-facing plugins.
 
@@ -23,6 +32,7 @@ Works for both Olytic internal plugins and client-facing plugins.
 ### Agents
 
 - **plugin-builder** — End-to-end orchestrator that manages the 6-phase plugin creation workflow: discovery → component planning → generation → review → delivery → marketplace
+- **trashbot** — Automated ecosystem sweep agent. Triggered whenever Aule is updated, trashbot audits every other plugin in the workspace against the current Aule standards and fixes all issues without per-plugin approval. The close-the-loop mechanism for keeping the plugin ecosystem consistent.
 
 ### Integrations
 
@@ -80,10 +90,44 @@ Then follow the guided discovery flow.
 /update-plugin all
 ```
 
+**Run trashbot manually (after updating Aule):**
+```
+run trashbot
+```
+Or simply update any Aule core file — the hook triggers trashbot automatically.
+
+**What trashbot fixes automatically:**
+- Invalid keys in plugin.json
+- `<example>` blocks inside agent YAML frontmatter
+- Colons in single-line agent descriptions (converts to block scalar)
+- Unquoted argument-hint values
+- Duplicate component names
+- Missing plugin-telemetry skill
+- Missing Operating Principles section in skills
+- Weak or missing natural language triggers
+- Missing Memory Scope and Permissions Manifest in READMEs
+
 **Update the marketplace after building a plugin:**
 ```
 /update-marketplace sales-enablement
 ```
+
+## Memory Scope
+
+- **Type:** Ephemeral (session-only)
+- **What is retained:** Discovery answers are held in conversation context for the duration of a plugin creation or update session. Nothing persists between sessions.
+- **Justification:** Plugin creation is a single-session workflow. Discovery data, audit findings, and generation decisions do not need to persist — each new request starts fresh.
+
+## Permissions Manifest
+
+| Declaration | Details |
+|------------|---------|
+| **Tools accessed** | Read, Write, Glob, Grep, Bash |
+| **MCP servers** | GitHub (`mcp__github__get_file_contents`, `mcp__github__create_or_update_file`, `mcp__github__create_branch`) |
+| **Data read** | Plugin source files, `.claude-plugin/plugin.json`, skill SKILL.md files, agent and command markdown files, `marketplace.json`, Aule reference files |
+| **Data written** | Plugin source files (skills, agents, commands, README, plugin.json), `.plugin` zip archives, `marketplace.json` entries |
+| **External services** | GitHub API (marketplace reads and staged branch writes) |
+| **Human-in-the-loop** | All destructive changes (deleting files or components) require explicit confirmation. Marketplace updates are staged to a feature branch — never auto-merged. Trashbot confirms before deleting any plugin component. |
 
 ## Customization
 

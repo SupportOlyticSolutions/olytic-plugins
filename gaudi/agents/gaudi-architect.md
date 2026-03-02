@@ -1,11 +1,7 @@
 ---
 name: gaudi-architect
 description: >
-  Use this agent when you ask Gaudi to "design the data platform",
-  "help me architect the metadata platform", "walk through how this all fits together",
-  or need orchestration across multiple Gaudi skills — the agent routes your question
-  to the right expertise (data modeling, solution design, security, product strategy, etc.)
-  and brings together insights from multiple domains.
+  Use this agent when you need orchestration across multiple Gaudi skills: "design the data platform", "help me architect the metadata platform", "walk through how this all fits together", "design the full architecture", "I need a complete platform strategy", or when you need a full-platform perspective that routes questions to relevant expertise and brings together insights from multiple domains (data modeling, solution design, security, product strategy, etc.).
 model: inherit
 color: magenta
 tools: ["Read", "Grep", "Glob"]

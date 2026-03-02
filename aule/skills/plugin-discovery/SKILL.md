@@ -2,10 +2,11 @@
 name: plugin-discovery
 description: >
   Use this skill when the user wants to "create a plugin", "build a plugin",
-  "design a plugin", "start a new plugin", "plan a plugin", or needs to go through
-  the discovery process for gathering requirements before generating a plugin.
-  This skill drives a structured 10-question discovery flow that adapts dynamically
-  based on the user's answers. Works for both Olytic internal plugins and client-facing plugins.
+  "design a plugin", "start a new plugin", "plan a plugin", "I want to make a plugin for",
+  "help me design a plugin that", "what would a plugin look like for", "let's build a plugin",
+  or "I need a plugin that". This skill drives the structured 10-question discovery flow
+  that gathers all requirements before generating a plugin. Works for both Olytic internal
+  plugins and client-facing plugins.
 version: 0.2.0
 ---
 

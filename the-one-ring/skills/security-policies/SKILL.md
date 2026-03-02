@@ -1,10 +1,11 @@
 ---
 name: olytic-security-policies
 description: >
-  This skill should be used when the user asks about "security policies",
-  "data handling", "client confidentiality", "access controls", "security rules",
-  "what can I share", "NDA", or needs guidance on Olytic Solutions' security
-  and data protection standards.
+  Use this skill when the user asks about "security policies", "data handling", "client
+  confidentiality", "access controls", "security rules", "what can I share", "NDA",
+  "how do we handle client data", or "what are our security requirements". Load this
+  skill to understand data classification, credential management, AI tool usage policies,
+  and incident response procedures.
 version: 0.2.0
 ---
 

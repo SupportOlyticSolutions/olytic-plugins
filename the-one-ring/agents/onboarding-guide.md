@@ -1,6 +1,11 @@
 ---
 name: onboarding-guide
-description: Use this agent when a new employee or collaborator needs to be oriented on Olytic Solutions' governance layer — what the company does, how it operates, what the rules are, and how to represent the brand. Also useful for anyone returning to the context after time away.
+description: >
+  Use this agent when a new employee or collaborator needs to be oriented on Olytic
+  Solutions' governance layer, when someone says "I just joined the team", "help me get
+  oriented", "what do I need to know as a new team member", "walk me through how things
+  work", or "I'm new here". This agent provides a structured, interactive walkthrough of
+  Olytic's strategy, values, brand voice, HR norms, and security policies.
 model: inherit
 color: green
 tools: ["Read"]

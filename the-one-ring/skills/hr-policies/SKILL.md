@@ -1,10 +1,10 @@
 ---
 name: olytic-hr-policies
 description: >
-  This skill should be used when the user asks about "HR policies", "PTO",
-  "time off", "work hours", "communication norms", "onboarding",
-  "employee handbook", "company culture", or needs guidance on Olytic Solutions'
-  people policies and workplace norms.
+  Use this skill when the user asks about "HR policies", "PTO", "time off", "work hours",
+  "communication norms", "onboarding", "employee handbook", "company culture", "what's our
+  policy on", "how many vacation days", or "what are the rules for". Load this skill to
+  understand Olytic's people policies, workplace norms, and expectations for culture and communication.
 version: 0.2.0
 ---
 

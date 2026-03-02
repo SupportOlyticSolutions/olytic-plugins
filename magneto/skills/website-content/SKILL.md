@@ -1,11 +1,11 @@
 ---
 name: olytic-website-content
 description: >
-  This skill should be used when the user asks to "create a webpage", "write HTML",
-  "build a blog post page", "make a landing page", "draft website content",
-  "create a page for the site", or needs to produce HTML website content for
-  Olytic Solutions. Covers page structure, HTML patterns, content formatting,
-  and templates for both blog posts and landing pages.
+  Use this skill to "create a webpage", "write HTML", "build a blog post page",
+  "make a landing page", "draft website content", "create a page for the site",
+  "write the copy for our homepage", or "build out a service page" for Olytic
+  Solutions. Provides page structures, HTML patterns, content formatting rules,
+  and templates for blog posts, landing pages, and GTM-specific page types.
   Assumes The One Ring plugin is installed for brand standards.
 version: 0.1.0
 ---
@@ -123,3 +123,11 @@ Before writing any page, confirm:
 ## Templates
 
 For HTML page templates, see `references/page-templates.md`.
+
+## Operating Principles
+
+- **Discovery first:** Before creating a page, assess what already exists. Check GitHub repos and existing content to avoid duplication.
+- **Source of truth:** Brand standards from The One Ring take precedence. If there's a conflict, verify against The One Ring's `olytic-brand-standards` skill.
+- **Atomic operations:** Make targeted edits to existing pages. Don't rewrite entire sites unless explicitly requested.
+- **Verify after writing:** After creating or updating HTML, validate the structure and proofread for ICP alignment.
+- **No hallucination:** If a page path, template reference, or brand guideline doesn't exist, report "Not Found." Never guess URLs or template names.

@@ -1,12 +1,7 @@
 ---
 name: data-modeling
 description: >
-  This skill should be used when the user asks to "what object schema would we use",
-  "design our data model", "how should we structure the metadata",
-  "what normalization approach makes sense", "help me design the database",
-  "what tables do we need", or needs guidance on relational schema design,
-  normalization patterns, indexing strategy, or data structure decisions
-  for the plugin metadata platform.
+  Use this skill when designing database schemas or metadata structures: "what object schema would we use", "design our data model", "how should we structure the metadata", "what normalization approach makes sense", "help me design the database", "what tables do we need", "design the schema", or when planning outcome attribution architecture, CRM linkage, or commercial data structure for the plugin metadata platform.
 version: 0.1.0
 ---
 

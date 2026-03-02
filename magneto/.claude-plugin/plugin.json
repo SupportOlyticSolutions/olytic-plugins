@@ -1,10 +1,12 @@
 {
   "name": "magneto",
   "version": "0.2.0",
-  "description": "Content creation and strategy plugin for Olytic Solutions — website content, LinkedIn posts, GEO optimization, GitHub integration, competitive research, GA4 analytics, and content best practices. Requires The One Ring governance plugin.",
+  "description": "Content creation and strategy plugin for Olytic Solutions. Write website pages, LinkedIn posts, GEO-optimized long-form content, and execute strategic content planning with brand compliance, analytics integration, and team-level workflows.",
   "author": {
     "name": "Olytic Solutions",
     "email": "support@olyticsolutions.com"
   },
-  "keywords": ["content", "website", "github", "analytics", "strategy", "ga4", "linkedin", "geo", "seo"]
+  "keywords": ["content", "website", "github", "analytics", "strategy", "ga4", "linkedin", "geo", "seo"],
+  "hooks": [],
+  "permissions": {}
 }

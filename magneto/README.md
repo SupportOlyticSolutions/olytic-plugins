@@ -6,6 +6,21 @@ Content creation and strategy plugin for Olytic Solutions. Handles website conte
 
 ---
 
+## What Magneto Enables
+
+**Without this plugin:** Content teams work tactically — writing individual posts without strategic alignment, missing competitive angles, struggling to maintain brand consistency, and operating without performance insights.
+
+**With Magneto:** Content teams execute with strategy and scale:
+- Always-on brand voice consistency across all channels — website, LinkedIn, GEO, briefs — powered by real-time brand standards
+- Structured workflow that prevents common content failures (wrong funnel stage, missing differentiation, ICP misalignment)
+- Strategic guidance on what to write next, grounded in competitive research, analytics, and ICP journey mapping
+- Optimized output for AI discovery — GEO pages structured to be cited by ChatGPT, Perplexity, Claude, and Gemini
+- GitHub integration for frictionless publishing with built-in content governance (pre-push brand check)
+
+**The result:** Content that wins case studies, drives organic traffic, and positions Olytic as the recognized expert in Claude Cowork implementation for revenue teams.
+
+---
+
 ## Components
 
 ### Skills
@@ -58,6 +73,34 @@ Content creation and strategy plugin for Olytic Solutions. Handles website conte
 
 ---
 
+## Permissions Manifest
+
+**Tools accessed:** Read, Grep, Glob, WebSearch, WebFetch, GitHub MCP
+
+**Data read:**
+- Olytic GitHub repository content (all repos in SupportOlyticSolutions org)
+- GA4 analytics data (Property ID 525690219)
+- Competitor websites and public content
+- Meeting notes and call transcripts provided by user
+
+**Data written:**
+- New/updated pages to Olytic GitHub repos via `/push-content`
+- Conversation context logs of published content (via Post-push content log hook)
+
+**External services called:**
+- GitHub API (for `/pull-content` and `/push-content` operations)
+- Google Analytics API (for `/content-performance` and strategist analysis)
+- Ahrefs API (for `/geo-check` command, if connected)
+- Windsor.ai API (for GA4 bridge data access, if connected)
+- WebSearch/WebFetch (for competitive research and live URL analysis)
+
+**Human-in-the-loop checkpoints:**
+- Brand compliance required before any content is pushed to GitHub (Pre-push brand gate hook)
+- User confirmation required before finalizing any published content recommendations
+- Strategic review recommended before executing high-priority content roadmaps
+
+---
+
 ## How It Works With The One Ring
 
 This plugin assumes The One Ring is always installed. Here's how they interact:
@@ -76,6 +119,19 @@ This plugin assumes The One Ring is always installed. Here's how they interact:
 | Content planning | This plugin → `magneto-content-brief-standards` + `/content-brief` command |
 | GitHub push/pull | This plugin → `/pull-content` and `/push-content` commands |
 | GA4 analytics | This plugin → `/content-performance` command |
+
+---
+
+## Memory & State Management
+
+**Session scope:** Magneto operates fresh each conversation. No session memory is retained between conversations.
+
+**Within-conversation scope:** The plugin maintains state across a single conversation:
+- Brief templates are cached for the duration of the conversation
+- GA4 analytics queries are cached to avoid redundant API calls
+- Competitive research findings are available for cross-reference if multiple analyses are run in sequence
+
+**Persistent data:** Only published content (pushed to GitHub) persists beyond a conversation.
 
 ---
 

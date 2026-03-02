@@ -1,11 +1,7 @@
 ---
 name: competitive-intelligence
 description: >
-  This skill should be used when the user asks to "what do buyers want in this data",
-  "who are the competitors in the data analytics space", "what's the market demand",
-  "how do we position against other solutions", "what buyer personas should we target",
-  or needs market research, buyer intelligence, competitive positioning, and strategic
-  insights to inform the commercial viability of the data platform.
+  Use this skill for market analysis and buyer intelligence: "what do buyers want in this data", "who are the competitors in the data analytics space", "what's the market demand", "how do we position against other solutions", "what buyer pain points should we address", "what's the competitive landscape", or when analyzing market opportunities, competitive threats, buyer personas, market sizing, and positioning strategy for the data platform.
 version: 0.1.0
 ---
 

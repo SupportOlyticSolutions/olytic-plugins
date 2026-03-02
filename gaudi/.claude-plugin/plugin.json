@@ -6,5 +6,7 @@
     "name": "Olytic Solutions",
     "email": "support@olyticsolutions.com"
   },
-  "keywords": ["data-architecture", "metadata-platform", "security", "data-governance", "optimization"]
+  "keywords": ["data-architecture", "metadata-platform", "security", "data-governance", "optimization"],
+  "hooks": [],
+  "permissions": {}
 }

@@ -1,12 +1,12 @@
 ---
 name: olytic-brand-standards
 description: >
-  This skill should be used when the user asks to "write content", "create a page",
-  "draft a blog post", "build a landing page", "check brand compliance", "review tone",
-  "write in our voice", "draft an email", "write a proposal", "create a document",
-  or needs guidance on Olytic Solutions' brand voice, messaging, ICP targeting,
-  competitive positioning, or content standards. Load this skill before creating
-  or reviewing ANY external-facing content for Olytic Solutions.
+  Use this skill when the user asks to "write content", "create a page", "draft a blog post",
+  "build a landing page", "check brand compliance", "review tone", "write in our voice",
+  "draft an email", "write a proposal", "does this sound like us", "is this on brand",
+  or "review this for brand". Load this skill before creating or reviewing ANY external-facing
+  content for Olytic Solutions to ensure alignment with brand voice, messaging pillars,
+  ICP targeting, competitive positioning, and design standards.
 version: 0.2.0
 ---
 

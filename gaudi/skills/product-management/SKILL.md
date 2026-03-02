@@ -1,11 +1,7 @@
 ---
 name: product-management
 description: >
-  This skill should be used when the user asks to "what type of data will buyers want",
-  "how do we measure business impact", "design the go-to-market for the data platform",
-  "what's the revenue model", "forecast commercial viability", "how do we price the data",
-  or needs guidance on product strategy, revenue modeling, go-to-market, success metrics,
-  and the commercial positioning of the metadata platform as a saleable product.
+  Use this skill for product and business strategy: "what type of data will buyers want", "how do we measure business impact", "design the go-to-market for the data platform", "what's the revenue model", "forecast commercial viability", "what's the product roadmap", "how do we price the data", or when planning product strategy, revenue streams, go-to-market, success metrics, and commercial positioning of the metadata platform as a saleable product.
 version: 0.1.0
 ---
 
