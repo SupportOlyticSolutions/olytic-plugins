@@ -37,6 +37,58 @@ The **O/G/O framework** (Operator / Governor / Optimizer) is how this philosophy
 
 ---
 
+## The Claude OS: Five Dimensions Framework
+
+Olytic helps companies implement Claude Cowork as a unified, custom, augmenting, agentic, and compounding operating system. These five dimensions are the architecture that makes Claude Cowork the foundational AI layer for knowledge work:
+
+1. **Unified** — Plugins collaborate during execution, not just alongside each other. Like end-to-end Salesforce vs. point solutions. When brand voice is defined once in The One Ring, every plugin that creates content immediately reflects it. When strategy changes, dependent plugins adapt automatically. This is integration at the operating system level.
+
+2. **Custom** — Personalized to the company's workflows, language, and processes. Every plugin is tailored to this company's specific brand, strategy, values, and policies — not a generic tool off the shelf. Claude Cowork becomes your company's operating system, not a system your company adopts.
+
+3. **Augmenting** — Amplification, not automation. Humans move from handling every operationalization to handling only strategic decisions. Claude handles the operationalization. This is not about replacing people — it's about multiplying what they can accomplish.
+
+4. **Agentic** — Powered by Anthropic's best-in-class model with advanced reasoning. Each plugin can reason through complex decisions, maintain consistency across dimensions, and improve itself over time. Agents in the Claude OS operate at the level of strategic capability, not just task execution.
+
+5. **Compounding** — Launch → Operate → Optimize → Perpetuate. The system intentionally improves itself over time. As strategy evolves, The One Ring's skills are updated. As those updates propagate, every dependent plugin reflects the change. As usage patterns emerge, the system adapts. This is a governance loop, not a one-time implementation.
+
+These Five Dimensions are the philosophical foundation of everything Olytic builds. Every client implementation, every plugin, every strategic decision serves one or more of these dimensions.
+
+---
+
+## The Hats Framework
+
+Each Olytic plugin represents a specific job-to-be-done — a "hat" someone wears at work. Every hat exists within the Claude OS and operates from the same brand voice, strategy, and values.
+
+**The One Ring is the governance hat.** It is the constitutional foundation that all other hats depend on. When someone wears the content strategist hat (Magneto) or the sales enablement hat (future), they automatically defer to The One Ring for brand standards, strategy guidance, and policy enforcement.
+
+Each hat is:
+- **Named for its job-to-be-done** (not a generic capability, but a role)
+- **Platonic ideal** — the best possible version of that role, with complete knowledge and institutional memory
+- **Dependent on The One Ring** — for brand voice, strategy alignment, and policy compliance
+- **Immediately responsive to strategy updates** — when The One Ring changes, this hat reflects the change automatically
+
+The Hats Framework is how Olytic organizes the Claude OS: as a collection of specialized, interdependent roles that together represent the complete set of jobs needed to run a go-to-market organization.
+
+---
+
+## The Alignment Dividend
+
+Classic business problem: marketing positions the product one way, sales positions it another, support uses different language. This misalignment is expensive and historically hard to close permanently. It's a perpetual tax on every organization.
+
+The Claude OS solves this through **The Alignment Dividend** — a strategic outcome where governance becomes structural rather than aspirational.
+
+**How it works:** The One Ring is the single source of truth for brand voice, strategy, and policy. Every plugin assumes The One Ring is present. When strategy changes, The One Ring's skills are updated once. That update immediately propagates to every dependent plugin.
+
+- Update brand voice once in The One Ring, and every plugin that creates content reflects it immediately.
+- Update strategy priorities in The One Ring, and every decision-making plugin aligns automatically.
+- Update a policy in The One Ring, and every plugin that enforces policy operates from the new standard.
+
+**The dividend is perpetual, not one-time.** Unlike a one-time alignment workshop, where alignment degrades immediately after the event, the Claude OS maintains alignment automatically. As strategy evolves, the update propagates. As business conditions change, the system adapts. Misalignment is not prevented through training or incentives — it's prevented through structure.
+
+This is not eventual consistency. This is instant, mandatory, structural alignment baked into the operating system itself.
+
+---
+
 ## Core Values
 
 These values govern how Olytic operates internally and how we show up for clients. They are not aspirational — they describe how we actually work.

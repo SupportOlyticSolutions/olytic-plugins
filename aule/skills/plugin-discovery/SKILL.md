@@ -291,7 +291,97 @@ Don't block the plugin, but flag it in the discovery summary: "This plugin prima
 
 ---
 
-## After All 9 Core Questions
+## Claude OS Framing Questions
+
+Before advancing to component planning, ask these five questions to ground the plugin in the Claude OS philosophy. These ensure every generated plugin understands its role in a larger operating system.
+
+### Claude OS Q1: What Hat Is This Plugin Wearing?
+
+**Ask:** "Let me frame this another way. In terms of jobs-to-be-done — what hat is this plugin wearing? What's the platonic ideal of this role?"
+
+**Why it matters:** A hat is a job-to-be-done at the ideal level, not a tool replacement. This reframes the plugin from "something that speeds up a task" to "a role someone plays in the organization." This shifts thinking from task automation to human augmentation.
+
+**Listen for:**
+- A concise role description (e.g., "the content auditor", "the proposal reviewer", "the deal analyst")
+- The essence of what this role does — its core responsibility
+- Whether the user is thinking about augmenting the human or replacing them
+
+**Store:**
+- `hat_identity` — one sentence defining the platonic ideal of this role
+
+**Example:** "The proposal auditor is the hat that ensures every proposal we send reflects our positioning and addresses the prospect's real pain point."
+
+### Claude OS Q2: Which Other Hats Exist in This OS?
+
+**Ask:** "What other plugins already exist in this Claude OS? How will this plugin relate to them?"
+
+**Why it matters:** A hat doesn't exist in isolation. It works alongside other hats. Understanding the existing hat ecosystem prevents siloed design and reveals opportunities for cross-hat integration.
+
+**Listen for:**
+- Names of other plugins already installed or planned
+- How this plugin feeds into or receives from other plugins
+- Whether there are natural handoffs between this plugin and others
+
+**Store:**
+- `existing_hats` — list of other plugins in the OS
+- `hat_relationships` — how this plugin sends to / receives from other hats
+
+**Example:** "The proposal-auditor plugin works downstream of the proposal-builder plugin. The builder generates, and the auditor reviews. Both feed telemetry to the Optimizer."
+
+### Claude OS Q3: Which Dimension Does This Plugin Serve?
+
+**Ask:** "The Claude OS has five dimensions — Unified (plugins working together), Custom (tailored to your workflows), Augmenting (new capabilities), Agentic (advanced reasoning), Compounding (self-improving). Which dimension does this plugin primarily serve?"
+
+**Why it matters:** Every plugin leans into one or two dimensions. Understanding which helps shape the generation priorities. A Unified plugin focuses on cross-plugin orchestration. An Augmenting plugin focuses on new capability discovery. A Compounding plugin focuses on telemetry for feedback loops.
+
+**Listen for:**
+- Which dimension resonates most
+- Whether the user sees overlap (that's fine — note the primary one)
+
+**Store:**
+- `primary_dimension` — the dominant dimension
+- `secondary_dimensions` — any supporting dimensions
+
+**Example:** "The proposal-auditor primarily serves the Augmenting dimension — it gives people the ability to maintain consistency across all proposals. Secondarily, it supports Compounding — it logs violations that feed back to proposal-builder improvements."
+
+### Claude OS Q4: What Does This Plugin Receive From The One Ring?
+
+**Ask:** "Does this plugin depend on governance foundations from The One Ring — like brand standards, strategy context, security policies? Or is it designed to work standalone?"
+
+**Why it matters:** Most internal plugins are part of a larger governance ecosystem. The One Ring provides the shared standards that let independent plugins stay aligned. Understanding this dependency shapes what the plugin references vs. what it contains.
+
+**Listen for:**
+- Whether the plugin references brand standards, strategy, or policy
+- Whether it's for a client without The One Ring (truly standalone)
+- What specific standards from The One Ring it needs
+
+**Store:**
+- `governance_dependency` — "The One Ring", "none", or "[other governance plugin name]"
+- `governance_specifics` — what standards it depends on (brand, strategy, security, HR)
+
+**Example:** "The proposal-auditor depends on The One Ring for brand voice standards, positioning, ICP definition, and messaging rules. It doesn't create those — it enforces them."
+
+### Claude OS Q5: How Does This Plugin Participate in the Compounding Loop?
+
+**Ask:** "How does this plugin feed back into the system to make it better over time? What does it log to telemetry that tells us how to improve the system?"
+
+**Why it matters:** A compounding operating system improves itself. The Optimizer pulls telemetry from all plugins to suggest improvements. Every plugin should log events that signal whether it's working well and where the system could improve.
+
+**Listen for:**
+- Decision traces (what choices was the user making?)
+- Constraint violations (where are the guardrails not strong enough?)
+- User feedback signals (is the plugin helping?)
+- Patterns across uses
+
+**Store:**
+- `telemetry_signals` — what events this plugin logs to feed improvement
+- `optimizer_feedback_points` — specific decisions or constraints the Optimizer should watch
+
+**Example:** "The proposal-auditor logs: every audit performed, every violation flagged, user feedback on whether violations were accurate, and time spent in review. The Optimizer watches violation patterns — if the same types of violations keep appearing, the brand standards need clarification or proposal-builder needs to enforce them differently."
+
+---
+
+## After All 10 Core Questions
 
 ### Question 10: Natural Language Triggers
 
@@ -334,6 +424,12 @@ Format the collected answers as a structured summary:
 **Name:** [plugin_name]
 **Purpose:** [plugin_purpose]
 **Audience:** [plugin_audience]
+
+**Hat Identity:** [hat_identity from Claude OS Q1]
+**Other Hats:** [existing_hats and relationships from Claude OS Q2]
+**Dimension:** [primary_dimension and secondary from Claude OS Q3]
+**Governance:** [governance_dependency and specifics from Claude OS Q4]
+**Compounding:** [telemetry_signals and optimizer_feedback_points from Claude OS Q5]
 
 **Users & Functions:**
 - Profile: [user_profile]

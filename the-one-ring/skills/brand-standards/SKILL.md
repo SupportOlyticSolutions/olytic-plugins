@@ -119,6 +119,16 @@ Olytic's voice is expert, specific, creative, with a dry sense of humor. It can 
 4. **Embedded partnership.** We're still here at meeting #20.
 5. **Revenue outcomes.** Everything connects back to revenue acceleration.
 
+## Magneto and the Brand Contract
+
+This skill is the source of truth for Olytic's external brand voice. The content strategist plugin — Magneto — treats this skill as authoritative. If a user working with Magneto says "our brand voice is casual" but this skill says otherwise, this skill wins. This is not negotiable.
+
+When Magneto creates GEO pages, LinkedIn content, website copy, or email outreach, it defers to these standards as the constitutional layer. If there's a conflict between conversational context and these standards, the standards take precedence. Magneto knows it is a hat that serves the governance hat.
+
+**When this skill changes**, Magneto's GEO pages, LinkedIn posts, and website content immediately reflect the update. This is the alignment dividend in action: one update to brand standards propagates through the entire content ecosystem automatically. New content written after the update will match the new standards. Existing content should be audited for consistency with each update.
+
+This is why The One Ring's brand standards skill exists as a dedicated, maintained, authoritative resource. It is the single source of truth that all dependent plugins reference — not a suggestion, not a secondary reference, but the constitutional foundation of Olytic's external voice.
+
 ## Competitive Positioning
 
 For the full competitive landscape, see `references/competitive-landscape.md`.

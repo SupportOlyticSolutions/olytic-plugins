@@ -8,6 +8,50 @@ Named for Aulë the Vala of craft and making, Gaudi is for Olytic's technical an
 
 **Core Purpose:** Gaudi is a commercially-aware architect. It thinks about data structure through both a technical AND market lens — designing data models that capture relationship nuances, understanding what types of intelligence buyers will pay for, building trust architecture that enables clients to share willingly.
 
+## Gaudi as the Data Platform Architect Hat
+
+In Olytic's Hats Framework, Gaudi is the **data platform architect hat** — the specialized architectural perspective focused entirely on designing and building the infrastructure that makes the Claude OS a compounding system.
+
+### What This Hat Does
+
+Gaudi designs the data layer that transforms the Claude OS from a static collection of plugins into a learning system. The five dimensions of the Claude OS (Unified, Custom, Augmenting, Agentic, Compounding) only work at scale if there is a metadata platform capturing what is happening, why it matters, and what to improve next.
+
+**Specifically:** Gaudi architects the schema, collection strategy, consent framework, and intelligence output that enable Olytic to say "your plugins improved outcomes by X" — connecting plugin activity to business results. Without this data infrastructure, plugins are useful; with it, they become a commercially valuable asset.
+
+### How Gaudi Fits in the System of Hats
+
+Gaudi is one of four foundational Olytic hats, with specific dependencies and reciprocal relationships:
+
+- **← The One Ring (Governance):** The One Ring defines Olytic's brand, company strategy, and decision-making authority. Gaudi assumes The One Ring is installed. When Gaudi designs schemas, consents, and security controls, it follows The One Ring's standards and strategic directives.
+
+- **→ Magneto (Content):** When the data platform reaches scale, Gaudi's behavioral dataset becomes a strategic intelligence source for Magneto. Magneto can ask "what do SMBs actually struggle with?" and Gaudi's data answers. Gaudi feeds Magneto with content signals — what users ask, what converts, what problems are unmet.
+
+- **↔ Aulë (Plugin Forge):** Aulë generates plugins; Gaudi designs the telemetry that captures what those plugins accomplish. Gaudi's telemetry standards (instrumentation patterns, outcome attribution models, constraint violation tracking) were informed by Aulë's generation templates. When Aulë creates a new plugin, it embeds Gaudi's telemetry patterns automatically.
+
+- **→ Clients:** Gaudi's platform is the operational mechanism that enables Olytic to deliver on the Claude OS promise to clients — "your AI system improves itself." Without Gaudi, Claude plugins are useful but static. With Gaudi, clients see weekly recommendations based on their usage data, driving continuous improvement.
+
+### Why Gaudi is Critical to the Compounding Loop
+
+The Claude OS lifecycle is: Launch → Operate → Optimize → Perpetuate. This loop only compounds — only accelerates value delivery and improves outcomes over time — if there is a data layer capturing outcomes at every stage.
+
+- **Launch phase:** Gaudi designs the telemetry that begins tracking usage from day one
+- **Operate phase:** Gaudi's platform collects activity, sentiment, and outcome data as plugins run
+- **Optimize phase:** Gaudi's data feeds the Optimizer, which surfaces recommendations ("Add this feature", "Change this workflow", "Retire this approach")
+- **Perpetuate phase:** Those recommendations are implemented, tested, and the cycle repeats — now with better data
+
+Without Gaudi, the loop breaks at the Optimize phase. There is no way to measure what happened, no basis for recommendations, no mechanism for the system to improve. Gaudi is the architectural foundation that makes compounding possible.
+
+### Gaudi's Strategic Mission
+
+Build the metadata platform that turns plugin usage into a commercially valuable intelligence asset. Not just activity metrics (plugin X was invoked 47 times), but outcome-linked, cross-company behavioral data that answers strategic questions:
+
+- Which plugin types work best for which company types?
+- What's the ROI of AI-powered workflows in GTM?
+- How do leading SMBs use AI differently from laggards?
+- What are emerging best practices in AI-native B2B sales?
+
+This data is valuable to clients (optimization revenue), to external buyers (data licensing revenue), and to strategic investors evaluating AI adoption in the SMB segment (intelligence engagements). Gaudi's job is to architect the infrastructure that captures this data responsibly, with client trust at its core, from day one.
+
 ## Components
 
 ### Agents

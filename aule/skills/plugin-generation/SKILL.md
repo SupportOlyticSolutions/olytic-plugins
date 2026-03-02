@@ -64,6 +64,7 @@ Map discovery answers to component types:
 | Memory scope declared (from Q5) | Memory declaration in skill + README | Plugin declares its context retention requirements |
 | Workflow context mapped (from Q6) | Augmentation framing in README + skill descriptions | Positions plugin around new capabilities, not just task speedup |
 | Augmentation signal weak | Advisory note in README | Flags the plugin as primarily an accelerator, suggests augmentation opportunities |
+| Claude OS framing (from new questions) | Claude OS Identity block in README | Declares hat role, relationships, governance, dimension, compounding |
 
 **Rules:**
 - Every plugin gets at least ONE skill (the primary domain skill)
@@ -71,6 +72,7 @@ Map discovery answers to component types:
 - Only create agents if the workflow genuinely requires multi-step orchestration
 - Only create commands if there's a clear, repeatable user-initiated action
 - Create a performance/metrics command if at least one data source from Q8 is programmatically accessible
+- Every plugin must include a Claude OS Identity block in its README (see Step 4b below)
 
 ### Step 2: Name Components
 
@@ -258,7 +260,7 @@ For each command, generate using the pattern from `references/component-template
 
 ### Step 4a: Generate Permissions Manifest
 
-**This is mandatory for every generated plugin.** Create a new section in the README (see Step 4's README.md template below).
+**This is mandatory for every generated plugin.** Create a new section in the README (see Step 4b's README.md template below).
 
 The permissions manifest is a structured declaration of:
 
@@ -295,6 +297,30 @@ Example structure:
 - ✓ Required before sharing analysis results externally
 ```
 
+### Step 4b: Generate Claude OS Identity Block
+
+**This is mandatory for every generated plugin.** Create a new section in the README called **Claude OS Identity** that appears early in the document, after the opening description and before Components.
+
+Populate this block using answers from the Claude OS Framing Questions in discovery:
+
+```markdown
+## Claude OS Identity
+
+**Hat:** [Plugin Name] is the [role] hat in the Claude OS — the platonic ideal of [job-to-be-done description from hat_identity].
+
+**Dimension:** This plugin primarily serves the [Unified / Custom / Augmenting / Agentic / Compounding] dimension of the Claude OS. [Brief statement of why: does it help plugins work together, enable personalization, create new capabilities, leverage advanced reasoning, or feed the improvement loop?]
+
+**Governance dependency:** [This plugin assumes The One Ring is installed / This plugin works standalone / Other]. [List which skills it references: e.g., "Uses The One Ring's olytic-brand-standards skill for voice and positioning rules."]
+
+**Relationships to other hats:**
+- [Plugin A]: [How this plugin uses or feeds Plugin A — e.g., "proposal-builder feeds completed proposals to proposal-auditor for review"]
+- [Plugin B]: [How this plugin interacts]
+
+**Compounding contribution:** [What telemetry does this plugin log that feeds the Optimizer? e.g., "Logs every audit result, constraint violation, and user feedback signal. The Optimizer watches violation patterns to recommend improvements to both proposal-builder and brand standards."]
+```
+
+Use the discovery answers to populate each field. If a field wasn't answered (e.g., no other plugins exist yet), note it explicitly (e.g., "No other hats yet" or "Governance dependency: This standalone client plugin does not reference The One Ring").
+
 #### README.md
 
 Generate from discovery data:
@@ -306,6 +332,10 @@ Enables [user] to [new capability] — [one paragraph describing what makes this
 
 **Audience:** [user_profile]
 **Requires:** [dependencies — e.g., "The One Ring governance plugin" if Olytic internal]
+
+## Claude OS Identity
+
+[See Step 4b — mandatory block declaring hat role, dimension, governance, relationships, and compounding contribution]
 
 ## Components
 
@@ -389,7 +419,13 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
    ```
    If any file is missing, write it now.
 
-4. **Verify no duplicate component names** across skills, commands, and agents:
+4. **Verify Claude OS Identity block exists in README:**
+   ```bash
+   grep -q "## Claude OS Identity" README.md && echo "OK — Claude OS Identity block found" || echo "FAIL: missing Claude OS Identity block"
+   ```
+   If missing, add it now using the template from Step 4b.
+
+5. **Verify no duplicate component names** across skills, commands, and agents:
    ```bash
    python3 -c "
    import os, sys
@@ -412,12 +448,12 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
    ```
    If this fails, rename the conflicting component (see Step 2a rules) and rewrite the affected files.
 
-5. **Verify agent files** (if the plugin has agents):
+6. **Verify agent files** (if the plugin has agents):
    - **Frontmatter structure:** Confirm the block between `---` delimiters contains only `name`, `description`, `model`, `color`, `tools`. If `<example>` tags appear inside the frontmatter, move them to after the closing `---`.
    - **Unquoted colons in descriptions:** If any agent's `description` value contains `: ` (colon followed by space) on a single line, convert it to `description: >` block scalar format.
    - **Valid keys in plugin.json:** Confirm no `displayName` or other non-standard keys exist.
 
-6. **Package the plugin.** Run this from INSIDE the plugin directory (not its parent):
+7. **Package the plugin.** Run this from INSIDE the plugin directory (not its parent):
    ```bash
    cd /absolute/path/to/[plugin-name] && \
    zip -r /tmp/[plugin-name].plugin . -x "*.DS_Store" -x ".git/*" && \
@@ -425,18 +461,18 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
    ```
    **Critical:** The `cd` must go INTO the plugin directory (e.g., `/sessions/.../outputs/my-plugin`), not the parent. If you zip from the parent, the zip will have a subfolder wrapper and the validator will not find `.claude-plugin/plugin.json`.
 
-7. **Verify the zip contains the right structure:**
+8. **Verify the zip contains the right structure:**
    ```bash
    unzip -l /tmp/[plugin-name].plugin | grep -E "plugin\.json|SKILL\.md"
    ```
    The output must show `.claude-plugin/plugin.json` at the root (not inside a subdirectory). If you see `my-plugin/.claude-plugin/plugin.json`, the zip is wrong — you ran it from the parent directory. Fix the cd path and repackage.
 
-8. **Copy to outputs:**
+9. **Copy to outputs:**
    ```bash
    cp /tmp/[plugin-name].plugin /path/to/outputs/[plugin-name].plugin
    ```
 
-9. Present the `.plugin` file to the user.
+10. Present the `.plugin` file to the user.
 
-10. Ask: "Want me to add this to the Olytic marketplace?"
+11. Ask: "Want me to add this to the Olytic marketplace?"
     - If yes, invoke the marketplace-management skill

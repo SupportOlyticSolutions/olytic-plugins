@@ -143,6 +143,135 @@ Four recurring angles aligned to the Zero Case Study Playbook:
 
 Rotate across themes. The ICP should see variety — diagnosis, framework, counterintuitive take, stakes — not the same angle every week.
 
+### Claude OS Post Angle Archetypes
+
+Beyond the core themes above, these three archetypes position Olytic's Claude OS philosophy and should be woven into the weekly post rotation:
+
+#### 1. The Salesforce Analogy
+
+**Core insight:** Unified Salesforce suite created exponential value in the early 2000s. Unified Claude OS does the same in 2026 for knowledge work. This is historical precedent, not futurism.
+
+**Hook patterns:**
+- "Salesforce unified CRM, sales, and service in 2003. They won. Fragmented CRM point tools lost. This is happening to AI right now."
+- "Everyone stacked CRM point tools before Salesforce. The winners unified. Same pattern with AI in 2026."
+- "You don't build revenue operations with 5 separate tools. You build it with Salesforce. Same logic applies to AI systems."
+
+**Body structure:**
+- Opening: name the historical parallel (Salesforce early 2000s vs. AI 2026)
+- Middle: why unified won in that era (single source of truth, compounding improvements, alignment)
+- Application: why the same principle applies to AI systems now
+- Landing: position Olytic as the company building the unified suite
+
+**Why this works:**
+- ICP decision-makers often have Salesforce experience
+- The analogy is intellectually credible and specific
+- It positions unified systems as a proven model, not a novel idea
+- It reframes the conversation from "AI tools" to "AI infrastructure"
+
+**Example post structure:**
+```
+Hook: "Salesforce unified CRM in 2003. Every competitor who stayed fragmented is gone. Same thing is happening to AI in 2026."
+
+Paragraph 1: Why unified won in enterprise software — single source of truth, one feedback loop, compound improvements.
+
+Paragraph 2: The AI reality now — most companies are stacking point tools. ChatGPT + this + that. Same fragmentation Salesforce solved.
+
+Paragraph 3: What actually wins — one system, one governance layer, one feedback loop. Alignment that compounds automatically.
+
+Landing: "The unified suite always beats the point solution stack. That's not changing with AI."
+
+CTA: "If you're thinking about AI infrastructure for your team, the assessment takes 10 minutes: [link]"
+```
+
+#### 2. The Hats Framework
+
+**Core insight:** Every business role is a "hat" — content strategist, GEO specialist, revenue ops expert. Olytic plugins = the platonic ideal of each hat, working in one operating system. You can't hire the perfect strategist; you can build one.
+
+**Hook patterns:**
+- "Every business needs a content strategist. You can hire one ($150K+) or build one inside your AI system. One costs money. One compounds value."
+- "The platonic ideal content strategist: always available, never tired, learns your voice, improves weekly. That's not a hiring problem. That's a plugin problem."
+- "You can't hire the perfect [GEO specialist / revenue ops person / researcher]. But you can build their ideal version inside a unified AI operating system."
+
+**Body structure:**
+- Opening: name the specific "hat" (content strategist, GEO specialist, whatever)
+- Middle: why hiring that role is expensive, slow, and fragile
+- Middle: alternative — build the platonic ideal inside a unified system (never tired, always improving, knows the company)
+- Application: concrete example from that domain
+- Landing: why this is infrastructure, not automation
+
+**Why this works:**
+- Reframes AI from "tool adoption" to "capabilities you can build"
+- Speaks directly to resource-constrained SMBs
+- Makes the philosophical leap from "AI should help us" to "AI can be the role"
+- Positions plugins as roles, not features
+
+**Example post structure:**
+```
+Hook: "You can't hire the perfect content strategist. But you can build one inside your AI system."
+
+Paragraph 1: What perfect looks like — always available, knows your voice, improves weekly, never gets bored or defensive about feedback.
+
+Paragraph 2: Why hiring fails — good people are expensive, slow to onboard, and leave. You're betting $150K+ on someone.
+
+Paragraph 3: The alternative — one plugin, one unified system, one voice. Operates continuously. Improves based on feedback. Stays.
+
+Landing: "The next decade of business is building the roles you can't hire and the people you can't afford."
+
+CTA: "If this resonates, our assessment scores your team against this kind of thinking: [link]"
+```
+
+#### 3. The Alignment Dividend
+
+**Core insight:** Every tool you add is another source of truth and another place to fix fragmentation. A unified system with shared governance (The One Ring) enforces alignment perpetually. Marketing and sales always misalign — until they operate from one source.
+
+**Hook patterns:**
+- "Your marketing says one thing. Your sales team says another. Your content is different again. The company is fragmented. Not because people are lazy. Because every tool is its own source of truth."
+- "Brand drift across channels is solvable. Marketing/sales misalignment is solvable. Plugin inconsistency is solvable. Not with more alignment meetings. With one governance layer."
+- "You can't fix organizational alignment with spreadsheets and Slack. You fix it with a unified system where alignment is structural."
+
+**Body structure:**
+- Opening: name the symptom (brand drift, messaging inconsistency, strategy fragmentation)
+- Root cause: each tool is its own source of truth; nobody can enforce alignment across 5 systems
+- Solution: unified governance layer (One Ring) that every component respects
+- Example: how this works in practice (e.g., Magneto and sales messaging enforcing the same positioning)
+- Landing: why compounding alignment beats yearly realignment meetings
+
+**Why this works:**
+- Addresses a real, daily pain (everyone says things differently)
+- Positions alignment as a structural problem, not a people problem
+- Makes the case for unified systems as governance, not just efficiency
+- Speaks to CTOs, COOs, and marketing leaders who manage multiple teams
+
+**Example post structure:**
+```
+Hook: "Your marketing says one thing. Your sales team says another. Your content is different. This isn't lazy. It's architecture."
+
+Paragraph 1: The problem — when each tool is independent, each becomes its own source of truth.
+
+Paragraph 2: What most companies do — more meetings, more alignment decks, more spreadsheets. It doesn't work because the structure is fragmented.
+
+Paragraph 3: What actually works — one governance foundation that every plugin respects. Alignment becomes automatic, not aspirational.
+
+Paragraph 4: The result — week over week, decisions compound. Messaging stays consistent. Brand stays clean. Competitive positioning sharpens automatically.
+
+Landing: "You don't fix alignment with process. You fix it with architecture."
+
+CTA: "Curious how this actually works? The O/G/O framework page has a concrete example: [link]"
+```
+
+---
+
+## Integration Strategy
+
+Weave these three Claude OS archetypes into the weekly post rotation:
+
+- **Week 1-2:** Core problem themes (AI pilot failure, hiring myths, tool vs. system)
+- **Week 3-4:** Claude OS angle (rotate: one Salesforce analogy post, one Hats Framework post, one Alignment Dividend post)
+- **Week 5-6:** Framework and IP building (O/G/O snippet, methodology deepdive)
+- Repeat
+
+This keeps the feed varied while building philosophical thought leadership around the unified Claude OS positioning. The ICP should encounter the thesis from multiple angles — not repeated arguments, but different facets of the same core idea.
+
 ---
 
 ## What NOT to Post

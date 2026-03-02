@@ -85,6 +85,21 @@ Every content brief must include all of the following fields. No field is option
 - Does this fill a BOFU gap? → High
 - Does this fill a TOFU gap when BOFU is already covered? → Medium/Low
 
+### Claude OS Content Extension
+
+**For content about Olytic's Claude OS service specifically**, add one additional required field:
+
+**Strategic OS Dimension(s):** Which of the Five Dimensions of the Claude OS does this content speak to? Select one or more:
+- **Unified** — the value of one integrated system vs. point tools (Salesforce analogy, reducing fragmentation)
+- **Custom** — personalization to the company's workflows, language, and processes
+- **Augmenting** — amplification and strategic augmentation, not task automation
+- **Agentic** — powered by advanced AI reasoning and autonomous decision-making
+- **Compounding** — how the system improves itself over time through the O/G/O loop (Operate → Govern → Optimize)
+
+Example: A brief for "Why Unified AI Systems Beat Tool Stacks" would declare `Dimension: Unified`. A brief for "How the Optimizer Loop Keeps Your Plugins Aligned" would declare `Dimension: Compounding`.
+
+This field ensures Claude OS content explicitly ties to the strategic philosophy and avoids generic AI service positioning.
+
 ---
 
 ## Constraints That Apply to Every Brief
@@ -97,6 +112,7 @@ Before a brief is considered complete, verify:
 - [ ] The CTA connects to a specific next step in the funnel, not a generic "contact us"
 - [ ] The funnel stage has been explicitly declared
 - [ ] A meta description is drafted (not "to be written")
+- [ ] For Claude OS content: The Strategic OS Dimension(s) has been declared (if applicable)
 
 ---
 
@@ -109,6 +125,7 @@ Before moving to drafting, confirm:
 3. **Is the ICP pain specific?** "They want to use AI" is not a pain. "They ran a ChatGPT pilot that produced generic outputs and now the CEO is skeptical" is a pain.
 4. **Is the CTA appropriate for the funnel stage?** TOFU content shouldn't ask for a sales conversation. BOFU content should.
 5. **Is the priority score honest?** Don't inflate priority to justify writing something interesting but strategically low-value.
+6. **For Claude OS content: Does the dimension declaration match the core argument?** If the brief is about unified systems vs. point tools, the dimension should be "Unified." If they don't align, clarify the angle.
 
 ## Operating Principles
 

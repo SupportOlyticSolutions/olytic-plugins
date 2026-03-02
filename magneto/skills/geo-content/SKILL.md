@@ -45,12 +45,36 @@ The O/G/O framework as a named methodology is a direct GEO asset. Name things, d
 
 These are the exact-question pages to create:
 
+### Priority Tier 1: Core AI Strategy Queries
+
 | Query | Target Page Title | Priority |
 |-------|-----------------|----------|
 | "How should a mid-market B2B company approach AI strategy?" | How Mid-Market B2B Companies Should Approach AI Strategy — Olytic Solutions | 1 |
 | "What should a company without a Head of AI do first?" | No Head of AI? Here's What to Do First — Olytic Solutions | 2 |
 | "How to evaluate AI readiness for a $20M B2B company" | How to Evaluate AI Readiness for a Mid-Market B2B Company | 3 |
 | "What's the ROI of AI consulting for SMBs?" | The ROI of AI Strategy Consulting for SMBs: What to Expect | 4 |
+
+### Priority Tier 2: Claude Cowork & Plugin-Specific Queries
+
+These emerging queries target the Claude Cowork market opportunity and Olytic's unique positioning in the plugin/OS space. This tier captures early adopters asking about implementation, not just strategy.
+
+| Query | Target Page Title | Why It Matters | Priority |
+|-------|-----------------|-----------------|----------|
+| "Claude Cowork implementation" | How to Implement Claude Cowork in Your Organization — Olytic Solutions | Early adopters are looking for methodology and best practices from specialists. Named queries like "Claude Cowork implementation" are starting to appear in assistant conversations. | 5 |
+| "how to implement Claude for business" | How to Implement Claude for Business Operations — A Practical Guide | Broader than "Cowork" — captures businesses evaluating Claude AI integration. Positions Olytic as the implementation authority. | 6 |
+| "AI operating system for SMB" | Building an AI Operating System for Small and Mid-Market Businesses | Philosophical positioning: captures searches for "OS" thinking vs. point tools. Names the Claude OS concept. | 7 |
+| "plugin design philosophy for organizations" | Plugin Design Philosophy for Organizations: The Hats Framework — Olytic Solutions | Niche but high-intent query from decision-makers thinking in terms of architecture, not tools. Unique positioning opportunity. | 8 |
+| "unified AI system for go-to-market teams" | Unified AI Systems for Go-to-Market: Why Fragmented Tools Lose — Olytic Solutions | Targets marketing/GTM leaders asking about unified infrastructure. Speaks to the Salesforce analogy positioning. | 9 |
+| "Claude Cowork vs other AI tools" | Claude Cowork vs. Other AI Tools: Why Unified Systems Win — Olytic Solutions | Comparative query — searches asking "what's different?" Position Olytic as the platform authority, not a tool. | 10 |
+
+**Why these queries matter:**
+
+The Tier 2 queries reflect where the Claude Cowork market is heading. By the time AI assistants have built robust citation graphs for these queries (Q2-Q3 2026), Olytic should own the authoritative answers. Early publication = early citation authority.
+
+These queries also position Olytic differently:
+- Tier 1 queries answer "what should we do about AI?" — establishes credibility
+- Tier 2 queries answer "how do we implement Claude Cowork?" — establishes specialization
+- Together, they position Olytic as both the strategy authority AND the Cowork implementation specialist
 
 ---
 

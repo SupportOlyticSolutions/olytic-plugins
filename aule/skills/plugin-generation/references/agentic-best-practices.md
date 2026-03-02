@@ -144,6 +144,85 @@ Design plugins as building blocks that can work together. Avoid tight coupling b
 
 ---
 
+## 6. Claude OS Composability Standards
+
+These are non-negotiable practices for every generated plugin. They ensure plugins work as hats within a unified operating system, not as isolated tools.
+
+### Hat Identity
+
+Every plugin must declare its hat identity in the README. No plugin is standalone.
+
+**Required:** A one-sentence statement of the job-to-be-done at the platonic ideal level (e.g., "The proposal auditor is the hat that ensures every proposal reflects our positioning and addresses the prospect's pain point").
+
+**Why:** Framing plugins as hats (roles) rather than tools shifts thinking from task automation to role augmentation. It signals that the plugin is designed to work as part of a larger system.
+
+### Governance Dependency
+
+Every plugin must declare which governance plugin it depends on. Default: The One Ring (for Olytic internal).
+
+**Required:** Explicit statement of governance dependency in the README's Claude OS Identity section.
+
+**Pattern:** "Governance dependency: The One Ring. Uses The One Ring's olytic-brand-standards skill for voice, positioning, and messaging rules."
+
+**Why:** This prevents siloed plugins that contradict each other. A plugin that makes decisions inconsistent with brand standards or strategy creates friction and misalignment.
+
+**Client exception:** Client plugins without centralized governance should explicitly state "Standalone — no shared governance layer." This is a valid architectural choice, but it must be intentional and declared.
+
+### Cross-Hat References
+
+When a plugin's skill or agent needs information owned by another hat, it must reference that hat's skill rather than duplicating the information.
+
+**Required:** Use patterns like "For brand voice rules, see The One Ring's `olytic-brand-standards` skill."
+
+**Prohibition:** Do not copy brand standards, strategy context, or other governance knowledge into the plugin's own skills. Always reference.
+
+**Why:** Copied knowledge creates two sources of truth. When standards change, only one copy gets updated, causing drift. References ensure a single source of truth and automatic consistency.
+
+### Alignment Enforcement
+
+Plugins that produce external-facing content must include a governance gate before publishing. This is non-negotiable.
+
+**Required:** For any command or agent that produces content that leaves the organization or is customer-facing, include an explicit governance check.
+
+**Pattern:** Before publishing a proposal, the plugin checks it against The One Ring's brand standards and positioning rules. Before sending an email, it validates voice consistency. Before publishing content, it checks ICP alignment.
+
+**Why:** This is the alignment dividend — the core value of the Claude OS. Independent plugins that share governance create consistency without manual coordination. A plugin that skips this gate defeats the entire purpose of the unified OS.
+
+### Compounding Telemetry
+
+Every plugin must log events that connect usage to outcomes. Activity metrics alone are insufficient.
+
+**Required:** Every plugin logs:
+- **Decision traces:** When the plugin makes or supports a decision, log the context and reasoning
+- **Constraint violations:** When guardrails are crossed, log them explicitly
+- **User feedback signals:** Did the plugin's output help or hurt?
+- **Outcome indicators:** Is the goal being achieved?
+
+**Pattern:** A proposal auditor logs "violation flagged: positioning not addressed", then later logs "user feedback: violation was accurate" or "user feedback: violation was wrong". This trains the Optimizer to refine auditing rules.
+
+**Why:** Without good telemetry, the Optimizer can't improve the plugin. Activity-only metrics (e.g., "ran 50 times") don't signal whether the plugin is working. Decision traces + feedback create a feedback loop for continuous improvement.
+
+### Hat Relationships
+
+Every plugin must declare its relationships to other hats in the README.
+
+**Required:** In the Claude OS Identity section, list:
+- Plugins that feed into this one (upstream)
+- Plugins this one feeds (downstream)
+- Plugins that work alongside (parallel)
+
+**Pattern:**
+```
+Relationships to other hats:
+- proposal-builder: Upstream. proposal-builder generates; proposal-auditor reviews.
+- sales-enablement: Parallel. Both feed The One Ring for strategy context.
+- the-optimizer: Downstream. proposal-auditor logs violations; Optimizer recommends improvements.
+```
+
+**Why:** Relationships prevent tunnel vision. When a plugin understands its place in the system, it can optimize for cross-plugin outcomes, not just its local goal.
+
+---
+
 ## How to Embed in Generated Plugins
 
 When generating a plugin, these practices are embedded in three places:
@@ -181,3 +260,10 @@ When generating a plugin, these practices are embedded in three places:
    - Log permission gate activations (when confirmation was requested)
    - Log decision traces for substantive decisions
    - Log memory scope events (storage, retrieval, purge)
+
+4. **In the README's Claude OS Identity block** — Declare:
+   - Hat identity and the job-to-be-done
+   - Primary dimension served
+   - Governance dependency
+   - Relationships to other hats
+   - Compounding contribution (telemetry signals for the Optimizer)

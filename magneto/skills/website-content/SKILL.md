@@ -89,6 +89,70 @@ The Zero Case Study Playbook introduces several priority page types beyond stand
 - Positioned as methodology proof: "Here's how we've done this motion before. Here's how we do it now."
 - Bridges "transformation experience" to "AI expertise" — the objection neutralizer in page form
 
+### Claude OS Service Pages
+
+These page templates position Olytic's Claude Cowork offering as a unified AI operating system strategy, not just another tool implementation:
+
+**The Five Dimensions Landing Page:**
+- **Hero:** "The Claude OS: Five Dimensions That Make AI Actually Work"
+- **Purpose:** Educational positioning — introduces the Five Dimensions as the philosophical foundation of the Claude OS
+- **Sections:**
+  - **Unified** — Why one integrated system beats fragmented tools (Salesforce analogy, single source of truth)
+  - **Custom** — How the Claude OS adapts to your specific workflows and language, not generic ChatGPT
+  - **Augmenting** — Why amplification (strategic augmentation) beats automation (task offloading)
+  - **Agentic** — The power of advanced reasoning and autonomous decision-making
+  - **Compounding** — How the O/G/O loop keeps the system improving perpetually
+- **CTA:** "Evaluate your company against the Five Dimensions with the AI Strategy Architect: [link]"
+- **Audience:** CEOs/COOs asking "what makes the Claude OS different?" MOFU content.
+
+**The Hats Framework Explainer Page:**
+- **Hero:** "The Hats Framework: Why Plugins Are the Future of AI in Business"
+- **Purpose:** Thought leadership and differentiation — positions Olytic's plugin architecture as philosophically sound
+- **Sections:**
+  - **The Problem** — "You can't hire enough perfect specialists. But you can build their ideal versions."
+  - **The Framework** — What are "hats"? Every business role is a hat (content strategist, GEO specialist, revenue ops expert). Each hat can be designed as a plugin.
+  - **How It Works** — Example walkthrough (e.g., Magneto as the content strategist hat — always available, knows the voice, improves weekly)
+  - **The Advantage** — Building plugins is scalable; hiring is expensive and fragile. Plugins compound; people leave.
+  - **Olytic's Hats** — List of plugins in development / available, showing how they work together
+- **CTA:** "Curious which hats matter most for your business? Start the assessment: [link]"
+- **Audience:** Operational leaders, CTOs evaluating AI infrastructure. MOFU/BOFU.
+
+**Plugin Design Philosophy Page:**
+- **Hero:** "How We Design Plugins: The Operating Principles Behind the Claude OS"
+- **Purpose:** Methodology positioning — demonstrates that Olytic's plugin architecture is principled and intentional
+- **Sections:**
+  - **Discovery First** — How every plugin starts with understanding your actual workflows
+  - **Source of Truth** — How governance prevents fragmentation (The One Ring concept)
+  - **Atomic Operations** — Why plugins do one thing well, not everything poorly
+  - **Verification & Iteration** — Built-in checks and the O/G/O feedback loop
+  - **No Hallucination** — Trust and reliability as architecture, not afterthought
+- **Example:** Walkthrough of how one of these principles applied to building Magneto
+- **CTA:** "See these principles in action with a personalized implementation walkthrough: [link]"
+- **Audience:** Technical decision-makers and skeptics. Trust-building. MOFU.
+
+**"How It Works" Implementation Page (The O/G/O Loop):**
+- **Hero:** "How the Claude OS Actually Works: The O/G/O Implementation Model"
+- **Purpose:** De-risk the purchase — show exactly what happens during an implementation and ongoing operations
+- **Sections:**
+  - **Week 1–2: The Operate Phase** — How plugins are configured and deployed to your specific processes
+  - **Week 3–4: The Govern Phase** — How alignment is enforced (brand, positioning, decision-making), how The One Ring audits plugin outputs
+  - **Week 5+: The Optimize Phase** — How data flows back in; which plugins improved, how; what changed; roadmap for next quarter
+  - **The Loop Repeats** — This compounds. Plugins get smarter. Alignment improves. Velocity increases.
+- **Real Example** — Concrete timeline (if available) from early client, showing week-by-week results
+- **CTA:** "Let's talk about what your O/G/O cycle would look like: [link to calendar]"
+- **Audience:** Prospects in decision stage, concerned about implementation. BOFU.
+
+**Why These Pages Matter:**
+
+These Claude OS pages do three things:
+1. **Educate** the market on unified AI operating system thinking (not tool adoption)
+2. **Differentiate** Olytic as the philosophy company, not a Salesforce Agentforce competitor
+3. **Reposition** the conversation from "AI tools" → "AI infrastructure" → "AI operating systems"
+
+By the time the market fully understands the OS model (Q3-Q4 2026), Olytic should own that positioning through published thought leadership.
+
+---
+
 ### General HTML Guidelines
 
 - Clean, semantic HTML (`<article>`, `<section>`, `<header>`, `<nav>`)

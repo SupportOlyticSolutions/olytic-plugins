@@ -4,6 +4,88 @@ Hard-coded standards that every Aulë-generated plugin must follow. These are no
 
 ---
 
+## The Hats Framework Pattern
+
+Every plugin represents a specific job-to-be-done — a "hat" someone wears at work. In the Claude OS, plugins are not standalone tools; they are composable hats that work together as an operating system.
+
+### Hat Identity
+
+Every plugin must declare:
+- **Hat name:** What job-to-be-done does this plugin embody? (e.g., "the proposal auditor", "the content strategist", "the deal analyzer")
+- **Platonic ideal:** One sentence describing the ideal version of this role at the highest level of abstraction
+- **Example:** "The proposal-auditor is the hat that ensures every proposal reflects our positioning and addresses the prospect's real pain point."
+
+This is **not** a task description ("automate proposal review"). It's a role description ("be the voice that ensures proposal quality").
+
+### Claude OS Dimensions
+
+Every plugin declares which dimension(s) of the Claude OS it primarily serves:
+
+1. **Unified** — This plugin helps other plugins work together. It orchestrates workflows across hats, ensuring they move from one stage to the next without manual handoffs.
+2. **Custom** — This plugin personalizes the OS to a specific organization's workflows, language, and processes. It encodes company-specific standards that other plugins reference.
+3. **Augmenting** — This plugin creates new capabilities that didn't previously exist. It amplifies human judgment and decision-making, not just speeds up existing work.
+4. **Agentic** — This plugin leverages advanced reasoning to handle complex, multi-step workflows autonomously. It is not just a knowledge reference; it actively reasons and decides.
+5. **Compounding** — This plugin feeds telemetry back into the system to improve itself over time. It logs decision traces, violations, and outcomes so the Optimizer can recommend improvements.
+
+A plugin may lean into multiple dimensions, but should declare one as primary.
+
+### Governance Dependency
+
+Every plugin declares what it depends on for governance:
+
+- **The One Ring (default for Olytic internal):** This plugin references The One Ring for brand standards, strategy context, security policies, HR policies, etc. It does not duplicate this knowledge; it points to it.
+- **Standalone (for client plugins without centralized governance):** This plugin works independently and does not assume a shared governance layer.
+- **Other governance plugins:** If the plugin depends on a custom governance plugin built for a specific client, name it explicitly.
+
+**Pattern:**
+```
+Governance dependency: The One Ring
+Specifically references:
+- olytic-brand-standards skill for voice, positioning, and messaging rules
+- olytic-strategy skill for ICP definition and market positioning
+```
+
+### Relationships to Other Hats
+
+Every plugin declares:
+- **Plugins that feed into this one** (upstream hats) — e.g., "proposal-builder feeds completed proposals to proposal-auditor"
+- **Plugins this one feeds** (downstream hats) — e.g., "proposal-auditor logs violations that inform proposal-builder improvements"
+- **Hats that work alongside this one** (parallel hats) — e.g., "content-strategist and proposal-strategist both feed The One Ring for strategy context"
+
+This prevents plugins from developing tunnel vision and makes it clear how the OS hangs together.
+
+**Pattern:**
+```
+Relationships to other hats:
+- proposal-builder: Upstream. proposal-builder generates draft proposals; proposal-auditor reviews them.
+- the-optimizer: Downstream. proposal-auditor logs violation patterns that feed the Optimizer's recommendations.
+```
+
+### Compounding Contribution
+
+Every plugin declares what telemetry it logs to feed the improvement loop:
+
+- **What decision traces are logged?** When the plugin makes or supports a decision, what context is captured?
+- **What constraint violations are logged?** When guardrails are crossed, how is it tracked?
+- **What user feedback is captured?** How does the plugin know if it's working?
+- **What outcome metrics are tracked?** Are there leading indicators of plugin effectiveness?
+
+**Pattern:**
+```
+Compounding contribution:
+- Logs every audit result (pass/fail per section)
+- Logs every constraint violation flagged
+- Logs user feedback: "violation was accurate" / "violation was wrong"
+- Logs time spent in audit
+
+The Optimizer watches violation patterns. If the same types of violations keep appearing, it recommends:
+- Clarifying the brand standards (if the rule was unclear)
+- Improving proposal-builder (if builder should have caught it earlier)
+- Adjusting the auditor's sensitivity (if false positives are too high)
+```
+
+---
+
 ## Olytic Business Context
 
 When generating **Olytic-internal plugins** (audience: `olytic-internal`), ground all content in Olytic's current business reality. This context informs how skills, agents, and commands are framed, what ICP they reference, and what strategic questions they embed.
@@ -261,7 +343,7 @@ Client plugins are typically standalone. If they depend on a governance plugin b
 1. `.claude-plugin/plugin.json` — always
 2. `skills/plugin-telemetry/SKILL.md` — always (from telemetry template)
 3. At least one domain skill — always
-4. `README.md` — always
+4. `README.md` — always (with Claude OS Identity block)
 5. `.mcp.json` — only if integrations exist
 6. `commands/` — only if repeatable actions exist
 7. `agents/` — only if multi-step workflows exist
@@ -291,6 +373,18 @@ Every generated plugin's README must include a Memory Scope section that declare
 - **Justification:** why persistent or retrieval memory is needed (if applicable)
 
 Default is ephemeral. Persistent memory requires explicit justification during discovery.
+
+## Claude OS Identity Block (Every Plugin)
+
+Every generated plugin's README must include a Claude OS Identity section that declares:
+
+- **Hat:** The plugin's role in the Claude OS — the platonic ideal of the job-to-be-done
+- **Dimension:** Which dimension(s) of the Claude OS it primarily serves (Unified, Custom, Augmenting, Agentic, Compounding)
+- **Governance dependency:** What governance foundation it depends on (The One Ring, standalone, or other)
+- **Relationships:** Which other plugins it sends to and receives from
+- **Compounding contribution:** What telemetry it logs to feed the Optimizer
+
+See "The Hats Framework Pattern" section above for detailed patterns.
 
 ## Integrity Controls
 

@@ -65,6 +65,18 @@ Role-specific plugins (content-strategist, sales, engineering, consulting-delive
 - Strategy updates propagate to all teams automatically
 - Policy changes take effect across the entire organization
 
+## The One Ring as the Governance Hat
+
+In Olytic's Hats Framework, each plugin represents a specific job-to-be-done — a "hat" someone wears at work. **The One Ring is the governance hat**: the platonic ideal of a Chief Governance Officer, brand guardian, policy enforcer, and strategic alignment keeper.
+
+The governance hat is not a reference library. It is the constitutional layer of the Claude OS. Every other hat — the content strategist hat, the sales enablement hat, the consulting delivery hat — derives its authority, brand voice, and strategic direction from The One Ring. When The One Ring's strategy or brand standards change, every dependent plugin immediately reflects the update. This is not eventual consistency. This is instant alignment.
+
+**The alignment dividend.** In traditional organizations, this problem is perpetual: marketing positions the product one way, sales positions it another, support uses different language. Misalignment is expensive and historically hard to close permanently. The One Ring solves this by being the single source of truth that all plugins reference. When The One Ring's strategy skill is updated, Magneto's content strategy updates. When brand voice changes, every plugin that creates external-facing content reflects the change. The alignment dividend is not one-time. It is compounding — as strategy evolves, the update propagates through the entire Claude OS automatically.
+
+**Why managed scope.** The One Ring is the ONLY plugin installed at `managed` scope — users cannot disable it. This is not a technical accident. Governance cannot be optional. If a team member could turn off brand standards or policy enforcement, the entire system falls apart. Managed scope ensures that The One Ring is always active, always authoritative, always the constitutional foundation the other hats rely on.
+
+**The compounding loop.** The One Ring participates in the compounding loop of the Claude OS: as strategy and brand voice evolve, The One Ring's skills are updated, and those updates immediately propagate through every dependent plugin. This is the governance dimension of the Olytic framework: Launch → Operate → Optimize → Perpetuate. At the Optimize phase, The One Ring's skills are refreshed. At the Perpetuate phase, those updates compound through the entire system. This is how governance becomes structural rather than aspirational.
+
 ## Permissions & Transparency
 
 ### Tools Accessed
