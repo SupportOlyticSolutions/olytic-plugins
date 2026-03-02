@@ -6,7 +6,15 @@
       "version": "0.2.0",
       "category": "governance",
       "scope": "managed",
-      "keywords": ["governance", "brand", "strategy", "policies", "alignment", "core-values", "consistency"],
+      "keywords": [
+        "governance",
+        "brand",
+        "strategy",
+        "policies",
+        "alignment",
+        "core-values",
+        "consistency"
+      ],
       "bigPicture": "The org-wide governance layer. Company strategy and consistency is its primary mission — brand voice, HR policies, security standards, and core values are the individual facets that serve that mission. Every piece of content, every decision, and every process at Olytic runs through this layer. It is installed for all employees and cannot be disabled.",
       "purpose": "Without a single source of truth for what Olytic stands for, every piece of content and every decision risks drifting — in message, in values, or in policy compliance. The One Ring exists so that anyone using Claude at Olytic gets the same strategic grounding, the same brand voice, and the same governance guardrails applied automatically. It is the baseline that makes every other plugin coherent.",
       "rulesets": [
@@ -52,30 +60,79 @@
       },
       "components": {
         "skills": [
-          { "name": "Company Strategy & Core Values", "desc": "Vision, core values, current business stage, strategic priorities with status, engagement models, decision framework. The primary skill — load first." },
-          { "name": "Brand Standards", "desc": "Voice rules, messaging pillars, ICP definition, competitive positioning, design system (color, typography, layout)" },
-          { "name": "HR Policies", "desc": "Culture principles, communication norms, work hours, PTO, onboarding checklist, professional development, escalation guidance" },
-          { "name": "Security Policies", "desc": "Data classification tiers, client data rules, AI usage policies, credential management, incident response" }
+          {
+            "name": "Company Strategy & Core Values",
+            "desc": "Vision, core values, current business stage, strategic priorities with status, engagement models, decision framework. The primary skill — load first."
+          },
+          {
+            "name": "Brand Standards",
+            "desc": "Voice rules, messaging pillars, ICP definition, competitive positioning, design system (color, typography, layout)"
+          },
+          {
+            "name": "HR Policies",
+            "desc": "Culture principles, communication norms, work hours, PTO, onboarding checklist, professional development, escalation guidance"
+          },
+          {
+            "name": "Security Policies",
+            "desc": "Data classification tiers, client data rules, AI usage policies, credential management, incident response"
+          }
         ],
         "commands": [
-          { "name": "/brand-check", "desc": "Scores content against voice & tone, messaging alignment, ICP targeting, competitive differentiation, structure, and CTA. Returns Pass/Needs Work with specific rewrites." },
-          { "name": "/strategy-check", "desc": "Reviews any work product or decision against strategic fit, message alignment, and core values. Returns a scored table with specific recommendations for anything off-track." },
-          { "name": "/policy-lookup", "desc": "Answers a specific HR or security policy question. Returns the rule, rationale, source section, and the right action for the user's situation." },
-          { "name": "/values-check", "desc": "Quick gut-check against each of the five core values. Returns a pass/flag per value with a one-line rationale. Escalates to consistency-auditor for a full scan." }
+          {
+            "name": "/brand-check",
+            "desc": "Scores content against voice & tone, messaging alignment, ICP targeting, competitive differentiation, structure, and CTA. Returns Pass/Needs Work with specific rewrites."
+          },
+          {
+            "name": "/strategy-check",
+            "desc": "Reviews any work product or decision against strategic fit, message alignment, and core values. Returns a scored table with specific recommendations for anything off-track."
+          },
+          {
+            "name": "/policy-lookup",
+            "desc": "Answers a specific HR or security policy question. Returns the rule, rationale, source section, and the right action for the user's situation."
+          },
+          {
+            "name": "/values-check",
+            "desc": "Quick gut-check against each of the five core values. Returns a pass/flag per value with a one-line rationale. Escalates to consistency-auditor for a full scan."
+          }
         ],
         "agents": [
-          { "name": "brand-compliance-reviewer", "desc": "Six-dimension brand audit: Voice & Tone, Messaging Alignment, ICP Targeting, Competitive Differentiation, Structural Quality, CTA. Verification gate before full report. Rewrite examples for all failures." },
-          { "name": "consistency-auditor", "desc": "Full cross-dimensional governance scan: brand voice, strategy alignment, core values, HR norms, security standards. Presents summary scorecard first, then drills into flagged dimensions on request." },
-          { "name": "onboarding-guide", "desc": "Interactive orientation for new team members and collaborators. Calibrates depth by role (full-time, contractor, returning). Covers strategy, values, brand voice, communication norms, and key policies." }
+          {
+            "name": "brand-compliance-reviewer",
+            "desc": "Six-dimension brand audit: Voice & Tone, Messaging Alignment, ICP Targeting, Competitive Differentiation, Structural Quality, CTA. Verification gate before full report. Rewrite examples for all failures."
+          },
+          {
+            "name": "consistency-auditor",
+            "desc": "Full cross-dimensional governance scan: brand voice, strategy alignment, core values, HR norms, security standards. Presents summary scorecard first, then drills into flagged dimensions on request."
+          },
+          {
+            "name": "onboarding-guide",
+            "desc": "Interactive orientation for new team members and collaborators. Calibrates depth by role (full-time, contractor, returning). Covers strategy, values, brand voice, communication norms, and key policies."
+          }
         ]
       },
       "successCriteria": {
         "narrative": "The One Ring succeeds when Olytic's brand voice, strategic alignment, and policies are applied consistently across all outputs without requiring manual correction. The primary signal is governance scan pass rate. Secondary signals are whether policy questions are answered accurately, whether strategic decisions consistently reflect current priorities, and whether onboarding orientation reduces ramp time for new contributors.",
         "kpis": [
-          { "metric": "/brand-check first-run pass rate", "target": ">80% of content passes all dimensions without revision", "reporting": "Manual log after each /brand-check run. Track Pass vs. Needs Work per dimension in a running Notion table." },
-          { "metric": "consistency-auditor scan pass rate", "target": ">90% of high-stakes documents pass all five governance facets on first scan", "reporting": "Log summary scorecard output after each consistency-auditor run. Track by document type (proposal, email, landing page)." },
-          { "metric": "Policy question accuracy", "target": "HR and security questions answered without requiring human correction", "reporting": "Spot-check during weekly review. Note any answers that needed correction in a running issues log." },
-          { "metric": "External content retraction rate", "target": "Zero published pieces need to be pulled back for brand or policy violations", "reporting": "Tracked reactively. Any retraction triggers a root-cause review against the relevant skill." }
+          {
+            "metric": "/brand-check first-run pass rate",
+            "target": ">80% of content passes all dimensions without revision",
+            "reporting": "Manual log after each /brand-check run. Track Pass vs. Needs Work per dimension in a running Notion table."
+          },
+          {
+            "metric": "consistency-auditor scan pass rate",
+            "target": ">90% of high-stakes documents pass all five governance facets on first scan",
+            "reporting": "Log summary scorecard output after each consistency-auditor run. Track by document type (proposal, email, landing page)."
+          },
+          {
+            "metric": "Policy question accuracy",
+            "target": "HR and security questions answered without requiring human correction",
+            "reporting": "Spot-check during weekly review. Note any answers that needed correction in a running issues log."
+          },
+          {
+            "metric": "External content retraction rate",
+            "target": "Zero published pieces need to be pulled back for brand or policy violations",
+            "reporting": "Tracked reactively. Any retraction triggers a root-cause review against the relevant skill."
+          }
         ]
       },
       "guardrails": [
@@ -88,11 +145,31 @@
         "Never expose client data or credentials in any output."
       ],
       "setup": [
-        { "name": "Managed Scope", "desc": "Installed org-wide. Users cannot disable it.", "status": "ok" },
-        { "name": "Company Strategy & Core Values", "desc": "Vision, priorities, engagement models, and Core Values populated", "status": "ok" },
-        { "name": "Brand Standards", "desc": "Voice, messaging, ICP, competitive positioning, and design system fully specified", "status": "ok" },
-        { "name": "HR Policies", "desc": "Working defaults populated for all sections. Review with leadership to confirm or adjust.", "status": "ok" },
-        { "name": "Security Policies", "desc": "Core rules and incident response populated. Review before enforcing in client engagements.", "status": "ok" }
+        {
+          "name": "Managed Scope",
+          "desc": "Installed org-wide. Users cannot disable it.",
+          "status": "ok"
+        },
+        {
+          "name": "Company Strategy & Core Values",
+          "desc": "Vision, priorities, engagement models, and Core Values populated",
+          "status": "ok"
+        },
+        {
+          "name": "Brand Standards",
+          "desc": "Voice, messaging, ICP, competitive positioning, and design system fully specified",
+          "status": "ok"
+        },
+        {
+          "name": "HR Policies",
+          "desc": "Working defaults populated for all sections. Review with leadership to confirm or adjust.",
+          "status": "ok"
+        },
+        {
+          "name": "Security Policies",
+          "desc": "Core rules and incident response populated. Review before enforcing in client engagements.",
+          "status": "ok"
+        }
       ]
     },
     {
@@ -101,7 +178,17 @@
       "version": "0.2.0",
       "category": "content",
       "scope": "managed",
-      "keywords": ["content", "website", "github", "analytics", "strategy", "ga4", "linkedin", "geo", "seo", "competitive-research"],
+      "keywords": [
+        "content",
+        "website",
+        "github",
+        "analytics",
+        "strategy",
+        "ga4",
+        "linkedin",
+        "geo",
+        "seo"
+      ],
       "bigPicture": "Content creation and strategy plugin for Olytic Solutions. Handles the full content loop: deciding what to write, producing it on-brand, pushing it to GitHub, and measuring whether it worked. Covers website content, LinkedIn posts, GEO optimization, competitive research, GA4 analytics, and content briefs. Requires The One Ring for brand voice and governance.",
       "purpose": "Content is Olytic's primary credibility and visibility engine at this stage. This plugin closes the gap between 'we should publish more' and actually doing it — at quality, on strategy, and with measurable outcomes. It codifies what to write (strategy), how to write it (templates and brand rules), where to publish it (GitHub repos), and whether it worked (GA4). Without it, content production stalls or goes off-strategy.",
       "rulesets": [
@@ -150,34 +237,95 @@
       },
       "components": {
         "skills": [
-          { "name": "Content Strategy", "desc": "Three content pillars, ICP journey mapping, prioritization scoring framework, GA4 integration, Content O/G/O loop, publishing cadence" },
-          { "name": "Website Content", "desc": "HTML templates for blog posts and landing pages, content formatting rules, SEO guidance, content planning checklist" },
-          { "name": "LinkedIn Content", "desc": "LinkedIn post anatomy, hook structures, voice rules for social, formatting, hashtag guidance" },
-          { "name": "GEO Content", "desc": "GEO page structure for AI citation, direct answer formatting, structured data signals, FAQ patterns" },
-          { "name": "Content Brief Standards", "desc": "Pre-writing brief template: keyword, pain point, content pillar, ICP stage, outline, CTA, success metric" }
+          {
+            "name": "Content Strategy",
+            "desc": "Three content pillars, ICP journey mapping, prioritization scoring framework, GA4 integration, Content O/G/O loop, publishing cadence"
+          },
+          {
+            "name": "Website Content",
+            "desc": "HTML templates for blog posts and landing pages, content formatting rules, SEO guidance, content planning checklist"
+          },
+          {
+            "name": "LinkedIn Content",
+            "desc": "LinkedIn post anatomy, hook structures, voice rules for social, formatting, hashtag guidance"
+          },
+          {
+            "name": "GEO Content",
+            "desc": "GEO page structure for AI citation, direct answer formatting, structured data signals, FAQ patterns"
+          },
+          {
+            "name": "Content Brief Standards",
+            "desc": "Pre-writing brief template: keyword, pain point, content pillar, ICP stage, outline, CTA, success metric"
+          }
         ],
         "commands": [
-          { "name": "/pull-content", "desc": "Fetches a file from any Olytic GitHub repo (olytic-site, olytic-lab, olytic-plugins, olytic-app) for review or editing" },
-          { "name": "/push-content", "desc": "Pushes new or updated content to an Olytic GitHub repo on a feature branch. Never auto-merges to main." },
-          { "name": "/content-performance", "desc": "Pulls GA4 data (Property 525690219) and maps page metrics to strategic purposes (credibility, visibility, conversion)" },
-          { "name": "/linkedin-post", "desc": "Drafts 3 LinkedIn post options in Olytic's voice from a topic, URL, or rough notes" },
-          { "name": "/competitive-snapshot", "desc": "Researches what competitors are publishing on a topic and surfaces Olytic's differentiation angle" },
-          { "name": "/content-brief", "desc": "Generates a structured content brief for any topic before writing begins" },
-          { "name": "/geo-check", "desc": "Evaluates a piece of content against GEO criteria for AI answer engine citation readiness" }
+          {
+            "name": "/pull-content",
+            "desc": "Fetches a file from any Olytic GitHub repo (olytic-site, olytic-lab, olytic-plugins, olytic-app) for review or editing"
+          },
+          {
+            "name": "/push-content",
+            "desc": "Pushes new or updated content to an Olytic GitHub repo on a feature branch. Never auto-merges to main."
+          },
+          {
+            "name": "/content-performance",
+            "desc": "Pulls GA4 data (Property 525690219) and maps page metrics to strategic purposes (credibility, visibility, conversion)"
+          },
+          {
+            "name": "/linkedin-post",
+            "desc": "Drafts 3 LinkedIn post options in Olytic's voice from a topic, URL, or rough notes"
+          },
+          {
+            "name": "/competitive-snapshot",
+            "desc": "Researches what competitors are publishing on a topic and surfaces Olytic's differentiation angle"
+          },
+          {
+            "name": "/content-brief",
+            "desc": "Generates a structured content brief for any topic before writing begins"
+          },
+          {
+            "name": "/geo-check",
+            "desc": "Evaluates a piece of content against GEO criteria for AI answer engine citation readiness"
+          }
         ],
         "agents": [
-          { "name": "content-strategist", "desc": "Evaluates content gaps against ICP journey and prioritization framework. Recommends what to write next with scoring rationale." },
-          { "name": "competitive-content-analyst", "desc": "Researches competitor content and messaging. Identifies positioning angles only Olytic can credibly own." },
-          { "name": "meeting-notes-reviewer", "desc": "Extracts content ideas, ICP language patterns, and objection data from meeting transcripts and recordings." }
+          {
+            "name": "content-strategist",
+            "desc": "Evaluates content gaps against ICP journey and prioritization framework. Recommends what to write next with scoring rationale."
+          },
+          {
+            "name": "competitive-content-analyst",
+            "desc": "Researches competitor content and messaging. Identifies positioning angles only Olytic can credibly own."
+          },
+          {
+            "name": "meeting-notes-reviewer",
+            "desc": "Extracts content ideas, ICP language patterns, and objection data from meeting transcripts and recordings."
+          }
         ]
       },
       "successCriteria": {
         "narrative": "Magneto succeeds when Olytic is publishing on cadence, content maps to the right ICP journey stage, and organic traffic grows month-over-month. It fails silently if content is published but not measured, or if publishing cadence drops because the workflow feels too heavy. The reporting mechanism is /content-performance, which pulls GA4 data directly and maps it to strategic purpose.",
         "kpis": [
-          { "metric": "Publishing cadence", "target": "2 blog posts and 1 landing page per month", "reporting": "GitHub commit history on olytic-site. Count merged PRs from /push-content per month." },
-          { "metric": "Organic pageviews", "target": "Month-over-month growth on content pages", "reporting": "/content-performance pulling GA4 Property 525690219. Reviewed monthly." },
-          { "metric": "Content-to-ICP-journey coverage", "target": "At least one piece covering each stage: Awareness, Consideration, Decision", "reporting": "content-strategist agent produces a gap analysis on demand. Run before each monthly planning session." },
-          { "metric": "Brand-check pass rate on published content", "target": "100% of content pushed via /push-content has passed /brand-check", "reporting": "Enforced by process: /brand-check is a required step before /push-content. Verified in PR description." }
+          {
+            "metric": "Publishing cadence",
+            "target": "2 blog posts and 1 landing page per month",
+            "reporting": "GitHub commit history on olytic-site. Count merged PRs from /push-content per month."
+          },
+          {
+            "metric": "Organic pageviews",
+            "target": "Month-over-month growth on content pages",
+            "reporting": "/content-performance pulling GA4 Property 525690219. Reviewed monthly."
+          },
+          {
+            "metric": "Content-to-ICP-journey coverage",
+            "target": "At least one piece covering each stage: Awareness, Consideration, Decision",
+            "reporting": "content-strategist agent produces a gap analysis on demand. Run before each monthly planning session."
+          },
+          {
+            "metric": "Brand-check pass rate on published content",
+            "target": "100% of content pushed via /push-content has passed /brand-check",
+            "reporting": "Enforced by process: /brand-check is a required step before /push-content. Verified in PR description."
+          }
         ]
       },
       "guardrails": [
@@ -189,13 +337,41 @@
         "All repo changes are staged on feature branches. Never auto-merges to main."
       ],
       "setup": [
-        { "name": "The One Ring (Dependency)", "desc": "Required. Brand voice and strategy come from here.", "status": "ok" },
-        { "name": "GitHub MCP Server", "desc": "Required for /pull-content, /push-content, and repo access", "status": "warn" },
-        { "name": "GA4 Property (525690219)", "desc": "Required for /content-performance command", "status": "warn" },
-        { "name": "Website Content Skill", "desc": "Templates and HTML patterns loaded", "status": "ok" },
-        { "name": "Content Strategy Skill", "desc": "Pillars, ICP journey, prioritization framework loaded", "status": "ok" },
-        { "name": "LinkedIn Content Skill", "desc": "Post anatomy and voice rules loaded", "status": "ok" },
-        { "name": "GEO Content Skill", "desc": "GEO page structure and citation signals loaded", "status": "ok" }
+        {
+          "name": "The One Ring (Dependency)",
+          "desc": "Required. Brand voice and strategy come from here.",
+          "status": "ok"
+        },
+        {
+          "name": "GitHub MCP Server",
+          "desc": "Required for /pull-content, /push-content, and repo access",
+          "status": "warn"
+        },
+        {
+          "name": "GA4 Property (525690219)",
+          "desc": "Required for /content-performance command",
+          "status": "warn"
+        },
+        {
+          "name": "Website Content Skill",
+          "desc": "Templates and HTML patterns loaded",
+          "status": "ok"
+        },
+        {
+          "name": "Content Strategy Skill",
+          "desc": "Pillars, ICP journey, prioritization framework loaded",
+          "status": "ok"
+        },
+        {
+          "name": "LinkedIn Content Skill",
+          "desc": "Post anatomy and voice rules loaded",
+          "status": "ok"
+        },
+        {
+          "name": "GEO Content Skill",
+          "desc": "GEO page structure and citation signals loaded",
+          "status": "ok"
+        }
       ]
     },
     {
@@ -204,7 +380,15 @@
       "version": "0.2.0",
       "category": "meta",
       "scope": "managed",
-      "keywords": ["plugin-creation", "meta-plugin", "marketplace", "telemetry", "generation", "integrity", "augmentation"],
+      "keywords": [
+        "plugin-creation",
+        "meta-plugin",
+        "marketplace",
+        "telemetry",
+        "generation",
+        "integrity",
+        "augmentation"
+      ],
       "bigPicture": "Olytic's plugin forge. Runs a structured discovery protocol to gather requirements, generates all plugin files (skills, commands, agents, hooks, MCP configs) with telemetry auto-injected, and manages the marketplace. Works for both internal Olytic plugins and client-facing ones. Every plugin it produces is production-ready: structured, versioned, and measurable from day one.",
       "purpose": "Olytic's plugin architecture only scales if building new plugins is fast and consistent. Aulë exists to turn a set of requirements into a fully structured, telemetry-equipped plugin in one session instead of a week of manual file creation. It also manages the marketplace so that new plugins are discoverable and versioned from day one.",
       "rulesets": [
@@ -243,26 +427,63 @@
       },
       "components": {
         "skills": [
-          { "name": "Plugin Discovery", "desc": "Structured adaptive protocol: name, purpose, users, strategic questions, constraints, integrations, metrics" },
-          { "name": "Plugin Generation", "desc": "Generates complete plugin file structures from discovery output using reference templates for all component types" },
-          { "name": "Marketplace Management", "desc": "Reads, diffs, and stages updates to the olytic-plugins marketplace repo and catalog.json" }
+          {
+            "name": "Plugin Discovery",
+            "desc": "Structured adaptive protocol: name, purpose, users, strategic questions, constraints, integrations, metrics"
+          },
+          {
+            "name": "Plugin Generation",
+            "desc": "Generates complete plugin file structures from discovery output using reference templates for all component types"
+          },
+          {
+            "name": "Marketplace Management",
+            "desc": "Reads, diffs, and stages updates to the olytic-plugins marketplace repo and catalog.json"
+          }
         ],
         "commands": [
-          { "name": "/create-plugin", "desc": "Starts the full guided workflow: discovery through delivery. Runs the structured protocol and generates all plugin files." },
-          { "name": "/update-marketplace", "desc": "Stages a plugin addition or update in the marketplace repo on a feature branch." },
-          { "name": "/update-plugin", "desc": "Audits an existing plugin against current best practices and generates an updated version." }
+          {
+            "name": "/create-plugin",
+            "desc": "Starts the full guided workflow: discovery through delivery. Runs the structured protocol and generates all plugin files."
+          },
+          {
+            "name": "/update-marketplace",
+            "desc": "Stages a plugin addition or update in the marketplace repo on a feature branch."
+          },
+          {
+            "name": "/update-plugin",
+            "desc": "Audits an existing plugin against current best practices and generates an updated version."
+          }
         ],
         "agents": [
-          { "name": "plugin-builder", "desc": "End-to-end orchestrator for the full plugin workflow: discovery, planning, generation, review, delivery, and marketplace staging." }
+          {
+            "name": "plugin-builder",
+            "desc": "End-to-end orchestrator for the full plugin workflow: discovery, planning, generation, review, delivery, and marketplace staging."
+          }
         ]
       },
       "successCriteria": {
         "narrative": "Aulë succeeds when new plugins are shipped quickly, are structurally consistent with existing ones, and get actively used after delivery. A plugin that sits unused after creation is a failure regardless of how well it was built. Telemetry is the primary feedback loop: every generated plugin includes a telemetry skill that logs usage, so adoption is measurable from day one.",
         "kpis": [
-          { "metric": "Time from requirements to delivered plugin", "target": "Under 2 hours for a standard plugin with 2–3 skills and 1–2 commands", "reporting": "Logged manually at delivery. Timestamp from /create-plugin invocation to PR opened in olytic-plugins." },
-          { "metric": "Structural compliance rate", "target": "100% of generated plugins pass verification gates without manual fixes", "reporting": "Verification gate output is included in the delivery summary. Any manual fixes are noted in the PR description." },
-          { "metric": "Plugin adoption rate", "target": "At least one active user logging telemetry events within 2 weeks of delivery", "reporting": "Telemetry skill logs reviewed via olytic-lab or designated telemetry dashboard. Reviewed per plugin at the 2-week mark." },
-          { "metric": "Marketplace currency", "target": "catalog.json reflects all active plugins within 24 hours of delivery", "reporting": "GitHub commit history on olytic-plugins. /update-marketplace should be the final step of every plugin delivery." }
+          {
+            "metric": "Time from requirements to delivered plugin",
+            "target": "Under 2 hours for a standard plugin with 2–3 skills and 1–2 commands",
+            "reporting": "Logged manually at delivery. Timestamp from /create-plugin invocation to PR opened in olytic-plugins."
+          },
+          {
+            "metric": "Structural compliance rate",
+            "target": "100% of generated plugins pass verification gates without manual fixes",
+            "reporting": "Verification gate output is included in the delivery summary. Any manual fixes are noted in the PR description."
+          },
+          {
+            "metric": "Plugin adoption rate",
+            "target": "At least one active user logging telemetry events within 2 weeks of delivery",
+            "reporting": "Telemetry skill logs reviewed via olytic-lab or designated telemetry dashboard. Reviewed per plugin at the 2-week mark."
+          },
+          {
+            "metric": "Marketplace currency",
+            "target": "catalog.json reflects all active plugins within 24 hours of delivery",
+            "reporting": "GitHub commit history on olytic-plugins. /update-marketplace should be the final step of every plugin delivery."
+          }
         ]
       },
       "guardrails": [
@@ -274,10 +495,26 @@
         "Permission gates: confirm with user before destructive actions or 5+ simultaneous changes."
       ],
       "setup": [
-        { "name": "GitHub MCP Server", "desc": "Required for marketplace management and repo operations", "status": "warn" },
-        { "name": "Plugin Generation References", "desc": "Templates, patterns, and best practices loaded", "status": "ok" },
-        { "name": "Discovery Protocol", "desc": "Structured discovery flow configured and ready", "status": "ok" },
-        { "name": "Telemetry Template", "desc": "Auto-included in every generated plugin", "status": "ok" }
+        {
+          "name": "GitHub MCP Server",
+          "desc": "Required for marketplace management and repo operations",
+          "status": "warn"
+        },
+        {
+          "name": "Plugin Generation References",
+          "desc": "Templates, patterns, and best practices loaded",
+          "status": "ok"
+        },
+        {
+          "name": "Discovery Protocol",
+          "desc": "Structured discovery flow configured and ready",
+          "status": "ok"
+        },
+        {
+          "name": "Telemetry Template",
+          "desc": "Auto-included in every generated plugin",
+          "status": "ok"
+        }
       ]
     },
     {
@@ -286,7 +523,13 @@
       "version": "0.1.0",
       "category": "meta",
       "scope": "managed",
-      "keywords": ["data-architecture", "metadata-platform", "security", "data-governance", "optimization", "bi-reporting", "product-management"],
+      "keywords": [
+        "data-architecture",
+        "metadata-platform",
+        "security",
+        "data-governance",
+        "optimization"
+      ],
       "bigPicture": "Gaudi architects Olytic's plugin metadata platform — designing data models, security layers, BI reporting frameworks, product strategy, and the optimization feedback loop. It is the engineering and data intelligence brain behind how Olytic collects, structures, and monetizes plugin usage data. Gaudi turns raw telemetry into strategic insight.",
       "purpose": "Olytic's plugin ecosystem generates metadata that could become a competitive asset — but only if it's collected consistently, modeled correctly, secured properly, and surfaced in ways that create real value for clients. Gaudi exists to make sure every architectural decision across the platform is intentional, defensible, and aligned with Olytic's long-term data strategy.",
       "rulesets": [
@@ -321,20 +564,53 @@
       ],
       "components": {
         "skills": [
-          { "name": "Data Modeling", "desc": "Relational schema design, entity relationships, normalization, versioning, and query patterns for the plugin metadata platform" },
-          { "name": "Security", "desc": "Trust architecture, access control, data classification, credential management, and compliance for the metadata platform" },
-          { "name": "BI Reporting", "desc": "Dashboard design, KPI frameworks, visualization patterns, and client-facing analytics surfaces" },
-          { "name": "Data Privacy", "desc": "Anonymization, consent management, PII handling, and data licensing boundaries" },
-          { "name": "Product Management", "desc": "Go-to-market strategy, revenue models, pricing, feature prioritization, and commercial viability" },
-          { "name": "Competitive Intelligence", "desc": "Market research, buyer personas, competitor positioning, and differentiation angles for the data platform" },
-          { "name": "User Experience", "desc": "Client-facing dashboard UX, onboarding flows, and experience architecture for platform users" },
-          { "name": "Plugin Telemetry", "desc": "Auto-loaded telemetry for the Gaudi plugin itself. Tracks usage events, version tags, constraint violations, and user feedback." }
+          {
+            "name": "Data Modeling",
+            "desc": "Relational schema design, entity relationships, normalization, versioning, and query patterns for the plugin metadata platform"
+          },
+          {
+            "name": "Security",
+            "desc": "Trust architecture, access control, data classification, credential management, and compliance for the metadata platform"
+          },
+          {
+            "name": "BI Reporting",
+            "desc": "Dashboard design, KPI frameworks, visualization patterns, and client-facing analytics surfaces"
+          },
+          {
+            "name": "Data Privacy",
+            "desc": "Anonymization, consent management, PII handling, and data licensing boundaries"
+          },
+          {
+            "name": "Product Management",
+            "desc": "Go-to-market strategy, revenue models, pricing, feature prioritization, and commercial viability"
+          },
+          {
+            "name": "Competitive Intelligence",
+            "desc": "Market research, buyer personas, competitor positioning, and differentiation angles for the data platform"
+          },
+          {
+            "name": "User Experience",
+            "desc": "Client-facing dashboard UX, onboarding flows, and experience architecture for platform users"
+          },
+          {
+            "name": "Plugin Telemetry",
+            "desc": "Auto-loaded telemetry for the Gaudi plugin itself. Tracks usage events, version tags, constraint violations, and user feedback."
+          }
         ],
         "commands": [],
         "agents": [
-          { "name": "gaudi-architect", "desc": "Orchestrates across all Gaudi skills to deliver comprehensive architectural designs for the metadata platform. Routes questions to the right expertise and synthesizes cross-domain recommendations." },
-          { "name": "solution-design", "desc": "Designs end-to-end platform architecture — from data collection through analysis through the optimization feedback loop. Produces detailed technical specifications." },
-          { "name": "full-stack-engineering", "desc": "Guides full-stack implementation: Cowork API integration, Supabase schema and queries, API design, data pipeline orchestration, and the technical architecture that connects Aulë to the metadata platform." }
+          {
+            "name": "gaudi-architect",
+            "desc": "Orchestrates across all Gaudi skills to deliver comprehensive architectural designs for the metadata platform. Routes questions to the right expertise and synthesizes cross-domain recommendations."
+          },
+          {
+            "name": "solution-design",
+            "desc": "Designs end-to-end platform architecture — from data collection through analysis through the optimization feedback loop. Produces detailed technical specifications."
+          },
+          {
+            "name": "full-stack-engineering",
+            "desc": "Guides full-stack implementation: Cowork API integration, Supabase schema and queries, API design, data pipeline orchestration, and the technical architecture that connects Aulë to the metadata platform."
+          }
         ]
       },
       "guardrails": [
@@ -346,15 +622,48 @@
         "No hallucination on technical specs: if something isn't defined, flag it as a gap rather than inventing a solution."
       ],
       "setup": [
-        { "name": "Data Modeling Skill", "desc": "Schema design patterns and entity relationships loaded", "status": "ok" },
-        { "name": "Security Skill", "desc": "Trust architecture and access control patterns loaded", "status": "ok" },
-        { "name": "BI Reporting Skill", "desc": "Dashboard frameworks and KPI patterns loaded", "status": "ok" },
-        { "name": "Data Privacy Skill", "desc": "Anonymization and consent management patterns loaded", "status": "ok" },
-        { "name": "Product Management Skill", "desc": "GTM strategy and revenue model frameworks loaded", "status": "ok" },
-        { "name": "Competitive Intelligence Skill", "desc": "Market research and buyer intelligence frameworks loaded", "status": "ok" },
-        { "name": "User Experience Skill", "desc": "Dashboard UX and onboarding flow patterns loaded", "status": "ok" },
-        { "name": "Supabase / Cowork API Integration", "desc": "Required for full-stack implementation work. Configure connection strings before engineering sessions.", "status": "warn" }
+        {
+          "name": "Data Modeling Skill",
+          "desc": "Schema design patterns and entity relationships loaded",
+          "status": "ok"
+        },
+        {
+          "name": "Security Skill",
+          "desc": "Trust architecture and access control patterns loaded",
+          "status": "ok"
+        },
+        {
+          "name": "BI Reporting Skill",
+          "desc": "Dashboard frameworks and KPI patterns loaded",
+          "status": "ok"
+        },
+        {
+          "name": "Data Privacy Skill",
+          "desc": "Anonymization and consent management patterns loaded",
+          "status": "ok"
+        },
+        {
+          "name": "Product Management Skill",
+          "desc": "GTM strategy and revenue model frameworks loaded",
+          "status": "ok"
+        },
+        {
+          "name": "Competitive Intelligence Skill",
+          "desc": "Market research and buyer intelligence frameworks loaded",
+          "status": "ok"
+        },
+        {
+          "name": "User Experience Skill",
+          "desc": "Dashboard UX and onboarding flow patterns loaded",
+          "status": "ok"
+        },
+        {
+          "name": "Supabase / Cowork API Integration",
+          "desc": "Required for full-stack implementation work. Configure connection strings before engineering sessions.",
+          "status": "warn"
+        }
       ]
     }
-  ]
+  ],
+  "generated": "2026-03-02T03:52:39.319Z"
 }
