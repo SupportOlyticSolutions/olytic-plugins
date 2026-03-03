@@ -1,0 +1,20 @@
+{
+  "id": "aule",
+  "name": "Aule",
+  "description": "Plugin discovery, generation, and marketplace management. Helps teams find, create, evaluate, and publish Claude plugins across organizations.",
+  "image": "assets/aule-logo.png",
+  "label": "Marketplace",
+  "version": "1.0.0",
+  "lastCortexUpdate": null,
+  "cortexTopics": [],
+  "relationships": {
+    "dependsOn": ["the-one-ring"],
+    "complementaryPlugins": ["gaudi", "magneto"]
+  },
+  "customFields": {
+    "tier": "tier-1",
+    "owner": "platform-engineering",
+    "usageScore": 90,
+    "maturityLevel": "production"
+  }
+}

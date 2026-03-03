@@ -163,6 +163,69 @@ Or simply update any Aule core file — the hook triggers trashbot automatically
 | **External services** | GitHub API (marketplace reads and staged branch writes) |
 | **Human-in-the-loop** | All destructive changes (deleting files or components) require explicit confirmation. Marketplace updates are staged to a feature branch — never auto-merged. Trashbot confirms before deleting any plugin component. |
 
+## Plugin Directory Structure
+
+The olytic-plugins repository is organized as follows:
+
+```
+olytic-plugins/
+├── Cortex/                          # Knowledge management system
+├── plugins-workspace/               # All plugins organized here
+│   ├── aule/
+│   │   ├── aule/                   # Actual Aule plugin folder
+│   │   ├── aule.zip                # Packaged plugin
+│   │   └── aule.metadata.json      # Plugin metadata sidecar
+│   ├── gaudi/
+│   │   ├── gaudi/                  # Actual Gaudi plugin folder
+│   │   ├── gaudi.zip
+│   │   └── gaudi.metadata.json
+│   ├── magneto/
+│   │   ├── magneto/
+│   │   ├── magneto.zip
+│   │   └── magneto.metadata.json
+│   └── the-one-ring/
+│       ├── the-one-ring/
+│       ├── the-one-ring.zip
+│       └── the-one-ring.metadata.json
+├── telemetry-blueprint/
+├── CORTEX-SYSTEM.md
+└── [other repo files]
+```
+
+**Key structure:**
+- Each plugin has a **parent folder** (e.g., `plugins-workspace/aule/`)
+- Inside the parent: the **actual plugin folder** (e.g., `aule/`), the **zip file** (e.g., `aule.zip`), and the **metadata file** (e.g., `aule.metadata.json`)
+- The **metadata file is a sidecar** — it lives in the parent folder, NOT inside the plugin folder
+- When creating or updating plugins, respect this hierarchy
+
+## Metadata Files
+
+Each plugin has a `.metadata.json` file in its parent folder that extends Anthropic's plugin schema with:
+
+```json
+{
+  "id": "plugin-id",
+  "name": "Plugin Name",
+  "description": "Extended description",
+  "image": "assets/logo.png",
+  "label": "Category",
+  "version": "1.0.0",
+  "lastCortexUpdate": null,
+  "cortexTopics": [],
+  "relationships": {
+    "dependsOn": ["other-plugin"],
+    "complementaryPlugins": ["other-plugin"]
+  },
+  "customFields": {
+    "tier": "tier-1",
+    "owner": "team",
+    "usageScore": 90
+  }
+}
+```
+
+This metadata is updated automatically by the Cortex processor when plugin knowledge is integrated.
+
 ## Customization
 
 - **Discovery questions:** Edit `skills/plugin-discovery/SKILL.md` to add, remove, or modify questions

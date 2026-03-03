@@ -27,13 +27,18 @@ Each plugin entry in the `plugins` array follows this format:
 ```json
 {
   "name": "kebab-case-plugin-name",
-  "source": "./plugin-directory-name",
+  "source": "./plugins-workspace/plugin-name",
   "description": "One-sentence description matching plugin.json",
   "version": "0.1.0",
   "keywords": ["keyword1", "keyword2"],
   "category": "category-name"
 }
 ```
+
+**Note on source path:** Plugins are now organized in `plugins-workspace/[plugin-name]/`. The `source` field in the marketplace entry points to the parent folder (e.g., `./plugins-workspace/aule`). Inside that folder you'll find:
+- `aule/` — the actual plugin folder
+- `aule.zip` — packaged plugin
+- `aule.metadata.json` — plugin metadata
 
 **Category values:**
 - `governance` — foundational plugins (The One Ring)

@@ -38,15 +38,30 @@ Every generated plugin must comply with these protocols. See `references/agentic
 - **No hallucination:** If a variable, file path, or data point is not found, report "Not Found" immediately. Never guess or estimate.
 - **Permission gate:** Ask for confirmation before destructive actions (delete, overwrite) or 5+ simultaneous file changes.
 
+## Folder Structure Reference
+
+**Read this first:** `references/olytic-folder-structure.md` — Complete guide to how plugins are organized in the repo.
+
+**Quick summary:**
+- All plugins live in `plugins-workspace/[plugin-name]/`
+- Inside: actual plugin folder `[plugin-name]/`, metadata file `[plugin-name].metadata.json`, and zip `[plugin-name].zip`
+- Metadata and zip files are **sidecars in the parent folder**, NOT inside the actual plugin folder
+
 ## Generation Process
 
 ### Step 0: Discovery First — Map the Environment
 
 Before generating anything:
-1. Check if a plugin with this name already exists in the working directory (use Glob)
+1. Check if a plugin with this name already exists in `plugins-workspace/[plugin-name]/[plugin-name]/` (use Glob)
 2. Check if a marketplace entry already exists (use the marketplace-management skill)
 3. If the plugin exists, ask: "A plugin named [name] already exists. Do you want to update it or create a new one?"
 4. If not, proceed to Step 1
+
+**Folder structure awareness:**
+- All plugins live in `plugins-workspace/` parent folders
+- Each plugin has: `plugins-workspace/[plugin-name]/[plugin-name]/` (the actual plugin), `[plugin-name].zip`, and `[plugin-name].metadata.json`
+- When you generate a plugin, you're writing files into the actual plugin folder (inside the parent)
+- The zip and metadata files are handled separately after generation
 
 ### Step 1: Determine Components
 
@@ -101,26 +116,32 @@ If any duplicates exist, rename the component with the weaker claim to the name:
 
 ### Step 3: Generate Plugin Structure
 
-Create this directory structure:
+Create this directory structure **inside** `plugins-workspace/[plugin-name]/[plugin-name]/`:
 
 ```
-[plugin-name]/
-├── .claude-plugin/
-│   └── plugin.json
-├── .mcp.json                    # Only if integrations exist
-├── README.md
-├── skills/
-│   ├── plugin-telemetry/        # ALWAYS included — non-negotiable
-│   │   └── SKILL.md
-│   └── [domain-skill]/
-│       ├── SKILL.md
-│       └── references/          # Only if domain needs detailed reference material
-│           └── [reference].md
-├── agents/                      # Only if agents are needed
-│   └── [agent-name].md
-└── commands/                    # Only if commands are needed
-    └── [command-name].md
+plugins-workspace/
+└── [plugin-name]/
+    ├── [plugin-name]/           # The actual plugin folder (this is what you generate into)
+    │   ├── .claude-plugin/
+    │   │   └── plugin.json
+    │   ├── .mcp.json            # Only if integrations exist
+    │   ├── README.md
+    │   ├── skills/
+    │   │   ├── plugin-telemetry/    # ALWAYS included — non-negotiable
+    │   │   │   └── SKILL.md
+    │   │   └── [domain-skill]/
+    │   │       ├── SKILL.md
+    │   │       └── references/      # Only if domain needs detailed reference material
+    │   │           └── [reference].md
+    │   ├── agents/                  # Only if agents are needed
+    │   │   └── [agent-name].md
+    │   └── commands/                # Only if commands are needed
+    │       └── [command-name].md
+    ├── [plugin-name].metadata.json  # Sidecar metadata (in parent folder, NOT in plugin folder)
+    └── [plugin-name].zip            # Packaged plugin (in parent folder)
 ```
+
+**Key:** Write all plugin files into the `plugins-workspace/[plugin-name]/[plugin-name]/` subfolder. The metadata and zip files are siblings in the parent folder (`plugins-workspace/[plugin-name]/`).
 
 ### Step 4: Generate Each File
 
@@ -455,26 +476,50 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
    - **Unquoted colons in descriptions:** If any agent's `description` value contains `: ` (colon followed by space) on a single line, convert it to `description: >` block scalar format.
    - **Valid keys in plugin.json:** Confirm no `displayName` or other non-standard keys exist.
 
-7. **Package the plugin.** Run this from INSIDE the plugin directory (not its parent):
+7. **Create plugin metadata file.** In the parent folder `plugins-workspace/[plugin-name]/`, create `[plugin-name].metadata.json`:
+   ```json
+   {
+     "id": "[plugin-id]",
+     "name": "[Plugin Name]",
+     "description": "[extended description from discovery]",
+     "image": "assets/logo.png",
+     "label": "[category label]",
+     "version": "0.1.0",
+     "lastCortexUpdate": null,
+     "cortexTopics": [],
+     "relationships": {
+       "dependsOn": [],
+       "complementaryPlugins": []
+     },
+     "customFields": {
+       "tier": "tier-2",
+       "owner": "[team]",
+       "usageScore": 0,
+       "maturityLevel": "beta"
+     }
+   }
+   ```
+
+8. **Package the plugin.** Run this from INSIDE the actual plugin directory (not the parent):
    ```bash
-   cd /absolute/path/to/[plugin-name] && \
+   cd /absolute/path/to/plugins-workspace/[plugin-name]/[plugin-name] && \
    zip -r /tmp/[plugin-name].plugin . -x "*.DS_Store" -x ".git/*" && \
    echo "Packaged successfully"
    ```
-   **Critical:** The `cd` must go INTO the plugin directory (e.g., `/sessions/.../outputs/my-plugin`), not the parent. If you zip from the parent, the zip will have a subfolder wrapper and the validator will not find `.claude-plugin/plugin.json`.
+   **Critical:** The `cd` must go INTO the plugin directory (e.g., `plugins-workspace/my-plugin/my-plugin`), not the parent folder. If you zip from the parent, the zip will have a subfolder wrapper and the validator will not find `.claude-plugin/plugin.json`.
 
-8. **Verify the zip contains the right structure:**
+9. **Verify the zip contains the right structure:**
    ```bash
    unzip -l /tmp/[plugin-name].plugin | grep -E "plugin\.json|SKILL\.md"
    ```
    The output must show `.claude-plugin/plugin.json` at the root (not inside a subdirectory). If you see `my-plugin/.claude-plugin/plugin.json`, the zip is wrong — you ran it from the parent directory. Fix the cd path and repackage.
 
-9. **Copy to outputs:**
-   ```bash
-   cp /tmp/[plugin-name].plugin /path/to/outputs/[plugin-name].plugin
-   ```
+10. **Copy the zip to the parent folder:**
+    ```bash
+    cp /tmp/[plugin-name].plugin /absolute/path/to/plugins-workspace/[plugin-name]/[plugin-name].zip
+    ```
 
-10. Present the `.plugin` file to the user.
+11. Present the packaged plugin structure to the user.
 
 11. Ask: "Want me to add this to the Olytic marketplace?"
     - If yes, invoke the marketplace-management skill
