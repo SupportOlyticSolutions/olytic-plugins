@@ -89,70 +89,6 @@ The Zero Case Study Playbook introduces several priority page types beyond stand
 - Positioned as methodology proof: "Here's how we've done this motion before. Here's how we do it now."
 - Bridges "transformation experience" to "AI expertise" — the objection neutralizer in page form
 
-### Claude OS Service Pages
-
-These page templates position Olytic's Claude Cowork offering as a unified AI operating system strategy, not just another tool implementation:
-
-**The Five Dimensions Landing Page:**
-- **Hero:** "The Claude OS: Five Dimensions That Make AI Actually Work"
-- **Purpose:** Educational positioning — introduces the Five Dimensions as the philosophical foundation of the Claude OS
-- **Sections:**
-  - **Unified** — Why one integrated system beats fragmented tools (Salesforce analogy, single source of truth)
-  - **Custom** — How the Claude OS adapts to your specific workflows and language, not generic ChatGPT
-  - **Augmenting** — Why amplification (strategic augmentation) beats automation (task offloading)
-  - **Agentic** — The power of advanced reasoning and autonomous decision-making
-  - **Compounding** — How the O/G/O loop keeps the system improving perpetually
-- **CTA:** "Evaluate your company against the Five Dimensions with the AI Strategy Architect: [link]"
-- **Audience:** CEOs/COOs asking "what makes the Claude OS different?" MOFU content.
-
-**The Hats Framework Explainer Page:**
-- **Hero:** "The Hats Framework: Why Plugins Are the Future of AI in Business"
-- **Purpose:** Thought leadership and differentiation — positions Olytic's plugin architecture as philosophically sound
-- **Sections:**
-  - **The Problem** — "You can't hire enough perfect specialists. But you can build their ideal versions."
-  - **The Framework** — What are "hats"? Every business role is a hat (content strategist, GEO specialist, revenue ops expert). Each hat can be designed as a plugin.
-  - **How It Works** — Example walkthrough (e.g., Magneto as the content strategist hat — always available, knows the voice, improves weekly)
-  - **The Advantage** — Building plugins is scalable; hiring is expensive and fragile. Plugins compound; people leave.
-  - **Olytic's Hats** — List of plugins in development / available, showing how they work together
-- **CTA:** "Curious which hats matter most for your business? Start the assessment: [link]"
-- **Audience:** Operational leaders, CTOs evaluating AI infrastructure. MOFU/BOFU.
-
-**Plugin Design Philosophy Page:**
-- **Hero:** "How We Design Plugins: The Operating Principles Behind the Claude OS"
-- **Purpose:** Methodology positioning — demonstrates that Olytic's plugin architecture is principled and intentional
-- **Sections:**
-  - **Discovery First** — How every plugin starts with understanding your actual workflows
-  - **Source of Truth** — How governance prevents fragmentation (The One Ring concept)
-  - **Atomic Operations** — Why plugins do one thing well, not everything poorly
-  - **Verification & Iteration** — Built-in checks and the O/G/O feedback loop
-  - **No Hallucination** — Trust and reliability as architecture, not afterthought
-- **Example:** Walkthrough of how one of these principles applied to building Magneto
-- **CTA:** "See these principles in action with a personalized implementation walkthrough: [link]"
-- **Audience:** Technical decision-makers and skeptics. Trust-building. MOFU.
-
-**"How It Works" Implementation Page (The O/G/O Loop):**
-- **Hero:** "How the Claude OS Actually Works: The O/G/O Implementation Model"
-- **Purpose:** De-risk the purchase — show exactly what happens during an implementation and ongoing operations
-- **Sections:**
-  - **Week 1–2: The Operate Phase** — How plugins are configured and deployed to your specific processes
-  - **Week 3–4: The Govern Phase** — How alignment is enforced (brand, positioning, decision-making), how The One Ring audits plugin outputs
-  - **Week 5+: The Optimize Phase** — How data flows back in; which plugins improved, how; what changed; roadmap for next quarter
-  - **The Loop Repeats** — This compounds. Plugins get smarter. Alignment improves. Velocity increases.
-- **Real Example** — Concrete timeline (if available) from early client, showing week-by-week results
-- **CTA:** "Let's talk about what your O/G/O cycle would look like: [link to calendar]"
-- **Audience:** Prospects in decision stage, concerned about implementation. BOFU.
-
-**Why These Pages Matter:**
-
-These Claude OS pages do three things:
-1. **Educate** the market on unified AI operating system thinking (not tool adoption)
-2. **Differentiate** Olytic as the philosophy company, not a Salesforce Agentforce competitor
-3. **Reposition** the conversation from "AI tools" → "AI infrastructure" → "AI operating systems"
-
-By the time the market fully understands the OS model (Q3-Q4 2026), Olytic should own that positioning through published thought leadership.
-
----
-
 ### General HTML Guidelines
 
 - Clean, semantic HTML (`<article>`, `<section>`, `<header>`, `<nav>`)
@@ -164,17 +100,52 @@ By the time the market fully understands the OS model (Q3-Q4 2026), Olytic shoul
 - Add `alt` attributes to all images
 - Keep inline styles minimal — use class names for the site's CSS framework
 
+## Boutique Authority Principles
+
+Every page Magneto produces for Olytic must embody the design discipline that separates expert boutiques from template sites. These principles were derived from studying firms like Thoughtbot, Animalz, Viget, and Barrel — small teams whose websites make them appear 10x their size.
+
+### Visual Language: Authority Through Restraint
+
+- **Color as system:** Use Olytic's palette with military consistency. Every button, heading, hover state, and accent follows the same logic. Inconsistency signals chaos; consistency signals "we have our act together."
+- **Whitespace as confidence:** Leave 40–60% of the viewport empty at any scroll position. Resist the instinct to fill every pixel with proof. Whitespace says "we can afford to show you only what matters."
+- **No stock photography. Ever.** Use screenshots of real work, custom illustrations, data visualizations, or nothing at all. Every image must earn its place by communicating something specific about Olytic's taste, clients, or process. Typography-forward pages with no imagery beat cluttered pages with generic photos every time.
+- **Typography as brand:** Use distinctive heading treatments. A carefully chosen headline typeface immediately signals that someone with design sensibility made deliberate choices — exactly what a technology-enabled services firm needs to convey.
+
+### Productization: Making the Abstract Tangible
+
+- **Name every offering.** Don't sell "consulting" — sell the "AI Strategy Blueprint," the "Revenue System Audit," the "O/G/O Implementation." Naming a service does three things: makes the buyer feel they're purchasing a proven product; gives them vocabulary to justify the purchase internally; and allows Olytic to standardize delivery and protect margins.
+- **Tier or categorize.** Use frameworks like "Assess / Design / Build / Optimize" so visitors self-select into the right conversation. Reduce cognitive load and pre-qualify leads before any human interaction.
+- **List deliverables, not descriptions.** The best service pages read like a statement of work preview. Tell the reader what artifacts they'll receive, what happens in each phase, and what the timeline looks like. Specificity de-risks the purchase.
+- **Signal pricing without stating it.** Use words like "select clients," engagement structures implying multi-month commitments, or scoping language that filters budget-mismatched leads before they reach the form.
+
+### Trust Signals: Proving Expertise Without Bragging
+
+- **Case studies as editorial content.** Write them so they're interesting to read even for someone not shopping for a vendor. Include the problem context, constraints, decision points, tradeoffs, and outcomes with actual metrics.
+- **Process transparency.** Document methodology in public. Olytic's O/G/O framework page is the exemplar: a firm confident enough to publish its process signals that the value isn't in the playbook — it's in the execution.
+- **Demonstrate, don't claim.** Blog posts and pages should demonstrate the same quality of thinking clients pay for. Content IS the proof. This is the most powerful trust signal available to a boutique firm because it cannot be faked with budget.
+- **Named humans, not anonymous teams.** Feature real people with real names and roles. Boutique firms sell access to senior talent — buyers want to see who they'll actually work with.
+- **Community contribution signals.** Open-source work, published frameworks, and public thinking are trust signals that large competitors cannot replicate because they require genuine expertise and generosity.
+
+### User Journey: Self-Education to Qualified Lead
+
+- **Homepage as router, not salesperson.** The homepage establishes identity ("we are X, we do Y for Z") and routes visitors to intent-matched content. Keep it to 3–5 scroll sections, decisive and link-heavy. Don't try to sell anything on the homepage.
+- **Invest in self-education content.** Every piece of content should help the visitor become a more informed buyer — before asking for anything. Blog posts, methodology pages, and deep case studies all serve this purpose.
+- **Service pages as pre-qualification.** Productized service pages are the middle layer between interest and a sales conversation. Visitors should be able to determine relevance without talking to a human. By the time someone fills out a form, they already know what they want.
+- **Low-friction, high-signal contact.** No aggressive pop-ups, no chatbots-on-arrival, no "SCHEDULE A DEMO" on every page. A simple form at the bottom of service and work pages with one or two qualifying questions ("Tell us about your situation"). The message: "We're here when you're ready."
+- **Never gate content.** No "download our whitepaper" bait. No mandatory newsletter signup before reading. The content IS the marketing — restricting access undermines the entire strategy.
+
 ## Content Planning Checklist
 
 Before writing any page, confirm:
 
-1. **What type of page?** Blog post or landing page?
+1. **What type of page?** Blog post, landing page, or service page?
 2. **Who is the audience?** ICP persona, awareness stage, specific pain point
 3. **What's the one thing?** Single core message or takeaway
 4. **What's the CTA?** What should the reader do next?
 5. **Which Olytic uniques apply?** Revenue systems expertise / O/G/O model / Strategic value creation
 6. **Competitive context?** Is this addressing a space where competitors exist?
 7. **Does this help win our first client?** If not directly, does it build toward that?
+8. **Does this page embody boutique authority?** Typography-forward, generous whitespace, no stock photos, named offerings with deliverables, and zero high-pressure CTAs.
 
 ## SEO Guidance
 
