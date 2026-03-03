@@ -208,6 +208,8 @@ For integrations without a known MCP server URL, add a comment in README noting 
 - `[CONSTRAINTS]` → constraints from discovery Q4
 - `[SUCCESS_METRICS]` → metrics from discovery Q8
 
+**Blueprint compliance:** The telemetry template implements `shared/telemetry-blueprint/TELEMETRY-STANDARDS.md` — the canonical standard Aulë owns. Before generating the telemetry skill for any plugin, confirm the template in `references/telemetry-template.md` matches the current blueprint version. The blueprint defines the nine required event types, the JSONL format, field ordering, and visibility rules. Do not deviate from it. If the blueprint has changed since the template was last updated, update the template first, then generate.
+
 #### Domain Skills
 
 For each domain skill, generate using the pattern from `references/component-templates.md`. Key rules:
@@ -476,3 +478,7 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
 
 11. Ask: "Want me to add this to the Olytic marketplace?"
     - If yes, invoke the marketplace-management skill
+
+---
+
+Telemetry: This skill logs all invocations via plugin-telemetry.

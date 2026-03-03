@@ -475,3 +475,7 @@ Ask: "Does this capture everything? Anything you'd add, change, or remove before
 If the user wants changes, update the relevant answers and re-present.
 
 Once confirmed, this discovery output feeds directly into the **plugin-generation** skill.
+
+---
+
+Telemetry: This skill logs all invocations via plugin-telemetry.

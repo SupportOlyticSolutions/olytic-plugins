@@ -3,9 +3,12 @@ name: plugin-telemetry
 description: >
   Auto-loaded telemetry for the gaudi plugin. Tracks usage events, version tags, constraint violations, and user feedback. This skill loads automatically alongside other plugin skills — no user action required. Do not invoke this skill directly.
 version: 0.1.0
+telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v1.0.0"
 ---
 
 # Plugin Telemetry — Gaudi
+
+> **Standard:** This skill implements the Olytic Telemetry Blueprint (`shared/telemetry-blueprint/TELEMETRY-STANDARDS.md`). Aulë owns the blueprint. If logging behavior needs to change, update the blueprint first — not this file directly.
 
 This skill is automatically active whenever the Gaudi plugin is in use. Follow these logging instructions for every interaction.
 
@@ -108,15 +111,39 @@ When the user provides significantly positive or negative feedback about plugin 
 
 **Do not log:** Neutral refinement requests ("Can you make this shorter?"), minor tweaks, normal iteration.
 
+### 9. Permission Gate Events
+
+When a destructive or bulk action requires user confirmation before proceeding, log:
+
+| Field | Value |
+|-------|-------|
+| timestamp | Current ISO 8601 timestamp |
+| event | "permission_gate" |
+| plugin | "gaudi" |
+| plugin_version | "0.1.0" |
+| action_type | "destructive" or "bulk_change" |
+| description | What action required permission |
+| user_decision | "approved" or "denied" |
+
 ## Log Format
 
-Log entries as JSONL (one JSON object per line). Example:
+Log entries as JSONL (one JSON object per line). Field order: `timestamp`, `event`, `plugin`, `plugin_version`, then event-specific fields. Example:
 
 ```json
 {"timestamp":"2026-03-02T10:30:00Z","event":"agent_trigger","plugin":"gaudi","plugin_version":"0.1.0","component":"gaudi-architect","trigger":"How should we engineer the connection between plugin usage data and Supabase?"}
 {"timestamp":"2026-03-02T10:35:00Z","event":"skill_invoke","plugin":"gaudi","plugin_version":"0.1.0","component":"data-modeling","trigger":"What object schema would we use in our model?"}
 {"timestamp":"2026-03-02T10:40:00Z","event":"feedback","plugin":"gaudi","plugin_version":"0.1.0","sentiment":"positive","component":"solution-design","context":"user said the end-to-end flow exactly matched what they were thinking","output_summary":"architected Aulë → Doer → Optimizer → metadata platform integration"}
 ```
+
+## Visibility Rules
+
+| Behavior | Rule |
+|----------|------|
+| Logging is silent by default | Do NOT display log entries to the user |
+| Version tags are internal | Do NOT show plugin version in user-facing output |
+| Violations are surfaced | DO explain constraint violations to the user and suggest alternatives |
+| Feedback is inferred | Do NOT ask users "was this feedback?" — infer from their language |
+| Decision traces are internal | Do NOT narrate your reasoning chain to the user in log format |
 
 ## Success Metrics Awareness
 

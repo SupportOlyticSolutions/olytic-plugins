@@ -1,5 +1,7 @@
 # Telemetry Skill Template
 
+> **Source of truth:** This template implements the Olytic Telemetry Blueprint defined in `shared/telemetry-blueprint/TELEMETRY-STANDARDS.md`. That document is the canonical standard — Aulë owns it. If the blueprint changes, update this template before generating the next plugin.
+
 Copy this template into every generated plugin at `skills/plugin-telemetry/SKILL.md`. Replace all `[PLACEHOLDERS]` with actual values from discovery.
 
 ---
@@ -15,11 +17,14 @@ description: >
   automatically alongside other plugin skills — no user action required.
   Do not invoke this skill directly.
 version: 0.1.0
+telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v1.0.0"
 ---
 
 # Plugin Telemetry — [PLUGIN_NAME]
 
 This skill is automatically active whenever the [PLUGIN_NAME] plugin is in use. Follow these logging instructions for every interaction.
+
+> **Standard:** This skill implements the Olytic Telemetry Blueprint (`shared/telemetry-blueprint/TELEMETRY-STANDARDS.md`). Aulë owns the blueprint. If logging behavior needs to change, update the blueprint first — not this file directly.
 
 ## What to Log
 
@@ -90,13 +95,24 @@ When the user provides significantly positive or negative feedback about plugin 
 
 ## Log Format
 
-Log entries as JSONL (one JSON object per line). Example:
+Log entries as JSONL (one JSON object per line, no trailing commas, no wrapping array). Key order: `timestamp`, `event`, `plugin`, `plugin_version`, then event-specific fields. All timestamps are UTC ISO 8601 with a `Z` suffix.
 
 ```json
-{"timestamp":"2026-02-27T10:30:00Z","event":"skill_invoke","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","component":"[skill-name]","trigger":"user asked to draft a proposal"}
-{"timestamp":"2026-02-27T10:35:00Z","event":"violation","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","violation_type":"out_of_scope","description":"user asked to modify production database","constraint_violated":"no direct database access","action_taken":"redirected to ops team"}
-{"timestamp":"2026-02-27T10:40:00Z","event":"feedback","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","sentiment":"positive","component":"proposal-standards","context":"user said output was exactly what they needed","output_summary":"generated client proposal draft"}
+{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","component":"[skill-name]","trigger":"user asked to draft a proposal"}
+{"timestamp":"2026-03-03T10:35:00Z","event":"violation","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","violation_type":"out_of_scope","description":"user asked to modify production database","constraint_violated":"no direct database access","action_taken":"redirected to ops team"}
+{"timestamp":"2026-03-03T10:40:00Z","event":"feedback","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","sentiment":"positive","component":"proposal-standards","context":"user said output was exactly what they needed","output_summary":"generated client proposal draft"}
+{"timestamp":"2026-03-03T10:45:00Z","event":"decision_trace","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","component":"[component-name]","input_summary":"user asked which approach to recommend","reasoning":["factor 1","factor 2","factor 3"],"output_summary":"recommended approach A over B","confidence":"high"}
 ```
+
+## Visibility Rules
+
+| Behavior | Rule |
+|----------|------|
+| Logging is silent | Do NOT display log entries to the user |
+| Version tags are internal | Do NOT show plugin version in user-facing output |
+| Violations are surfaced | DO explain constraint violations to the user and suggest alternatives |
+| Feedback is inferred | Do NOT ask users "was this feedback?" — infer from their language |
+| Decision traces are internal | Do NOT narrate reasoning in log format to the user |
 
 ## Success Metrics Awareness
 
