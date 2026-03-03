@@ -17,7 +17,7 @@ FAILED=0
 WARNINGS=0
 
 # Plugin files to validate
-PLUGINS=("the-one-ring.plugin" "olytic-content-strategist.plugin" "olytic-plugin-creator.plugin")
+PLUGINS=("the-one-ring.plugin" "aule.plugin" "magneto.plugin" "gaudi.plugin")
 
 echo "================================================"
 echo "   Olytic Plugin Validation Suite"
@@ -39,12 +39,44 @@ check_required_files() {
     local file=$1
     local missing_files=0
 
-    # Check for .claude-plugin/plugin.json
-    if ! unzip -l "$file" | grep -q ".claude-plugin/plugin.json"; then
+    # Check for subdirectory wrapper (plugin zipped from parent, not from inside)
+    if python3 -c "
+import zipfile, sys
+with zipfile.ZipFile('$file') as z:
+    names = z.namelist()
+    # If plugin.json is not at root, zip has a subdirectory wrapper
+    if not any(n == '.claude-plugin/plugin.json' for n in names):
+        print('WRAPPED')
+        sys.exit(0)
+" 2>/dev/null | grep -q "WRAPPED"; then
+        echo -e "${RED}  ✗ Zip has subdirectory wrapper — plugin.json not at root. Re-zip from inside the plugin directory.${NC}"
+        ((missing_files++))
+        return $missing_files
+    fi
+
+    # Check for __MACOSX junk (created by macOS Compress, breaks upload)
+    if python3 -c "
+import zipfile
+with zipfile.ZipFile('$file') as z:
+    if any('__MACOSX' in n for n in z.namelist()):
+        print('MACOSX')
+" 2>/dev/null | grep -q "MACOSX"; then
+        echo -e "${RED}  ✗ Zip contains __MACOSX entries — use 'zip -r' from terminal, not macOS Compress.${NC}"
+        ((missing_files++))
+        return $missing_files
+    fi
+
+    # Check for .claude-plugin/plugin.json at root
+    if python3 -c "
+import zipfile, sys
+with zipfile.ZipFile('$file') as z:
+    if '.claude-plugin/plugin.json' not in z.namelist():
+        sys.exit(1)
+" 2>/dev/null; then
+        echo -e "${GREEN}  ✓ Found: .claude-plugin/plugin.json${NC}"
+    else
         echo -e "${RED}  ✗ Missing: .claude-plugin/plugin.json${NC}"
         ((missing_files++))
-    else
-        echo -e "${GREEN}  ✓ Found: .claude-plugin/plugin.json${NC}"
     fi
 
     return $missing_files
@@ -71,12 +103,37 @@ check_plugin_json() {
 
         if [ -z "$name" ] || [ -z "$version" ] || [ -z "$description" ] || [ -z "$author" ]; then
             echo -e "${RED}  ✗ Missing required fields in plugin.json${NC}"
+            rm -rf "$tmpdir"
+            return 1
+        fi
+
+        # Check for unrecognized keys (upload-blocking)
+        local bad_keys=$(jq -r 'keys[] | select(. != "name" and . != "version" and . != "description" and . != "author" and . != "keywords" and . != "hooks" and . != "sublabel" and . != "icon")' "$plugin_json")
+        if [ -n "$bad_keys" ]; then
+            echo -e "${RED}  ✗ Unrecognized keys in plugin.json (will block upload): $bad_keys${NC}"
+            rm -rf "$tmpdir"
             return 1
         fi
 
         echo -e "${GREEN}  ✓ plugin.json structure valid${NC}"
         echo -e "    - Name: $name"
         echo -e "    - Version: $version"
+
+        # Check for recommended fields (sublabel, icon)
+        local sublabel=$(jq -r '.sublabel // empty' "$plugin_json")
+        local icon=$(jq -r '.icon // empty' "$plugin_json")
+        if [ -z "$sublabel" ]; then
+            echo -e "${YELLOW}  ⚠ Missing recommended field: sublabel${NC}"
+            ((WARNINGS++))
+        else
+            echo -e "${GREEN}  ✓ sublabel: $sublabel${NC}"
+        fi
+        if [ -z "$icon" ]; then
+            echo -e "${YELLOW}  ⚠ Missing recommended field: icon${NC}"
+            ((WARNINGS++))
+        else
+            echo -e "${GREEN}  ✓ icon: $icon${NC}"
+        fi
     fi
 
     rm -rf "$tmpdir"
