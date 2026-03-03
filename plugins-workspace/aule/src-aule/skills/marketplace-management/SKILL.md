@@ -36,9 +36,9 @@ Each plugin entry in the `plugins` array follows this format:
 ```
 
 **Note on source path:** Plugins are now organized in `plugins-workspace/[plugin-name]/`. The `source` field in the marketplace entry points to the parent folder (e.g., `./plugins-workspace/aule`). Inside that folder you'll find:
-- `aule/` — the actual plugin folder
-- `aule.zip` — packaged plugin
-- `aule.metadata.json` — plugin metadata
+- `src-[plugin-name]/` — the actual plugin source code (e.g., `src-aule/`)
+- `[plugin-name].zip` — packaged plugin
+- `[plugin-name].metadata.json` — plugin metadata sidecar
 
 **Category values:**
 - `governance` — foundational plugins (The One Ring)

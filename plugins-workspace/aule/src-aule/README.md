@@ -169,22 +169,22 @@ The olytic-plugins repository is organized as follows:
 
 ```
 olytic-plugins/
-├── Cortex/                          # Knowledge management system
+├── Cortex/                          # Knowledge management system (flat, drag-and-drop)
 ├── plugins-workspace/               # All plugins organized here
 │   ├── aule/
-│   │   ├── aule/                   # Actual Aule plugin folder
-│   │   ├── aule.zip                # Packaged plugin
-│   │   └── aule.metadata.json      # Plugin metadata sidecar
+│   │   ├── src-aule/                # Actual plugin source code
+│   │   ├── aule.zip                 # Packaged plugin
+│   │   └── aule.metadata.json       # Plugin metadata sidecar
 │   ├── gaudi/
-│   │   ├── gaudi/                  # Actual Gaudi plugin folder
+│   │   ├── src-gaudi/
 │   │   ├── gaudi.zip
 │   │   └── gaudi.metadata.json
 │   ├── magneto/
-│   │   ├── magneto/
+│   │   ├── src-magneto/
 │   │   ├── magneto.zip
 │   │   └── magneto.metadata.json
 │   └── the-one-ring/
-│       ├── the-one-ring/
+│       ├── src-the-one-ring/
 │       ├── the-one-ring.zip
 │       └── the-one-ring.metadata.json
 ├── telemetry-blueprint/
@@ -193,14 +193,15 @@ olytic-plugins/
 ```
 
 **Key structure:**
-- Each plugin has a **parent folder** (e.g., `plugins-workspace/aule/`)
-- Inside the parent: the **actual plugin folder** (e.g., `aule/`), the **zip file** (e.g., `aule.zip`), and the **metadata file** (e.g., `aule.metadata.json`)
-- The **metadata file is a sidecar** — it lives in the parent folder, NOT inside the plugin folder
-- When creating or updating plugins, respect this hierarchy
+- Each plugin has a **parent folder** (e.g., `plugins-workspace/aule/`) that acts as the workspace
+- Inside: **`src-[plugin-name]/`** (the actual plugin source code), **`[plugin-name].zip`**, and **`[plugin-name].metadata.json`**
+- The **`src-[plugin-name]/` folder** contains all plugin files (skills, agents, commands, .claude-plugin/, README, etc.)
+- The **metadata and zip files are sidecars** in the parent folder, NOT inside `src-[plugin-name]/`
+- The **Cortex folder is flat** — just drag and drop .md files directly into it
 
 ## Metadata Files
 
-Each plugin has a `.metadata.json` file in its parent folder that extends Anthropic's plugin schema with:
+Each plugin has a `.metadata.json` sidecar file in its **parent folder** (e.g., `plugins-workspace/aule/aule.metadata.json`) — **NOT inside `src-[plugin-name]/`** — that extends Anthropic's plugin schema with:
 
 ```json
 {

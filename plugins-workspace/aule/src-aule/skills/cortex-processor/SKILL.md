@@ -25,20 +25,19 @@ Process accumulated knowledge from your Cortex folder, deduplicate themes, recom
 
 ## Cortex Folder Structure
 
-Located at the root of your working folder:
+Located at the root of your working folder. **Flat structure — no subfolders:**
 
 ```
 Cortex/
-├── plugin-evolution/          # How plugins should evolve
-├── domain-knowledge/          # Deep domain knowledge
-├── user-feedback/             # Synthesized user insights
-├── technical-patterns/        # Architecture and best practices
-├── competitive-analysis/      # Market/competitive insights
-├── _archived/                 # Processed materials (audit trail)
-└── _cortex-state.json        # System state tracking
+├── 2026-03-01-insight-title.md      # Cortex insight files (drag & drop here)
+├── 2026-03-02-another-insight.md
+├── 2026-03-03-plugin-evolution.md
+├── _archived/                       # Processed materials (auto-managed)
+│   └── 2026-03-01-insight-title.md
+└── _cortex-state.json              # System state tracking
 ```
 
-Add subdirectories as needed. The processor scans all `.md` files regardless of structure.
+**No subfolders.** Just drag and drop your `.md` files directly into the Cortex folder. The processor will automatically archive them after processing.
 
 ## Cortex File Format
 
@@ -49,7 +48,6 @@ Add subdirectories as needed. The processor scans all `.md` files regardless of 
 # [Clear Title]
 
 **Date:** YYYY-MM-DD
-**Category:** [Plugin Evolution | Domain Knowledge | User Feedback | Technical Patterns | Competitive Analysis]
 **Status:** Ready for processor
 
 ## The Problem
@@ -208,8 +206,8 @@ Process my Cortex and show me recommendations."
 ## Example Workflow
 
 **You add files:**
-- `Cortex/plugin-evolution/2026-03-01-metadata-versioning.md`
-- `Cortex/domain-knowledge/2026-03-02-aule-best-practices.md`
+- `Cortex/2026-03-01-metadata-versioning.md`
+- `Cortex/2026-03-02-aule-best-practices.md`
 
 **You trigger processor:**
 ```
