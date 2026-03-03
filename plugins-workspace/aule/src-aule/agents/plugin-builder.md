@@ -455,6 +455,133 @@ Then repackage:
 
 ---
 
+## Telemetry Instrumentation for Plugin-Builder
+
+This agent orchestrates the entire plugin creation or update workflow. Log telemetry at phase boundaries and on critical decisions.
+
+### Agent Trigger Event
+
+At activation, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:30:00Z","event":"agent_trigger","plugin":"aule","plugin_version":"0.2.0","component":"plugin-builder","trigger":"user asked to create a new plugin for their sales team"}
+```
+
+**When:** Log this immediately after the agent is invoked and you've determined which mode to enter (Create or Update).
+
+### Phase Transition Decision Traces
+
+At each phase transition, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:32:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.2.0","component":"plugin-builder","input_summary":"user completed discovery: 3 key functions, memory scope, workflow context, and success metrics defined","reasoning":["discovery identified need for 2 skills and 1 agent","memory scope is session-based, not persistent","augmentation signal strong: plugin enables new compliance review capability"],"output_summary":"advancing to Phase 2 (component planning) with 2 skill + 1 agent architecture","confidence":"high"}
+```
+
+**When:**
+- After Phase 1 (Discovery) completes and you're moving to Phase 2 (Planning)
+- After Phase 2 (Planning) completes and you're moving to Phase 3 (Generation)
+- After Phase 4 (Review) completes and you're moving to Phase 5 (Delivery)
+
+**Why:** These decision traces document the architectural choices and phase progression, enabling the Optimizer to understand what conditions lead to successful plugin creation.
+
+### Phase 4 Verification Gate Events
+
+During Phase 4 (Review & Verification), as you run each check, log verification events:
+
+```jsonl
+{"timestamp":"2026-03-03T10:40:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.2.0","result":"pass","component":"plugin-builder","description":"Check 1: plugin.json validation passed — all required fields present, no unrecognized keys"}
+```
+
+```jsonl
+{"timestamp":"2026-03-03T10:41:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.2.0","result":"pass","component":"plugin-builder","description":"Check 3: skill frontmatter valid — all SKILL.md files have required frontmatter"}
+```
+
+```jsonl
+{"timestamp":"2026-03-03T10:42:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.2.0","result":"pass","component":"plugin-builder","description":"Check 6: agentic best practices embedded — discovery first, source of truth, atomic operations patterns present"}
+```
+
+**Required fields:**
+- `timestamp` — ISO 8601 UTC time with Z suffix
+- `event` — literal string "verification_gate"
+- `plugin` — literal string "aule"
+- `plugin_version` — from the agent context
+- `result` — "pass" or "fail"
+- `component` — literal string "plugin-builder"
+- `description` — what was verified and result
+
+**When:** Log after each major verification check (Check 1-10 from Phase 4).
+
+**If result="fail":** Log immediately and stop — do not present to user or proceed to packaging.
+
+**Why:** Verification gates are the safety mechanism that prevents malformed plugins from being delivered to users.
+
+### Permission Gate Events — Before Destructive Operations
+
+Before writing files in Phase 3, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:35:00Z","event":"permission_gate","plugin":"aule","plugin_version":"0.2.0","action_type":"bulk_change","description":"about to create 12 new files in plugin 'content-reviewer': 4 skills, 1 agent, 2 commands, plugin.json, README, LICENSE, .gitignore, .claude-plugin/ directory","user_decision":"approved"}
+```
+
+**When:** After presenting the component plan in Phase 2 and getting user confirmation before writing any files in Phase 3.
+
+In UPDATE Mode:
+```jsonl
+{"timestamp":"2026-03-03T10:38:00Z","event":"permission_gate","plugin":"aule","plugin_version":"0.2.0","action_type":"bulk_change","description":"audit found 6 issues in 'proposal-analyzer' plugin; 2 are upload-blocking. Fix all, just the blocking ones, or review each?","user_decision":"fix all"}
+```
+
+**When:** After presenting the audit report in Update Phase 2 and before applying fixes in Phase 3.
+
+### Feedback Events
+
+If the user provides explicit feedback on the generated/updated plugin, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:50:00Z","event":"feedback","plugin":"aule","plugin_version":"0.2.0","sentiment":"positive","component":"plugin-builder","context":"user said the plugin captured exactly what they wanted to build","output_summary":"generated complete 'content-reviewer' plugin: 4 skills, 1 agent, 2 commands, full telemetry setup"}
+```
+
+**When:** Log ONLY if user explicitly praises ("This is exactly right", "Perfect") or criticizes ("This isn't what I asked for") the generated/updated plugin output.
+
+**Do NOT log:** Normal refinement requests during the review loop.
+
+### Violation Events
+
+If a user tries to bypass phases or violates plugin-builder constraints:
+
+```jsonl
+{"timestamp":"2026-03-03T10:33:00Z","event":"violation","plugin":"aule","plugin_version":"0.2.0","violation_type":"out_of_scope","description":"user asked to skip discovery and jump directly to generating plugin files","constraint_violated":"Phase 1 (discovery) is mandatory before generation — cannot skip to Phase 3","action_taken":"redirected — explained why discovery is required and restarted Phase 1"}
+```
+
+**Plugin-builder constraints are:**
+- Phase 1 (Discovery) must complete before Phase 2 — cannot skip
+- Phase 2 (Component Planning) confirmation required before Phase 3 starts
+- Phase 4 (Verification) all checks must pass before Phase 5 (Delivery) — cannot skip
+- In UPDATE Mode, all High severity issues must be fixed before repackaging
+
+**When:** Log when user tries to bypass a phase or skips verification.
+
+**Important:** When you log a violation, explain to the user why the phase is mandatory and guide them back to the correct path.
+
+### Not Found Events
+
+In UPDATE Mode, if you cannot locate the plugin the user references:
+
+```jsonl
+{"timestamp":"2026-03-03T10:34:00Z","event":"not_found_reported","plugin":"aule","plugin_version":"0.2.0","component":"plugin-builder","description":"user asked to update plugin 'sales-enabler' but no plugin with that name found in plugins-workspace/ or as .plugin file — suggested alternatives or asked user to clarify"}
+```
+
+**When:** Before proceeding with Update Mode, if you can't find the plugin.
+
+### Phase 5 Delivery Summary
+
+When packaging completes successfully, log a final decision trace:
+
+```jsonl
+{"timestamp":"2026-03-03T10:48:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.2.0","component":"plugin-builder","input_summary":"plugin 'content-reviewer' passed all 10 verification checks and is ready for delivery","reasoning":["all files generated without errors","verification gates passed: plugin.json valid, agent frontmatter correct, natural language triggers present","telemetry skill generated and integrated"],"output_summary":"packaged and ready for deployment or marketplace registration","confidence":"high"}
+```
+
+---
+
 ## Important Rules (Both Modes)
 
 - **Every plugin gets a telemetry skill.** No exceptions. This is Olytic's standard.

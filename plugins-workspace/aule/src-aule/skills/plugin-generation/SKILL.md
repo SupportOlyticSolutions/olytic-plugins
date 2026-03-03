@@ -526,4 +526,146 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
 
 ---
 
+## Telemetry Instrumentation
+
+This skill captures the critical decision points in plugin generation — which components are created, what verification gates pass/fail, and whether the generated plugin meets the user's expectations.
+
+### 1. Skill Invocation Event
+
+At the **start** of generation, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:35:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.2.0","component":"plugin-generation","trigger":"user approved plugin discovery summary and approved generation"}
+```
+
+**When:** After the user confirms the discovery summary from plugin-discovery, and before you start generating the first file.
+
+### 2. Decision Trace Events — Component Selection
+
+When you **decide which component types to generate** (skills, agents, commands) based on discovery answers, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:36:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.2.0","component":"plugin-generation","input_summary":"user described 3 key functions: validate content, synthesize feedback, check compliance","reasoning":["validation is a knowledge task → skill component","synthesis requires multi-step reasoning → agent component","compliance is a discrete action → command component"],"output_summary":"planned architecture: 1 agent (synthesis), 2 skills (validation, compliance), 1 command (check-status)","confidence":"high"}
+```
+
+**When:** Log this after Step 1 when you've analyzed the discovery output and decided on component breakdown.
+
+**Why:** These decision traces show which user inputs lead to which architectural choices — essential for optimizing the generation templates.
+
+### 3. Decision Trace Events — Template Selection
+
+When you **select which reference templates** to use for each component, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:37:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.2.0","component":"plugin-generation","input_summary":"validation skill handles PII-sensitive content classification","reasoning":["skill processes user data → use prompt-injection-defense template","classification is deterministic → use simple lookup pattern, not agentic","compliance context required → include memory-scope declaration"],"output_summary":"selected standard-skill-template with prompt-defense injection pattern and memory declaration","confidence":"high"}
+```
+
+**When:** Log after Step 2 when you're mapping templates to components.
+
+### 4. Permission Gate Events — Before Destructive Operations
+
+When you're about to **write files to the file system** (especially if it's an update to an existing plugin), log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:40:00Z","event":"permission_gate","plugin":"aule","plugin_version":"0.2.0","action_type":"bulk_change","description":"about to create 7 new skill files, 1 agent, 2 commands, and .claude-plugin/ directory for plugin 'content-reviewer'","user_decision":"approved"}
+```
+
+**Required fields:**
+- `timestamp` — ISO 8601 UTC time with Z suffix
+- `event` — literal string "permission_gate"
+- `plugin` — literal string "aule"
+- `plugin_version` — from the skill frontmatter
+- `action_type` — "destructive" (if overwriting existing files) or "bulk_change" (if creating 5+ files)
+- `description` — what files will be created/modified
+- `user_decision` — "approved" or "denied" (log after user responds)
+
+**When:** Log before calling the file creation tools in Step 3. Present the user with a summary of what will be created and ask for confirmation before writing.
+
+**Why:** Permission gates ensure users are aware of file-system side effects and can intervene if needed.
+
+### 5. Verification Gate Events — After File Creation
+
+After **writing plugin files** in Step 3, verify they exist and log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:41:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.2.0","result":"pass","component":"plugin-generation","description":"verified all 10 plugin files created correctly: 3 skills, 1 agent, 2 commands, plugin.json, README, .gitignore, LICENSE"}
+```
+
+**Required fields:**
+- `timestamp` — ISO 8601 UTC time with Z suffix
+- `event` — literal string "verification_gate"
+- `plugin` — literal string "aule"
+- `plugin_version` — from the skill frontmatter
+- `result` — "pass" or "fail"
+- `component` — literal string "plugin-generation"
+- `description` — what was written and what was checked
+
+**When:** Log after each major write operation (after Step 3 creates files, after Step 4 creates metadata).
+
+**If result="fail":** Log what went wrong and stop — do not proceed to packaging. Ask the user for permission to retry or to debug.
+
+**Why:** Verification gates are a critical safety mechanism. They ensure that plugin generation doesn't silently fail and leave the user with corrupted files.
+
+### 6. Verification Gate Events — Plugin Structure Validation
+
+After **validating plugin structure** in Step 5, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:43:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.2.0","result":"pass","component":"plugin-generation","description":"plugin structure validation passed: all component names unique, no duplicate keys in plugin.json, agent frontmatter valid"}
+```
+
+**When:** Log after Step 5 validation checks complete.
+
+### 7. Verification Gate Events — Packaging
+
+After **packaging the plugin** in Step 8, verify the zip is correct and log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:45:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.2.0","result":"pass","component":"plugin-generation","description":"plugin packaged successfully: zip created at /tmp/content-reviewer.plugin, verified .claude-plugin/plugin.json at root level"}
+```
+
+**When:** Log after the zip is created and verified in Step 9.
+
+### 8. Decision Trace — Packaging Success
+
+When packaging completes successfully, optionally log a summary decision trace:
+
+```jsonl
+{"timestamp":"2026-03-03T10:46:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.2.0","component":"plugin-generation","input_summary":"plugin generation completed all 8 steps for 'content-reviewer' plugin","reasoning":["all files created without errors","structure validation passed all checks","zip packaged correctly with proper nesting"],"output_summary":"ready for marketplace registration or manual deployment","confidence":"high"}
+```
+
+### 9. Feedback Events
+
+If the user provides **significantly positive or negative** feedback about the generated plugin, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:50:00Z","event":"feedback","plugin":"aule","plugin_version":"0.2.0","sentiment":"positive","component":"plugin-generation","context":"user said the generated plugin exactly matched what they wanted to build","output_summary":"generated complete 'content-reviewer' plugin with 3 skills, 1 agent, 2 commands"}
+```
+
+**When:** Log ONLY if the user explicitly praises ("This is perfect", "Exactly what I needed") OR explicitly criticizes ("This isn't right", "Start over") the generated plugin.
+
+**Do NOT log:** Normal refinement requests ("Can you adjust the skill description?" or "Add one more command").
+
+**Why:** Feedback signals help the Optimizer understand which generation templates produce user-approved plugins.
+
+### 10. Violation Events
+
+If a user tries to bypass generation or violates plugin-generation constraints, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:35:00Z","event":"violation","plugin":"aule","plugin_version":"0.2.0","violation_type":"constraint_breach","description":"user asked to generate a plugin with API keys hardcoded in skill files","constraint_violated":"Do NOT create plugins that embed personal data, credentials, or API keys in skill files","action_taken":"refused — explained security risk and suggested credential injection pattern instead"}
+```
+
+**Plugin-generation constraints are:**
+- Do NOT generate plugin files without completing discovery first
+- Do NOT create plugins with hardcoded credentials or PII
+- Do NOT skip verification steps — all files must be validated before packaging
+- Do NOT package the plugin from the parent directory (must cd into src-[plugin-name]/)
+
+**When:** Log when a user explicitly tries to bypass generation or requests something that violates constraints.
+
+**Important:** When you log a violation, explain to the user why the request is problematic and suggest the correct alternative.
+
+---
+
 Telemetry: This skill logs all invocations via plugin-telemetry.

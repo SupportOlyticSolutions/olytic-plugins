@@ -478,4 +478,134 @@ Once confirmed, this discovery output feeds directly into the **plugin-generatio
 
 ---
 
+## Telemetry Instrumentation
+
+This skill participates in Aule's compounding loop by logging all discovery sessions. Follow these instructions to capture telemetry at key moments.
+
+### 1. Skill Invocation Event
+
+At the **start** of discovery, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.2.0","component":"plugin-discovery","trigger":"user asked to create a new plugin"}
+```
+
+**Required fields:**
+- `timestamp` — ISO 8601 UTC time with Z suffix
+- `event` — literal string "skill_invoke"
+- `plugin` — literal string "aule"
+- `plugin_version` — from the skill frontmatter (currently 0.2.0)
+- `component` — literal string "plugin-discovery"
+- `trigger` — paraphrase of the user's initial message (5-15 words, no PII)
+
+**When:** Log this the moment the user initiates discovery (answer to initial "What should this plugin be called?").
+
+### 2. Decision Trace Events
+
+When you are **interpreting user answers and storing discovery data**, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:35:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.2.0","component":"plugin-discovery","input_summary":"user described a content review workflow with 2 approval steps","reasoning":["multi-step orchestration → agent component","content constraint checking → skill component","trigger on keyword detection → command component"],"output_summary":"planned plugin architecture: 1 agent, 1 command, 1 skill","confidence":"high"}
+```
+
+**Required fields:**
+- `timestamp` — ISO 8601 UTC time with Z suffix
+- `event` — literal string "decision_trace"
+- `plugin` — literal string "aule"
+- `plugin_version` — from the skill frontmatter
+- `component` — literal string "plugin-discovery"
+- `input_summary` — what the user said (1-2 sentences, paraphrased, no verbatim PII)
+- `reasoning` — list of 2-3 key factors that influenced interpretation (bullet-point style)
+- `output_summary` — what you decided or concluded (1-2 sentences)
+- `confidence` — "high", "medium", or "low" based on clarity of user's answers
+
+**When:** Log after interpreting answers to Q2 (key functions), Q3 (strategic questions), Q4 (constraints), Q6 (workflow context), Q7 (integrations), and Q9 (success metrics) — these are the substantive interpretive decisions.
+
+**Why:** Discovery answers are the foundation for plugin design. Logging the reasoning behind how we interpret those answers helps the Optimizer understand what kinds of user inputs lead to well-designed plugins.
+
+### 3. Feedback Events
+
+If the user provides **significantly positive or negative** feedback about the discovery flow itself, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:50:00Z","event":"feedback","plugin":"aule","plugin_version":"0.2.0","sentiment":"positive","component":"plugin-discovery","context":"user said the questions helped them clarify what they really wanted to build","output_summary":"guided user through 10 discovery questions to complete plugin specification"}
+```
+
+**Required fields:**
+- `timestamp` — ISO 8601 UTC time with Z suffix
+- `event` — literal string "feedback"
+- `plugin` — literal string "aule"
+- `plugin_version` — from the skill frontmatter
+- `sentiment` — "positive" or "negative"
+- `component` — literal string "plugin-discovery"
+- `context` — what the user said or did (paraphrased, no verbatim PII)
+- `output_summary` — what the plugin produced or accomplished
+
+**When:** Log ONLY if the user explicitly praises the discovery process ("This flow was really helpful", "The questions made me think about it the right way") OR explicitly criticizes it ("These questions were confusing", "I didn't understand what you were asking").
+
+**Do NOT log:** Neutral refinements like "Can you rephrase question 5?" or normal back-and-forth iteration.
+
+**Why:** Feedback signals tell the Optimizer whether the 10-question protocol is effective, or whether discovery needs redesign.
+
+### 4. Violation Events
+
+If a user tries something that conflicts with discovery's constraints, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:45:00Z","event":"violation","plugin":"aule","plugin_version":"0.2.0","violation_type":"constraint_breach","description":"user tried to skip the discovery process and jump directly to code generation","constraint_violated":"Complete discovery conversation before generating plugin","action_taken":"redirected — explained why discovery is required and restarted the protocol"}
+```
+
+**Discovery constraints are:**
+- Do NOT skip the 10-question discovery protocol (all questions must be asked in order or user intent must clearly indicate they want to skip)
+- Do NOT accept vague answers and proceed (probe with follow-up questions until clear)
+- Do NOT generate a plugin without storing the discovery output (the stored data is the source of truth)
+
+**Required fields:**
+- `timestamp` — ISO 8601 UTC time with Z suffix
+- `event` — literal string "violation"
+- `plugin` — literal string "aule"
+- `plugin_version` — from the skill frontmatter
+- `violation_type` — "constraint_breach" (for discovery)
+- `description` — what the user tried to do
+- `constraint_violated` — which specific constraint was triggered
+- `action_taken` — "redirected", "refused", or "warned"
+
+**When:** Log when a user explicitly tries to bypass discovery or when vague answers suggest they haven't thought through the problem.
+
+**Important:** When you log a violation, DO explain to the user why the request falls outside discovery's scope and suggest the correct path forward.
+
+**Why:** Violation logs help the Optimizer understand where users struggle with the discovery protocol, informing improvements to question clarity or ordering.
+
+### 5. Not Found Events
+
+If a user references a plugin name that already exists, or references a file/path that doesn't exist, log:
+
+```jsonl
+{"timestamp":"2026-03-03T10:40:00Z","event":"not_found_reported","plugin":"aule","plugin_version":"0.2.0","component":"plugin-discovery","description":"user asked to create plugin named 'content-auditor' but a plugin with that name already exists in plugins-workspace/"}
+```
+
+**Required fields:**
+- `timestamp` — ISO 8601 UTC time with Z suffix
+- `event` — literal string "not_found_reported"
+- `plugin` — literal string "aule"
+- `plugin_version` — from the skill frontmatter
+- `component` — literal string "plugin-discovery"
+- `description` — what was looked for and not found (or found when shouldn't be)
+
+**When:** Before accepting a plugin name, search plugins-workspace/ for existing plugins. If found, log this event and ask the user if they want to update the existing plugin instead, or use a different name.
+
+**Why:** These logs help us understand naming collisions and whether users are aware of existing plugins.
+
+### 6. Summary at End
+
+Once discovery is complete and the user confirms the summary, you can add a final decision trace summarizing what was discovered:
+
+```jsonl
+{"timestamp":"2026-03-03T10:55:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.2.0","component":"plugin-discovery","input_summary":"user completed all 10 discovery questions for a proposal review plugin","reasoning":["identified 3 key functions: structure validation, feedback synthesis, compliance checking","constraints emerged: must preserve client confidentiality, cannot generate content","success metric: reviewers save 30+ mins per review"],"output_summary":"complete plugin specification stored and ready for generation","confidence":"high"}
+```
+
+This summary event marks the transition from discovery → generation phase.
+
+---
+
 Telemetry: This skill logs all invocations via plugin-telemetry.
