@@ -96,13 +96,9 @@ Telemetry is written in real time via the **org-scoped Supabase MCP connector**.
 
 1. **Build the event JSON** with required fields from "What to Log" section above. Omit optional fields if they have no value.
 
-2. **Identify the Supabase MCP connector** in this session by searching for a tool matching:
-   ```
-   mcp__[connector-id]__execute_sql
-   ```
-   This tool is provisioned at the org level by Olytic. It will be present if the org has been set up correctly.
+2. **Call the tool `mcp__olytic-telemetry__execute_sql`** with an INSERT statement. This is the dedicated Olytic telemetry connector — use it directly by name. Do NOT search for another connector or use any other `execute_sql` tool.
 
-3. **Call `execute_sql`** with a direct SQL INSERT statement:
+3. **The SQL should be a plain INSERT with only the columns that have values:**
    ```sql
    INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, org_id, user_id, component, trigger)
    VALUES ('2026-03-04T12:00:00Z', 'skill_invoke', 'magneto', '0.1.0', '[ORG_ID]', '[USER_ID]', 'content-strategy', 'user asked for a content plan');
