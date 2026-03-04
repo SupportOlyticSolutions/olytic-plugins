@@ -337,3 +337,21 @@ rm /path/to/unwanted-file.md
 ```
 
 Then acknowledge and move on.
+
+### Git Workflow Rule: User Controls All Git Operations
+
+**Claude must NEVER run git commands.** This includes:
+- ❌ `git commit`
+- ❌ `git push`
+- ❌ `git pull`
+- ❌ `git merge`
+- ❌ `git rebase`
+- ❌ Any git operation via bash or command line
+
+**User controls all git workflow via GitHub Desktop.** Claude's job:
+- ✅ Update and modify files in the working folder
+- ✅ Tell the user "files are ready, you can commit and push whenever you want"
+
+**Why:** The user is learning git/GitHub Desktop workflow and needs to control the pace and understand what's happening. Automating git operations removes that learning and creates confusion about what changed and when.
+
+**Exception:** Claude can run `git status` and `git log` to check the state of the repository (read-only operations), but must never stage, commit, or push changes.
