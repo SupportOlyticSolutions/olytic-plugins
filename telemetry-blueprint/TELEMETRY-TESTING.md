@@ -1,7 +1,7 @@
 # Telemetry Testing & Troubleshooting Strategy
 **Status:** Living document
 **Owner:** Joshua Kambour
-**Last updated:** 2026-03-04
+**Last updated:** 2026-03-04 (added unmounted-folder guidance throughout)
 **Companion to:** `TELEMETRY-ARCHITECTURE.md`
 
 ---
@@ -11,6 +11,19 @@
 The telemetry pipeline has several distinct layers, and failures can happen at any one of them. Rather than diagnosing from the middle, this document gives you a structured approach: **always test from the bottom up**, starting with the database and working outward. Each layer is a prerequisite for the one above it.
 
 If you're in a hurry, jump to the [Quick Diagnostic Checklist](#quick-diagnostic-checklist) at the bottom.
+
+> **🔧 Need to run diagnostics right now?**
+> Use the `gaudi:telemetry-diagnostic` skill. It is fully self-contained — all architecture knowledge is embedded, no files need to be mounted. It will scan the current session, confirm whether a row should have been logged, run live layer tests, and produce a structured verdict with the specific fix. This guide is the reference document; the diagnostic skill is the active tool.
+
+---
+
+> **⚠️ Working Folder Not Mounted?**
+> This guide can still be run in full without a locally mounted working folder. The only steps that require local file access are:
+> - Layer 3: reading/editing `claude_desktop_config.json` on your Mac
+> - Layer 3: running the manual bash test command in Terminal
+> - Known Issue (auto-sync): running `ls -lt` to verify zip timestamps
+>
+> All database tests (Layers 1, 2, 4, 5) run entirely through Supabase or Claude and do not require a mounted folder. Where local file access is needed, this guide will note it explicitly and offer an alternative path.
 
 ---
 
@@ -132,15 +145,33 @@ Config file location:
 ~/Library/Application Support/Claude/claude_desktop_config.json
 ```
 
-See `claude_desktop_config_options.md` for pre-built config blocks for different Node.js setups.
+> **📁 Working folder not mounted?** You can still read and edit `claude_desktop_config.json` directly on your Mac using a text editor (TextEdit, VS Code, etc.) — you don't need the working folder mounted for this. The config file lives on your Mac at `~/Library/Application Support/Claude/claude_desktop_config.json`. Open it in any editor, make corrections, save, and restart Claude Desktop.
 
-**Common failure: wrong flag name.** Some versions of `@supabase/mcp-server-supabase` don't accept `--supabase-access-token`. If you see this error in Terminal when running the command manually, check `troubleshoot-mcp-connector.md` for the correct flag for your installed version.
+See `claude_desktop_config_options.md` for pre-built config blocks for different Node.js setups. If your working folder isn't mounted and you can't access this companion doc, the most common config looks like:
+```json
+{
+  "mcpServers": {
+    "olytic-telemetry": {
+      "command": "/opt/homebrew/bin/npx",
+      "args": ["-y", "@supabase/mcp-server-supabase@latest",
+               "--project-ref", "kxnmgutidehncnafrwbu",
+               "--read-only", "false",
+               "--supabase-access-token", "<your-token>"]
+    }
+  }
+}
+```
+Replace `/opt/homebrew/bin/npx` with the output of `which npx` if different.
+
+**Common failure: wrong flag name.** Some versions of `@supabase/mcp-server-supabase` don't accept `--supabase-access-token`. If you see this error in Terminal when running the command manually, check `troubleshoot-mcp-connector.md` for the correct flag for your installed version. If you can't access that file (folder not mounted), the alternative flag to try is `--access-token` instead of `--supabase-access-token`.
 
 To test the command manually in Terminal:
 ```bash
 /opt/homebrew/bin/npx -y @supabase/mcp-server-supabase@latest --project-ref kxnmgutidehncnafrwbu --supabase-access-token sbp_173d82e4ab04962d954bcd0412a72f07b5a142dd
 ```
 (Replace the path and token with your actual values. If it runs without errors, the command is valid.)
+
+> **📁 Working folder not mounted?** You can still run this Terminal command directly — it does not require the working folder. Open Terminal on your Mac and paste the command above with your actual token substituted in.
 
 ### Step 3b: Restart Claude after config changes
 
@@ -322,6 +353,7 @@ START: Telemetry rows aren't appearing in Supabase
 | Plugin loads old skill content | Stale plugin cache | Delete plugin cache directory, restart Claude (cache path TBD) |
 | Claude looks for files in wrong location | Local vs. remote plugin confusion | State clearly in prompt: "using organizational version" or "locally mounted" |
 | Updated plugin source but uploaded version doesn't have the changes | .ZIP file is stale (not regenerated after source edit) | Auto-sync system should trigger automatically. If not, manually run: "repackage [plugin-name]". See "Known Issue: Plugin Source vs. .ZIP File Drift" for details |
+| Smoke test Steps 1–4 all pass but real skill invocation produces no telemetry row | Steps 1–4 only test the connector in isolation — they do NOT test whether the plugin's telemetry skill fires autonomously. The plugin's silent-fail path is masking the error | Run Step 5 (real invocation in a new session), then use `gaudi:telemetry-diagnostic` to identify which layer broke. Most likely cause: wrong session type, stale cached plugin, or plugin packaging issue |
 
 ---
 
@@ -329,17 +361,25 @@ START: Telemetry rows aren't appearing in Supabase
 
 Run this sequence after any significant change (new plugin uploaded, connector config updated, blueprint version change, new machine setup). Each step must pass before proceeding to the next.
 
+> **⚠️ Known limitation of Steps 1–4:** These steps verify that the database is reachable and the connector is usable when Claude is *explicitly told* to use it. They do NOT verify that the plugin's telemetry skill will autonomously fire during normal use. It is fully possible to pass Steps 1–4 and still have telemetry silently fail in real sessions. **Step 5 is the only true end-to-end test.** Do not declare the pipeline working until Step 5 passes.
+
+---
+
 **Step 1 — Database reachable:**
 ```sql
 SELECT NOW();
 ```
 ✅ Returns a timestamp
 
+---
+
 **Step 2 — Table and schema valid:**
 ```sql
 SELECT column_name FROM information_schema.columns WHERE table_name = 'telemetry_events';
 ```
 ✅ Returns expected columns including `org_id` and `user_id`
+
+---
 
 **Step 3 — Direct INSERT works (Supabase SQL Editor):**
 ```sql
@@ -348,7 +388,12 @@ VALUES (NOW(), 'skill_invoke', 'smoke-test', '0.0.0', 'olytic-internal', 'suppor
 ```
 ✅ No error
 
-**Step 4 — INSERT via org-scoped MCP connector (via Claude):**
+---
+
+**Step 4 — INSERT via org-scoped MCP connector (connector reachability test):**
+
+> **What this tests:** That the `mcp__olytic-telemetry__execute_sql` tool is available in the session and Claude can use it when explicitly instructed. **What this does NOT test:** Whether the plugin's telemetry skill will independently find and use it.
+
 Ask Claude to use `mcp__olytic-telemetry__execute_sql` to run:
 ```sql
 INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, org_id, user_id, component, trigger)
@@ -356,17 +401,43 @@ VALUES (NOW(), 'skill_invoke', 'smoke-test', '0.0.0', 'olytic-internal', 'suppor
 ```
 ✅ Claude confirms it used `mcp__olytic-telemetry__execute_sql`, row appears in Supabase
 
-**Step 5 — Real plugin telemetry fires automatically:**
-Invoke any skill from Gaudi, The One Ring, Magneto, or Aulë. Then:
+If this step fails (tool not found), the connector is not in this session — fix Layer 3 before continuing.
+
+---
+
+**Step 5 — Real plugin telemetry fires autonomously (the only true end-to-end test):**
+
+> **This is the step that actually matters.** Steps 1–4 can all pass while this step fails. Only this step proves that a plugin's telemetry skill is correctly wired up.
+
+Open a **new Claude session** (not the same session where you ran Steps 1–4). Make sure the plugin you want to test is active. Invoke a skill naturally — for example, ask Gaudi a data modeling question, or ask The One Ring to check something for brand compliance. Then immediately run:
+
 ```sql
-SELECT id, timestamp, plugin, org_id, user_id, component
+SELECT id, timestamp, plugin, plugin_version, org_id, user_id, component, trigger
 FROM telemetry_events
 WHERE org_id = 'olytic-internal'
   AND plugin != 'smoke-test'
+  AND plugin != 'diagnostic-test'
 ORDER BY created_at DESC
 LIMIT 5;
 ```
-✅ A row appears with correct `org_id`, `user_id`, and the plugin name you invoked
+
+**Verify:**
+- A new row appeared after your invocation
+- `plugin` matches the plugin you used
+- `component` matches the skill you invoked
+- `org_id = 'olytic-internal'` (not null)
+- `user_id` is not null
+
+✅ All of the above confirmed = pipeline is genuinely working end-to-end
+
+**If no row appeared after Step 5 (even though Steps 1–4 passed):** The most likely cause is that the plugin's telemetry skill is hitting its silent-fail path ("if tool not found, continue without logging"). This can happen because:
+- The session type where skills run is different from the session where you ran Steps 1–4 (some session configurations don't expose the same MCP tools)
+- The plugin cached in Claude is an older version without working telemetry
+- The plugin's skill file calls the connector by exact name but the connector ID in the session has changed
+
+In all of these cases, use `gaudi:telemetry-diagnostic` to run an active diagnosis — it will identify exactly which layer broke.
+
+---
 
 **Step 6 — No rows with null org_id (last hour):**
 ```sql
@@ -375,7 +446,11 @@ WHERE org_id IS NULL AND created_at > NOW() - INTERVAL '1 hour';
 ```
 ✅ Returns 0
 
-All six steps passing = pipeline is verified end-to-end.
+---
+
+**Steps 1–4 passing + Step 5 passing + Step 6 passing = pipeline is verified end-to-end.**
+
+Steps 1–4 passing but Step 5 failing = connector works when Claude is told to use it, but the plugin's telemetry skill is not autonomously firing. Use `gaudi:telemetry-diagnostic` to find why.
 
 ---
 
@@ -386,7 +461,7 @@ For fast triage when something seems off:
 - [ ] Is the Supabase project Active (not paused)?
 - [ ] Does `telemetry_events` table exist with correct schema?
 - [ ] Is `olytic-telemetry` showing Connected in Claude Desktop?
-- [ ] Does `which npx` in Terminal match the `"command"` in `claude_desktop_config.json`?
+- [ ] Does `which npx` in Terminal match the `"command"` in `claude_desktop_config.json`? *(Open this file directly on your Mac at `~/Library/Application Support/Claude/claude_desktop_config.json` — no working folder needed)*
 - [ ] Did I fully quit and relaunch Claude after the last config change?
 - [ ] When rows appear, do they have `org_id = 'olytic-internal'` (not null, not different)?
 - [ ] Is the plugin's telemetry skill at blueprint v2.2.0?
@@ -462,12 +537,16 @@ All four organizational plugins are now synced:
 
 ### How to Verify the Fix is Working
 
-After editing plugin source, run:
+**If working folder is mounted**, after editing plugin source, run:
 ```bash
 ls -lt Plugins/gaudi/gaudi.zip Plugins/gaudi/src-gaudi/
 ```
+If the .zip timestamp is within 1-2 seconds of the source folder timestamp, auto-sync is working.
 
-If the .zip timestamp is within 1-2 seconds of the source folder timestamp, auto-sync is working. If the .zip is much older, the hook may not have triggered — in that case, manually invoke: `"repackage the gaudi plugin"`.
+**If working folder is not mounted**, you cannot check file timestamps via bash. Instead:
+1. Ask Claude: `"List files in the gaudi plugin folder and show the most recent modification times for gaudi.zip and the src-gaudi directory."` — Claude can use its file tools to check this without a bash shell.
+2. Alternatively, open Finder on your Mac, navigate to the `olytic-plugins/Plugins/gaudi/` folder, and compare the "Date Modified" timestamps of `gaudi.zip` vs. the `src-gaudi/` folder visually.
+3. If the .zip is much older than the source, the hook may not have triggered — in that case, manually invoke: `"repackage the gaudi plugin"` in a Claude session where the working folder **is** mounted (the repackager skill requires file write access).
 
 ---
 

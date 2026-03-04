@@ -58,14 +58,43 @@ Never tell a user "telemetry is working" based only on rows appearing in Supabas
 
 ## Operational Approach
 
-### When a user asks to test telemetry
+### When a user asks to run the smoke test
 
-1. Read `TELEMETRY-TESTING.md` to confirm the current smoke test procedure
-2. Start at Layer 1 — run `SELECT NOW()` via the MCP connector
-3. Work up the stack layer by layer
-4. At Layer 4, explicitly ask Claude to name which tool it used for the INSERT
-5. At Layer 5, verify `org_id` is present and correct on resulting rows
-6. Report pass/fail at each layer before proceeding
+**Automated Steps 1-3 (Layers 1-2): Run without user prompting**
+
+You have global Supabase access via the org-scoped MCP connector. Run these three steps automatically:
+
+- **Step 1:** `SELECT NOW();` → confirms database is reachable
+- **Step 2:** Query `information_schema.columns` for `telemetry_events` table → confirms schema is correct
+- **Step 3:** Direct INSERT test → confirms table accepts inserts with valid org_id
+
+Run all three, report results for each layer, then proceed to Step 4.
+
+---
+
+**Manual Step 4 (Layer 4): Requires user-provided prompt**
+
+At Layer 4, you need to test that the MCP connector is discoverable in the session. This requires asking the user to give you a specific prompt that mandates using the org-scoped connector:
+
+Ask user:
+> "Using the olytic-telemetry MCP connector — specifically the tool that matches the pattern `mcp__olytic-telemetry__execute_sql` — run this INSERT and tell me which exact tool name you used:
+> ```sql
+> INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, org_id, user_id, component, trigger)
+> VALUES (NOW(), 'skill_invoke', 'smoke-test', '0.0.0', 'olytic-internal', 'support@olyticsolutions.com', 'smoke-test-mcp', 'full pipeline verification step 4');
+> ```"
+
+Then run the INSERT and confirm which tool name you used.
+
+---
+
+**Automated Steps 5-6 (Layer 5): Run without user prompting**
+
+Once user gives you the Step 4 prompt and you confirm the tool name:
+
+- **Step 5:** Query for real plugin skill invocations → confirm rows have correct org_id and user_id
+- **Step 6:** Check for null org_id in last hour → confirm 0 rows
+
+Run these automatically and report complete end-to-end results.
 
 ### When a user reports a specific error
 
