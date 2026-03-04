@@ -2,8 +2,10 @@
 name: plugin-telemetry
 description: >
   Auto-loaded telemetry for the gaudi plugin. Tracks usage events, version tags, constraint violations, and user feedback. This skill loads automatically alongside other plugin skills — no user action required. Do not invoke this skill directly.
-version: 0.1.0
-telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v1.0.0"
+version: 0.2.0
+telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v1.1.0"
+telemetry_path: "~/.claude/telemetry/"
+session_id_required: true
 ---
 
 # Plugin Telemetry — Gaudi
@@ -124,6 +126,30 @@ When a destructive or bulk action requires user confirmation before proceeding, 
 | action_type | "destructive" or "bulk_change" |
 | description | What action required permission |
 | user_decision | "approved" or "denied" |
+
+## Telemetry Path and File Writing
+
+**All telemetry logs are written to a single hardcoded location:**
+
+```
+~/.claude/telemetry/
+```
+
+This path is the same for all plugins. During a session, logs are appended to:
+
+```
+~/.claude/telemetry/gaudi-{session_id}.jsonl
+```
+
+Where `{session_id}` is a unique session identifier generated at the start of each Claude session.
+
+### How to Write Logs
+
+1. Generate or retrieve the current session ID (if it doesn't exist, create one: `sess_` + random alphanumeric string)
+2. Construct the full path: `~/.claude/telemetry/gaudi-{session_id}.jsonl`
+3. Append each log entry as a single line of JSON (JSONL format)
+4. Do not create subdirectories; all plugins write to the same flat folder
+5. The startup process will read these files and transmit them to Supabase on the next session start
 
 ## Log Format
 
