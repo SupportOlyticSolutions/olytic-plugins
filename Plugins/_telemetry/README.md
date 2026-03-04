@@ -1,42 +1,39 @@
 # Olytic Telemetry System
 
-Central configuration and startup process for plugin telemetry.
+> **⚠ DEPRECATED — DO NOT USE**
+>
+> This folder (`startup.py`, `hooks/hooks.json`) represents the **retired staging-file approach** to telemetry. It is archived here for reference only. The architecture was replaced because Claude's Bash tool runs in a VM sandbox and cannot write to `~/.claude/telemetry/` on the user's Mac. Local file staging never worked.
+>
+> **Current architecture:** Plugins call `mcp__olytic-telemetry__log-telemetry` directly. Events are inserted into Supabase in real time. No local files, no startup script, no hooks required.
 
-## Primary Reference
+---
 
-**Read this first:** `telemetry-blueprint/TELEMETRY-STANDARDS.md` (v2.0.0)
+## Why This Approach Was Retired
 
-This is the single authoritative source for all telemetry standards, architecture, and implementation. It consolidates both specification and architecture in one document.
+The staging-file design assumed Claude could write to `~/.claude/telemetry/` on the host machine. In reality, Claude's Bash tool runs inside a Linux VM sandbox — writes go to the VM filesystem, which resets between sessions. Telemetry files were never accumulating on the Mac.
 
-## Files in This Folder
+## Current Architecture
 
-| File | Purpose |
-|------|---------|
-| `startup.py` | Startup script — runs on session start to send telemetry to Supabase |
-| `.env.example` | Credential template — shows what environment variables are needed |
-| `hooks/hooks.json` | SessionStart hook configuration — tells Claude when to run startup.py |
-| `IMPLEMENTATION-GUIDE.md` | Setup and testing instructions for your machine |
+All four plugins (`gaudi`, `aule`, `magneto`, `the-one-ring`) include a `.mcp.json` that registers the `olytic-telemetry` MCP server:
 
-## Quick Start
+```json
+{
+  "mcpServers": {
+    "olytic-telemetry": {
+      "type": "http",
+      "url": "https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry"
+    }
+  }
+}
+```
 
-1. **Read:** Start with `IMPLEMENTATION-GUIDE.md`
-2. **Configure:** Add real Supabase credentials to `~/Olytic Setup/.env`
-3. **Verify:** Run `startup.py` manually to test
-4. **Monitor:** Check `~/.claude/telemetry.log` for activity
+When a plugin skill logs an event, it calls `mcp__olytic-telemetry__log-telemetry` with the event JSON. The Edge Function validates and inserts the row directly into the `telemetry_events` table in Supabase. Real-time, no user setup required.
 
-## Key Concepts
+## Files in This Folder (Archived)
 
-- **Hardcoded path:** `~/.claude/telemetry/` (all plugins write here)
-- **Staging:** JSONL files accumulate during the session
-- **Transmission:** On next session start, startup.py reads and sends to Supabase
-- **Cleanup:** Local files deleted after successful transmission
-
-## Status
-
-✅ Framework complete and integrated
-✅ Blueprint updated (v1.1.0)
-✅ Plugin skills updated (gaudi, aule)
-✅ Startup script ready
-✅ SessionStart hook configured
-
-Ready for plugin integration.
+| File | Status |
+|------|--------|
+| `startup.py` | Retired — batch uploader, no longer needed |
+| `hooks/hooks.json` | Retired — SessionStart hook, no longer needed |
+| `.env.example` | Retained — documents what credentials are needed (still relevant for other uses) |
+| `IMPLEMENTATION-GUIDE.md` | Outdated — describes the retired approach |

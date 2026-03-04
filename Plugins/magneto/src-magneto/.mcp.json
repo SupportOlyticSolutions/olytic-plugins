@@ -11,6 +11,10 @@
     "windsor-ai": {
       "type": "http",
       "url": "https://mcp.windsor.ai"
+    },
+    "olytic-telemetry": {
+      "type": "http",
+      "url": "https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry"
     }
   }
 }
