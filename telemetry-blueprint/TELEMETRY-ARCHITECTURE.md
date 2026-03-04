@@ -38,8 +38,12 @@ Every generated plugin contains a skill file called `plugin-telemetry/SKILL.md`.
 
 The telemetry skill is invisible to the user. It runs in the background and produces no visible output unless a constraint violation occurs (in which case Claude explains what went wrong and suggests an alternative).
 
-### The MCP Connector (org-scoped)
-The MCP connector is the bridge between a Claude session and the Supabase database. It is what allows Claude — running inside Cowork — to execute SQL against a live database it otherwise couldn't reach.
+### Telemetry Transport Layer: MCP Connector vs. Edge Function HTTP POST
+
+There are two mechanisms by which plugin telemetry can reach Supabase. The architecture has evolved to support both, with a preference for the HTTP POST approach in new implementations.
+
+#### Option 1: MCP Connector (org-scoped) — Legacy Pattern
+The MCP connector is the bridge between a Claude session and the Supabase database via SQL. It is what allows Claude — running inside Cowork — to execute SQL against a live database it otherwise couldn't reach.
 
 **How it works:**
 - The connector is a small configuration entry in the Claude desktop config file (`claude_desktop_config.json`), installed at the machine/user level — not inside any plugin
@@ -49,9 +53,36 @@ The MCP connector is the bridge between a Claude session and the Supabase databa
 
 **The connector is org-scoped.** Each organization gets their own connector, configured with their org's credentials. The connector encodes an `org_id` (e.g., `olytic-internal` for Olytic's own use, `client-acme` for a future client). The Supabase database uses Row Level Security (RLS) to enforce that each org can only read and write their own rows. This is how multi-tenancy works — one shared database, isolated per org.
 
-**For Olytic internally:** The connector is already installed and configured. The org_id is `olytic-internal`, pointing to the Supabase project `kxnmgutidehncnafrwbu`.
+**Limitation:** The MCP connector requires machine-level setup in `claude_desktop_config.json`. This creates friction for client onboarding and cannot be automated. The connector package also has known startup reliability issues (see Issue 6).
 
-**For future clients:** During client onboarding, we generate a new JWT for their `org_id` and install their own connector in their Cowork environment. Their telemetry flows into the same Supabase project but is isolated behind RLS.
+#### Option 2: Supabase Edge Function HTTP POST — Current Preferred Pattern
+**As of 2026-03-04**, new plugins should use HTTP POST to a Supabase Edge Function instead of the MCP connector. This approach is more reliable, client-agnostic, and requires zero client setup.
+
+**How it works:**
+- Plugin telemetry skill builds an event JSON object: `{ timestamp, event, plugin, plugin_version, org_id, user_id, component, trigger }`
+- Telemetry skill calls `curl` or an equivalent HTTP client to POST the JSON to the edge function:
+  ```
+  POST https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry
+  Authorization: Bearer [SERVICE_ROLE_JWT]
+  Content-Type: application/json
+  ```
+- Edge function receives the request, validates the JWT, extracts `org_id` from the JWT claim (server-side, client cannot override)
+- Edge function inserts the row into `telemetry_events` with RLS enforcement
+- Plugin receives `{"success":true}` confirmation and continues
+
+**Advantages over MCP:**
+- No machine-level configuration required in Claude Desktop
+- Works consistently across all clients and environments
+- HTTP is universally available (no special MCP package needed)
+- org_id is injected server-side, making client tampering impossible
+- Clients cannot use a global Supabase connector to bypass telemetry tracking
+- Simpler troubleshooting (HTTP status codes, standard error responses)
+
+**For Olytic internally:** Edge function is at `https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry`, ready to receive HTTP POST requests with a valid service role JWT.
+
+**For future clients:** Generate a service role JWT for the client's org_id and provide it to them. The same edge function endpoint is used for all orgs; the JWT claim carries the org isolation.
+
+**Migration status:** Gaudi plugin migrated to HTTP POST transport as of 2026-03-04. The One Ring, Magneto, and Aulë plugins pending migration.
 
 ### The Supabase Edge Function
 When a plugin calls the MCP connector with a SQL INSERT, where does that INSERT go?
@@ -68,7 +99,9 @@ This is referenced in Aulë's `.mcp.json` as the `olytic-telemetry` server URL. 
 
 ## End-to-End Data Flow
 
-Here's the full journey of a single telemetry event, from user action to database row:
+### HTTP POST Edge Function Approach (Current)
+
+Here's the full journey of a single telemetry event, from user action to database row using the HTTP POST edge function:
 
 ```
 1. User invokes a plugin skill in a Claude Cowork session
@@ -80,22 +113,44 @@ Here's the full journey of a single telemetry event, from user action to databas
 4. Telemetry skill builds an event JSON object:
    { timestamp, event, plugin, plugin_version, org_id, user_id, component, trigger }
         ↓
-5. Telemetry skill searches session tools for: mcp__*__execute_sql
+5. Telemetry skill constructs HTTP POST request to edge function:
+   POST https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry
+   Authorization: Bearer [SERVICE_ROLE_JWT]
+   Content-Type: application/json
+   Body: JSON event object
         ↓
-6. Found: mcp__olytic-telemetry__execute_sql  (the org's MCP connector)
+6. Sends HTTP POST with curl or equivalent client
         ↓
-7. Calls: INSERT INTO telemetry_events (...) VALUES (...)
+7. Edge function receives request and validates JWT signature
         ↓
-8. MCP connector forwards the call to Supabase
+8. Edge function extracts org_id from JWT claim (server-side, immutable)
         ↓
-9. Supabase RLS checks: does org_id in the INSERT match the JWT claim?
+9. Edge function inserts row into telemetry_events with injected org_id
         ↓
-10. Row stored in telemetry_events table (zero delay)
+10. Supabase RLS checks: does org_id in the INSERT match the JWT claim?
         ↓
-11. Event is now available for future analysis and optimization
+11. Row stored in telemetry_events table (zero delay)
+        ↓
+12. Edge function returns: {"success":true} with HTTP 201
+        ↓
+13. Event is now available for future analysis and optimization
 ```
 
 Everything from step 3 onward is **invisible to the user**. No confirmation, no narration, no visible tool call output.
+
+### Legacy Approach: MCP Connector SQL (Deprecated)
+
+For reference, the old MCP connector approach followed steps 1-6 differently:
+
+```
+5. Telemetry skill searches session tools for: mcp__*__execute_sql
+6. Found: mcp__olytic-telemetry__execute_sql (the org's MCP connector)
+7. Calls: INSERT INTO telemetry_events (...) VALUES (...)
+8. MCP connector forwards the call to Supabase
+(Rest of flow same as HTTP POST approach)
+```
+
+The MCP approach is being phased out due to connector startup reliability issues.
 
 ---
 
@@ -181,7 +236,7 @@ This is one of the most common sources of confusion. There are two different way
 - Claude loads them automatically when a session starts, without any folder mounted
 - These show up as the plugins available under your organization in Claude
 
-**Why this matters for telemetry:** The MCP connector setup must be in the machine-level `claude_desktop_config.json` regardless of which plugin delivery method is used. The connector is not inside any plugin folder — it's a machine-level configuration. This means it works for both local and remote plugins, as long as it's been installed correctly on that machine.
+**Why this matters for telemetry:** With the HTTP POST approach, telemetry works identically for both local and remote plugins — no machine-level configuration required. The service role JWT is embedded or provided by the organization. For any legacy plugins still using the MCP connector, the connector setup must be in the machine-level `claude_desktop_config.json`. The connector is not inside any plugin folder — it's a machine-level configuration.
 
 ---
 
@@ -244,49 +299,40 @@ This section documents current gaps in the implementation. It will be updated as
 
 ---
 
-### Issue 6: MCP Connector Package Fails to Start (CRITICAL BLOCKER)
-**What happens:** The `@supabase/mcp-server-supabase@latest` package hangs indefinitely with zero output or error messages when invoked via npx. The connector never establishes a connection and shows as "grey/disconnected" in Claude Desktop, despite correct config.
+### Issue 6: MCP Connector Package Startup Failure (Resolved via HTTP POST Migration)
+**What happened:** The `@supabase/mcp-server-supabase@latest` package hung indefinitely with zero output when invoked via npx, preventing the connector from running.
 
-**Environment:** Node v20.20.0 (nvm), npm 10.8.2, config path: `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Resolution (2026-03-04):** Instead of continuing to troubleshoot the MCP connector package, the architecture was pivoted to use Supabase Edge Function HTTP POST. This approach eliminates the MCP dependency entirely and provides better reliability, simpler onboarding, and stronger security (server-side org_id injection).
 
-**Symptoms:**
-- Claude Desktop shows olytic-telemetry connector with grey circle (not green)
-- After full Claude restart, connector remains disconnected
-- Direct command execution: `/path/to/npx -y @supabase/mcp-server-supabase@latest --project-ref kxnmgutidehncnafrwbu --access-token [token]` produces zero output and hangs indefinitely
-- No error messages, no debug output, must Ctrl+C to exit
+**Migration status:** Gaudi plugin successfully tested with HTTP POST transport. The One Ring, Magneto, and Aulë plugins pending migration.
 
-**Impact:** Layer 5 (plugin skill telemetry) completely broken. Layers 1–4 work fine — database is reachable, schema is correct, direct INSERTs work, and the connector *can* be used when Claude is explicitly directed to use it. But plugin skills cannot autonomously fire telemetry because the MCP connector isn't running to be discovered at runtime.
+**Legacy note:** If any plugins remain on the MCP transport, they should be migrated to HTTP POST as part of regular maintenance. The MCP connector will continue to work for orgs that have it installed, but new plugins should not be generated with MCP transport.
 
-**What we've ruled out:**
-- Config path is correct
-- npx path matches `which npx` output exactly
-- Service role JWT token was used (old JWT token was invalid, replaced with fresh Supabase-generated service role key)
-- npm cache cleared
-- Full Claude restarts performed
-- Plugin source and zip files both reference the correct connector name by exact spelling
-- Nothing is wrong with the skill code itself
+**Referenced in:** `TELEMETRY-TESTING.md` → "MCP Connector Migration to HTTP POST (2026-03-04)"
 
-**Root cause theories:**
-1. **Most likely:** `@supabase/mcp-server-supabase@latest` has a bug or critical incompatibility that prevents startup
-2. **Possible:** The package is trying to reach Supabase at startup and silently timing out
-3. **Possible:** Node v20.20.0 has compatibility issues with the package
-4. **Possible:** The specific version of the package available on npm is broken
+---
 
-**Next steps for future investigation:**
-1. Pin to a specific stable version instead of `@latest` — try older known-good versions (e.g., `@supabase/mcp-server-supabase@1.0.0`)
-2. Enable verbose debugging: `DEBUG=* npx -y @supabase/mcp-server-supabase@latest ...`
-3. Check npm registry at https://www.npmjs.com/package/@supabase/mcp-server-supabase for known issues, deprecations, or breaking changes
-4. Try alternative Supabase MCP packages if one exists (search npm for `supabase mcp`)
-5. Implement a custom minimal MCP connector in Node.js if the package cannot be fixed
-6. Test on another Mac to determine if issue is machine-specific or systemic
+### Issue 7: Plugin Telemetry Skills Not Yet Migrated to HTTP POST
+**What happens:** Existing plugins (The One Ring, Magneto, Aulë) were generated with MCP connector telemetry transport. They have not yet been updated to use the new HTTP POST edge function approach.
 
-**DO NOT spend more time troubleshooting the `@supabase/mcp-server-supabase@latest` package itself without first trying a pinned version or checking the npm registry for known issues.** The hanging-with-zero-output behavior suggests a fundamental package problem, not a config or credential issue.
+**Why this matters:** For consistency and to leverage the benefits of the HTTP POST approach (no machine-level setup required, stronger security, better reliability), all plugins should be migrated.
 
-**Workaround (temporary):** Manual telemetry logging is possible by explicitly running SQL inserts via Supabase, but this defeats the purpose of autonomous plugin telemetry. Use this only for critical diagnostics, not as a permanent solution.
+**What needs to happen:**
+1. Update each plugin's `plugin-telemetry/SKILL.md` to use HTTP POST instead of MCP SQL INSERT
+2. Include the service role JWT in each plugin's configuration or environment
+3. Update the plugin's frontmatter: `telemetry_transport: "supabase-edge-function-http"`
+4. Test the updated plugin with a live skill invocation
+5. Repackage and re-upload to the marketplace
 
-**Status:** CRITICAL BLOCKER. This is the primary blocker preventing end-to-end telemetry verification (Layer 5). Resolving this is higher priority than Issue 5 (plugin compliance), because Issue 5 is moot if the connector doesn't run.
+**Migration checklist:**
+- [ ] The One Ring plugin telemetry skill updated
+- [ ] Magneto plugin telemetry skill updated
+- [ ] Aulë plugin telemetry skill updated
+- [ ] Each plugin tested with live skill invocation
+- [ ] Verify rows appear in Supabase with correct `org_id`
+- [ ] Update Aulë's generation templates to emit HTTP POST telemetry for all future plugins
 
-**Referenced in:** `TELEMETRY-TESTING.md` → "Known Issue: MCP Connector Startup Failure (2026-03-04)"
+**Status:** Open. Expected completion: Week of 2026-03-10.
 
 ---
 

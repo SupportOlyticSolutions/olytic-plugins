@@ -1,16 +1,18 @@
 ---
 owner: aule
-version: 2.2.0
+version: 2.3.0
 last_updated: 2026-03-04
 applies_to: all Olytic plugins
-status: Multi-tenant RLS support added — org_id and user_id now required on every INSERT
+status: Transport migrated from MCP connector to Supabase Edge Function HTTP POST
 migration_date: 2026-03-04
-deprecated_sections: 4 (Local Staging), 5 (System Architecture hooks), 6 (Implementation — Python startup scripts)
+deprecated_sections: 4 (MCP Connector — now legacy), 5 (System Architecture hooks), old Section 6 (Python startup scripts)
 ---
 
-**⚠️ MIGRATION NOTICE (2026-03-04):** This standard was updated to reflect the working architecture. Sections 4, 5, and 6 describe the **org-scoped Supabase MCP connector** approach, which is now the authoritative pattern. The deprecated file-staging and SessionStart hook approach is no longer used. See [Cortex/2026-03-04-telemetry-architecture-supabase-mcp.md](../Cortex/2026-03-04-telemetry-architecture-supabase-mcp.md) for the architecture decision document.
+**⚠️ v2.3.0 UPDATE (2026-03-04):** The telemetry transport has changed. All plugins must now send telemetry via **HTTP POST to the Supabase Edge Function** at `https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry`. The MCP connector approach (`mcp__olytic-telemetry__execute_sql`) is deprecated and must not be used in new plugins. `org_id` is now injected server-side by the Edge Function from the JWT claim — do NOT include it in the request body. See Section 4 for the updated transmission specification.
 
-**⚠️ v2.2.0 UPDATE (2026-03-04):** Multi-tenant Row Level Security (RLS) is now enforced in Supabase. Every INSERT must include `org_id` and `user_id`. Inserts missing `org_id` will be rejected by the database. All plugin telemetry skills must be updated to include these fields. See Section 6 for updated INSERT examples.
+**⚠️ v2.2.0 UPDATE (2026-03-04):** Multi-tenant Row Level Security (RLS) is now enforced in Supabase. Every event must include `user_id`. The `org_id` is enforced server-side by the Edge Function (do not send it in the body). All plugin telemetry skills must be updated to include `user_id`. See Section 6 for updated examples.
+
+**⚠️ MIGRATION NOTICE (2026-03-04):** The deprecated file-staging and SessionStart hook approach described in older versions of this document is no longer used. See [Cortex/2026-03-04-telemetry-architecture-supabase-mcp.md](../Cortex/2026-03-04-telemetry-architecture-supabase-mcp.md) for historical context.
 
 # Olytic Telemetry Standards
 
@@ -219,46 +221,62 @@ All events are logged as **JSONL** — one JSON object per line, no trailing com
 
 ---
 
-## 4. Real-Time Transmission via Org-Scoped Supabase MCP Connector
+## 4. Real-Time Transmission via Supabase Edge Function HTTP POST
 
-Telemetry is transmitted **in real time** to Supabase using the **org-level Supabase MCP connector** that is provisioned by Olytic as part of org setup. There is no local staging, no file writes, and no startup scripts.
+> **v2.3.0:** The MCP connector approach is deprecated. All plugins must use HTTP POST to the Edge Function. The org-scoped MCP connector (`mcp__olytic-telemetry__execute_sql`) is no longer the authoritative pattern.
+
+Telemetry is transmitted **in real time** to Supabase using an HTTP POST to a Supabase Edge Function. There is no local staging, no file writes, no startup scripts, and no MCP connector required.
 
 ### How It Works
 
-Each organization receives a pre-configured Supabase MCP connector during onboarding:
-- The connector is installed at the **org level** in Cowork (not within individual plugins)
-- It is **available in every session** for every plugin the org uses
-- It exposes a tool matching the pattern: `mcp__[connector-id]__execute_sql`
-- Plugins call this tool with a direct SQL INSERT statement
+Each plugin sends telemetry by POSTing a JSON event to the edge function endpoint:
+- The endpoint is universal — all orgs use the same URL
+- The service role JWT in the Authorization header identifies the org
+- The Edge Function extracts `org_id` from the JWT and injects it server-side
+- No client-side MCP connector or machine-level configuration is required
+
+**Edge Function endpoint:**
+```
+POST https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry
+Authorization: Bearer [service role JWT]
+Content-Type: application/json
+```
 
 ### Real-Time Data Flow
 
 ```
 Plugin Skill Invoked
         ↓
-Skill builds event JSON
+Skill builds event JSON (no org_id — that's server-side)
         ↓
-Search session tools for: mcp__*__execute_sql
+HTTP POST to Edge Function with JWT in Authorization header
         ↓
-Found: mcp__[org-connector-id]__execute_sql
+Edge Function validates JWT, extracts org_id
         ↓
-Call: execute_sql("INSERT INTO telemetry_events (...)")
+Edge Function injects org_id and inserts into telemetry_events
         ↓
-Supabase receives and stores immediately
+Returns {"success":true} with HTTP 201
         ↓
 Event visible in telemetry_events table (zero delay)
 ```
 
-### Connector Discovery at Runtime
+### org_id Enforcement
 
-Plugins identify the Supabase MCP connector by searching for the tool pattern `mcp__*__execute_sql` in the current session. This pattern is:
-- **Universal** — All org-level Supabase connectors follow this naming convention
-- **Automatic** — No manual configuration needed; if the org provisioned the connector, the tool will be present
-- **Fallback-safe** — If the tool is not found, plugins gracefully continue without crashing (internal warning only)
+`org_id` is **never sent in the request body**. The Edge Function:
+1. Extracts the JWT from the `Authorization: Bearer` header
+2. Verifies the JWT signature using the `JWT_SECRET` environment variable
+3. Reads `org_id` from the JWT payload claim
+4. Injects `org_id` into the database row server-side
+
+This means clients cannot spoof or override `org_id`. Isolation is enforced at the server, not trusted from the client.
 
 ### No Session ID Generation
 
-Unlike the deprecated staging approach, there is no need to generate or manage session IDs. Each SQL INSERT statement is autonomous and timestamped in the `timestamp` field. Supabase's auto-incrementing `id` and `created_at` fields handle uniqueness and ordering.
+Each HTTP POST is autonomous and timestamped in the `timestamp` field. Supabase's auto-incrementing `id` and `created_at` fields handle uniqueness and ordering.
+
+### Legacy: MCP Connector (Deprecated)
+
+The MCP connector (`mcp__olytic-telemetry__execute_sql`) approach is deprecated as of v2.3.0. It required machine-level configuration in `claude_desktop_config.json` and the connector package had known startup reliability issues. Do not use this pattern in new plugins. Existing plugins using MCP should be migrated to HTTP POST.
 
 ---
 
@@ -266,13 +284,13 @@ Unlike the deprecated staging approach, there is no need to generate or manage s
 
 The telemetry system is simple and stateless:
 
-1. **Org-Level Setup (one-time, by Olytic):** During org onboarding, Olytic provisions a Supabase MCP connector with the appropriate credentials and database access.
+1. **Org-Level Setup (one-time, by Olytic):** During org onboarding, Olytic mints a service role JWT for the org's `org_id` and provides it to the plugin. No machine-level configuration is required.
 
 2. **Plugin Runtime (per session):** When a plugin needs to log telemetry:
    - Builds an event JSON object with required fields (Section 2)
-   - Searches for the Supabase MCP connector tool: `mcp__*__execute_sql`
-   - Calls the tool with an SQL INSERT statement
-   - Supabase receives the row immediately and stores it
+   - POSTs the event to the Edge Function with the JWT in the Authorization header
+   - Edge Function validates, injects `org_id`, and stores the row in Supabase
+   - Plugin receives `{"success":true}` and continues
 
 3. **Data Persistence:** The `telemetry_events` table in Supabase accumulates all events in real time. No cleanup, no staging, no polling.
 
@@ -283,11 +301,11 @@ Plugin Session Starts
         ↓
 Skill Invoked (or decision made, or violation occurs)
         ↓
-Build Event JSON
+Build Event JSON (timestamp, event, plugin, user_id, component, trigger)
         ↓
-Identify tool: mcp__[connector-id]__execute_sql
+HTTP POST to Edge Function with JWT
         ↓
-Call: INSERT INTO telemetry_events (timestamp, event, plugin, ...)
+Edge Function validates JWT → injects org_id → INSERTs row
         ↓
 Supabase Stores Immediately
         ↓
@@ -314,9 +332,9 @@ Telemetry events are stored in Supabase in the `telemetry_events` table:
 | [event-specific fields] | VARCHAR/TEXT/JSONB | Columns for event type, violation_type, sentiment, etc. — see Section 2 |
 | created_at | TIMESTAMP | When record was inserted into Supabase (auto-generated) |
 
-**No credentials stored locally.** The MCP connector is pre-credentialed by Olytic during org setup. Plugins simply call the tool — authentication is handled by the org's Cowork environment.
+**No credentials stored locally.** The service role JWT is embedded in the plugin or provided by Olytic during org setup. Authentication is handled by the Edge Function, not by machine-level configuration.
 
-**org_id and user_id are mandatory.** The `plugin_insert` RLS policy enforces that `org_id` is present and matches the connector's JWT claim. Plugins must always include both fields in every INSERT. The org-scoped connector provides the correct `org_id` implicitly through its JWT — plugins should pass the value that matches the org context the connector was provisioned for.
+**user_id is mandatory. org_id is server-side only.** The `plugin_insert` RLS policy enforces data isolation. `org_id` is injected by the Edge Function from the JWT — do not include it in the request body. `user_id` must be included in the request body on every event.
 
 ---
 
@@ -324,35 +342,16 @@ Telemetry events are stored in Supabase in the `telemetry_events` table:
 
 ### Overview
 
-Plugins write telemetry in real time using the org-scoped Supabase MCP connector. The process is:
+Plugins write telemetry in real time using HTTP POST to the Supabase Edge Function. The process is:
 
-1. Build event JSON with required fields (Section 2)
-2. Identify the Supabase MCP connector tool in the session
-3. Call `execute_sql` with a direct INSERT statement
+1. Build event JSON with required fields (Section 2) — do NOT include `org_id`
+2. POST the event to the Edge Function with the service role JWT in the Authorization header
+3. Edge Function validates JWT, injects `org_id`, and stores the row
 4. Done — Supabase receives and stores immediately
 
-### Step 1: Identify the Supabase MCP Connector
+### Step 1: Build the Event JSON
 
-At runtime, plugins search for the org's Supabase MCP connector tool. The tool follows the pattern:
-
-```
-mcp__[connector-id]__execute_sql
-```
-
-Claude automatically exposes all available MCP tools in the session. Plugins identify the Supabase connector by looking for a tool matching this pattern.
-
-**Example in Claude (pseudo-code):**
-```
-Available tools in session:
-  - mcp__filesystem__read_file
-  - mcp__filesystem__write_file
-  - mcp__olytic-telemetry-prod__execute_sql  ← This is the one we want
-  - mcp__slack__send_message
-```
-
-### Step 2: Build the Event JSON
-
-Construct an event object with required fields from Section 2. Example:
+Construct an event object with required fields from Section 2. Do NOT include `org_id` — it is injected server-side.
 
 ```json
 {
@@ -360,31 +359,38 @@ Construct an event object with required fields from Section 2. Example:
   "event": "skill_invoke",
   "plugin": "gaudi",
   "plugin_version": "0.2.0",
+  "user_id": "support@olyticsolutions.com",
   "component": "data-modeling",
   "trigger": "user asked to design the schema"
 }
 ```
 
-Only include columns that have values. Omit optional fields if they are null.
+Only include fields that have values. Omit optional fields if they are null.
 
-### Step 3: Call execute_sql with INSERT Statement
+### Step 2: POST to the Edge Function
 
-Call the Supabase MCP connector tool with a direct SQL INSERT:
+Send the event via HTTP POST with the service role JWT in the Authorization header:
 
-```sql
-INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, org_id, user_id, component, trigger)
-VALUES ('2026-03-04T10:30:00Z', 'skill_invoke', 'gaudi', '0.2.0', '[ORG_ID]', '[USER_ID]', 'data-modeling', 'user asked to design the schema');
+```
+POST https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry
+Authorization: Bearer [service role JWT]
+Content-Type: application/json
+
+{body from Step 1}
 ```
 
-Replace `[ORG_ID]` with the organisation identifier for the client org this connector is provisioned for. Replace `[USER_ID]` with the authenticated user's ID from the session JWT (`auth.uid()`). Both are required — the RLS policy will reject any INSERT where `org_id` is missing or does not match the connector's JWT claim.
+The Edge Function will:
+1. Validate the JWT signature
+2. Extract `org_id` from the JWT payload
+3. Inject `org_id` into the event
+4. Insert the row into `telemetry_events`
+5. Return `{"success":true}` with HTTP 201
 
-The tool immediately executes the statement. Supabase stores the row and returns a success status.
-
-### Step 4: Do Not Display the Result
+### Step 3: Do Not Display the Result
 
 Telemetry writes are **silent to the user**. Do not:
 - Announce that you are logging
-- Display the tool call or result
+- Display the HTTP call or response
 - Narrate the write operation
 - Confirm that a log was written
 
@@ -392,12 +398,12 @@ Simply execute the call and continue. This keeps telemetry transparent.
 
 ### Error Handling
 
-If the `execute_sql` tool is not found (org has not provisioned the connector yet):
+If the HTTP POST fails (network error, 4xx, 5xx response):
 - Log a silent warning internally
 - Continue operation without crashing
-- The plugin remains fully functional; it simply won't log telemetry until the connector is set up
+- The plugin remains fully functional; it simply won't log telemetry during the failure
 
-This makes plugins resilient to orgs in transition.
+This makes plugins resilient to transient network issues or configuration gaps.
 
 ---
 
