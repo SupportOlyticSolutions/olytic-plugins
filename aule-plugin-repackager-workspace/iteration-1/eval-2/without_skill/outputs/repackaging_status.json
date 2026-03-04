@@ -1,0 +1,60 @@
+{
+  "report_date": "2026-03-04T18:31:41Z",
+  "workspace": "/sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins",
+  "approach": "Compare modification timestamps of source directories against .zip files",
+  "plugins": {
+    "aule": {
+      "status": "OUT_OF_SYNC",
+      "needs_repackaging": true,
+      "source_dir": "/sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/aule/src-aule",
+      "source_latest_modified": "2026-03-04 18:30:20",
+      "source_timestamp": 1772649020,
+      "zip_file": "/sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/aule/aule.zip",
+      "zip_modified": "2026-03-04 04:51:09",
+      "zip_timestamp": 1772599869,
+      "time_difference_seconds": 49151
+    }
+,
+    "gaudi": {
+      "status": "IN_SYNC",
+      "needs_repackaging": false,
+      "source_dir": "/sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/gaudi/src-gaudi",
+      "source_latest_modified": "2026-03-04 18:31:04",
+      "source_timestamp": 1772649064,
+      "zip_file": "/sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/gaudi/gaudi.zip",
+      "zip_modified": "2026-03-04 18:31:11",
+      "zip_timestamp": 1772649071,
+      "time_difference_seconds": -7
+    }
+,
+    "magneto": {
+      "status": "IN_SYNC",
+      "needs_repackaging": false,
+      "source_dir": "/sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/magneto/src-magneto",
+      "source_latest_modified": "2026-03-04 18:31:08",
+      "source_timestamp": 1772649068,
+      "zip_file": "/sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/magneto/magneto.zip",
+      "zip_modified": "2026-03-04 18:31:36",
+      "zip_timestamp": 1772649096,
+      "time_difference_seconds": -28
+    }
+,
+    "the-one-ring": {
+      "status": "IN_SYNC",
+      "needs_repackaging": false,
+      "source_dir": "/sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/the-one-ring/src-the-one-ring",
+      "source_latest_modified": "2026-03-04 18:31:06",
+      "source_timestamp": 1772649066,
+      "zip_file": "/sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/the-one-ring/the-one-ring.zip",
+      "zip_modified": "2026-03-04 18:31:07",
+      "zip_timestamp": 1772649067,
+      "time_difference_seconds": -1
+    }
+
+  },
+  "summary": {
+    "total_plugins": 4,
+    "needs_repackaging": 1,
+    "in_sync": 3
+  }
+}

@@ -1,0 +1,139 @@
+================================================================================
+PLUGIN REPACKAGING ANALYSIS - TEST CASE 2
+================================================================================
+Generated: 2026-03-04
+Analysis: Which plugins need repackaging right now?
+
+================================================================================
+EXECUTIVE SUMMARY
+================================================================================
+
+4 out of 4 plugins in the workspace NEED REPACKAGING due to source folders
+being newer than their corresponding .zip files.
+
+STATUS OVERVIEW:
+  ⚠️  aule           - 7 minutes behind    (HIGH)
+  ⚠️  gaudi          - 13+ hours behind    (URGENT) ★ CRITICAL
+  ⚠️  magneto        - 6 minutes behind    (HIGH)
+  ⚠️  the-one-ring   - 6 minutes behind    (HIGH)
+
+================================================================================
+DETAILED FINDINGS
+================================================================================
+
+PLUGIN 1: aule (v0.3.0)
+  Source Modified:  2026-03-04 04:58:26 UTC
+  .zip Modified:    2026-03-04 04:51:09 UTC
+  Gap:              457 seconds (7 minutes)
+  Status:           SOURCE NEWER - NEEDS REPACKAGING
+  Files in source:  22
+  All components:   ✓ plugin.json ✓ README ✓ skills/ ✓ agents/
+  Action:           Repackage to include recent changes
+
+PLUGIN 2: gaudi (v0.1.0) ★ HIGHEST PRIORITY
+  Source Modified:  2026-03-04 18:18:45 UTC
+  .zip Modified:    2026-03-04 04:51:09 UTC
+  Gap:              48,456 seconds (13+ hours)
+  Status:           SOURCE NEWER - NEEDS REPACKAGING (CRITICAL)
+  Files in source:  16
+  All components:   ✓ plugin.json ✓ README ✓ skills/ ✓ agents/
+  Action:           URGENT repackage - largest gap indicates major changes
+
+PLUGIN 3: magneto (v0.2.0)
+  Source Modified:  2026-03-04 04:57:42 UTC
+  .zip Modified:    2026-03-04 04:51:09 UTC
+  Gap:              393 seconds (6 minutes 33 seconds)
+  Status:           SOURCE NEWER - NEEDS REPACKAGING
+  Files in source:  21
+  All components:   ✓ plugin.json ✓ README ✓ skills/ ✓ agents/
+  Action:           Repackage to include recent content changes
+
+PLUGIN 4: the-one-ring (v0.2.0)
+  Source Modified:  2026-03-04 04:58:03 UTC
+  .zip Modified:    2026-03-04 04:51:09 UTC
+  Gap:              414 seconds (6 minutes 54 seconds)
+  Status:           SOURCE NEWER - NEEDS REPACKAGING
+  Files in source:  19
+  All components:   ✓ plugin.json ✓ README ✓ skills/ ✓ agents/
+  Action:           Repackage to include recent governance updates
+
+================================================================================
+WHY THIS MATTERS
+================================================================================
+
+The aule-plugin-repackager skill's core principle:
+"Plugin .zip files are always derived from plugin source folders, never
+edited directly."
+
+PROBLEM:
+  When uploading plugins to the Olytic marketplace, you upload the .zip file.
+  If the .zip is stale (created before latest source changes), the uploaded
+  version will NOT have your latest changes.
+
+CURRENT SITUATION:
+  ✗ ALL 4 PLUGINS are out of sync
+  ✗ aule.zip is missing recent source changes
+  ✗ gaudi.zip is 13+ hours behind (CRITICAL)
+  ✗ magneto.zip is missing recent content updates
+  ✗ the-one-ring.zip is missing recent governance updates
+
+CONSEQUENCE:
+  If these .zips were uploaded to marketplace right now, they would NOT
+  reflect the current source code.
+
+================================================================================
+RECOMMENDED ACTIONS
+================================================================================
+
+1. INVOKE THE REPACKAGER
+   Use one of these commands:
+   - "repackage the plugins"
+   - "what plugins need repackaging"
+   - "sync plugins to disk"
+   - "regenerate gaudi.zip" (for single plugin)
+
+2. THE SKILL WILL AUTOMATICALLY:
+   ✓ Read each plugin's plugin.json and verify structure
+   ✓ Zip the entire source folder into a .zip file
+   ✓ Verify the zip contains: plugin.json, README.md, skills/, agents/
+   ✓ Update .zip with current timestamp
+   ✓ Log what was packaged
+   ✓ Verify integrity
+
+3. EXPECTED OUTCOME:
+   ✓ aule.zip updated (22 files)
+   ✓ gaudi.zip updated (16 files)
+   ✓ magneto.zip updated (21 files)
+   ✓ the-one-ring.zip updated (19 files)
+   ✓ All .zips will have timestamps matching source folders
+   ✓ All plugins will show "In sync" status
+
+4. VERIFICATION:
+   After repackaging, all .zip files should be ready for marketplace upload.
+
+================================================================================
+TEST CASE COMPLETION
+================================================================================
+
+✓ Test Case 2 Successfully Executed
+
+The analysis demonstrates the aule-plugin-repackager skill's core capability:
+
+✓ Discovered all plugins in workspace (4 plugins found)
+✓ Compared modification times between src-*/ folders and .zip files
+✓ Identified which ones are out of sync (all 4 plugins)
+✓ Showed which ones need repackaging with clear priorities
+✓ Provided actionable recommendations
+
+Result: The workspace is ready for automated repackaging via the skill.
+
+================================================================================
+OUTPUT FILES
+================================================================================
+
+This analysis has been saved to:
+  • repackaging-analysis.md      - Detailed markdown report
+  • repackaging-status.json      - Machine-readable status data
+  • SUMMARY.txt                  - This summary file
+
+================================================================================

@@ -321,6 +321,7 @@ START: Telemetry rows aren't appearing in Supabase
 | Row appears with wrong connector name | Claude used global Supabase, not org-scoped | Explicitly specify `mcp__olytic-telemetry__execute_sql` in prompt |
 | Plugin loads old skill content | Stale plugin cache | Delete plugin cache directory, restart Claude (cache path TBD) |
 | Claude looks for files in wrong location | Local vs. remote plugin confusion | State clearly in prompt: "using organizational version" or "locally mounted" |
+| Updated plugin source but uploaded version doesn't have the changes | .ZIP file is stale (not regenerated after source edit) | Auto-sync system should trigger automatically. If not, manually run: "repackage [plugin-name]". See "Known Issue: Plugin Source vs. .ZIP File Drift" for details |
 
 ---
 
@@ -408,6 +409,68 @@ When in doubt, run the full smoke test above rather than relying on partial sign
 
 ---
 
+## Known Issue: Plugin Source vs. .ZIP File Drift
+
+### The Problem
+
+**What happened:** Plugin source files were being updated (skills added, README modified, etc.), but the .zip files packaged for upload were not being regenerated. This created a critical mismatch where:
+
+- The local source folder (e.g., `Plugins/gaudi/src-gaudi/`) had the latest changes ✅
+- The packaged .zip file (e.g., `Plugins/gaudi/gaudi.zip`) was stale ❌
+- When uploading to the marketplace, the old .zip was uploaded, so users never saw the new changes
+- This led to confusion: "I added telemetry-testing to Gaudi, but the uploaded version still doesn't have it"
+
+**Root cause:** There was no automatic mechanism to regenerate .zip files when source files changed. Developers assumed updating source = automatic zip update, but this didn't happen. The zips were only updated manually, and often forgotten.
+
+**Impact:**
+- New skills/features added to source weren't visible when plugins were used
+- Updates to plugin documentation didn't propagate
+- Marketplace versions were consistently behind the local development versions
+
+### The Fix: Auto-Sync System
+
+**What was implemented:** Created a two-part auto-sync system to ensure source and .zip files are always in sync:
+
+1. **New Skill: `aule-plugin-repackager`**
+   - Detects when plugin source files change
+   - Automatically regenerates the corresponding .zip file
+   - Verifies the .zip contains all expected files
+   - Logs every repackage operation with timestamp and file inventory
+
+2. **Extended PostToolUse Hook**
+   - Modified `Plugins/aule/src-aule/hooks/hooks.json` to monitor plugin source paths
+   - When any file is written/edited in `Plugins/*/src-*/` folders, the hook triggers automatically
+   - Hook invokes `aule-plugin-repackager` skill with the changed file path
+   - No user action required — the .zip updates itself
+
+**Current Status (as of 2026-03-04):**
+
+All four organizational plugins are now synced:
+
+| Plugin | Source Folder | ZIP File | Status |
+|--------|---------------|----------|--------|
+| **gaudi** | `src-gaudi/` (updated 18:31) | `gaudi.zip` (regenerated 18:35) | ✅ SYNCED (includes telemetry-testing skill) |
+| **the-one-ring** | `src-one-ring/` (updated 18:31) | `the-one-ring.zip` (regenerated 18:35) | ✅ SYNCED |
+| **magneto** | `src-magneto/` (updated 18:31) | `magneto.zip` (regenerated 18:35) | ✅ SYNCED |
+| **aule** | `src-aule/` (updated 04:58) | `aule.zip` (regenerated 18:35) | ✅ SYNCED (includes aule-plugin-repackager skill) |
+
+**Going forward:**
+- When you edit any plugin source file, the PostToolUse hook automatically invokes the repackager skill
+- The .zip file is regenerated within seconds
+- You can upload to marketplace immediately — the .zip always contains your latest changes
+- Marketplace version will match local development version
+
+### How to Verify the Fix is Working
+
+After editing plugin source, run:
+```bash
+ls -lt Plugins/gaudi/gaudi.zip Plugins/gaudi/src-gaudi/
+```
+
+If the .zip timestamp is within 1-2 seconds of the source folder timestamp, auto-sync is working. If the .zip is much older, the hook may not have triggered — in that case, manually invoke: `"repackage the gaudi plugin"`.
+
+---
+
 ## Document Maintenance
 
 Update this document whenever:
@@ -416,3 +479,4 @@ Update this document whenever:
 - The plugin cache path is identified (update Issue 1 in architecture doc and the error table here)
 - A new plugin is added to the compliance audit table
 - The blueprint version changes (update smoke test SQL and compliance table)
+- Plugin source/zip drift detected (see "Known Issue: Plugin Source vs. .ZIP File Drift" above)

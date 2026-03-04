@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "plugin-drift-detection",
+  "prompt": "What plugins in my workspace need repackaging right now? Check if any source folders are newer than their corresponding .zip files.",
+  "assertions": [
+    {
+      "text": "All 4 plugins are discovered (gaudi, the-one-ring, magneto, aule)",
+      "passed": true,
+      "evidence": "With-skill discovered all 4; without-skill also found all 4 via filesystem search"
+    },
+    {
+      "text": "Timestamp comparison is performed for each plugin",
+      "passed": true,
+      "evidence": "Both approaches calculated modification time deltas for source vs .zip"
+    },
+    {
+      "text": "Drift is detected and reported clearly",
+      "passed": true,
+      "evidence": "With-skill: gaudi marked URGENT (13+ hours behind); without-skill: aule marked as 13.6 hours out of sync"
+    },
+    {
+      "text": "Recommendations are provided for which plugins need repackaging",
+      "passed": true,
+      "evidence": "Both approaches provided clear next-steps guidance on which plugins to repackage"
+    }
+  ]
+}

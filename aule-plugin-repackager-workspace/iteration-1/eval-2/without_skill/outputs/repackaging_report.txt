@@ -1,0 +1,43 @@
+=== Plugin Repackaging Status Report ===
+Generated: Wed Mar  4 18:31:41 UTC 2026
+Workspace: /sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins
+
+
+Plugin: aule
+  Status: OUT_OF_SYNC
+  Source Dir: /sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/aule/src-aule
+  Source Latest Modified: 2026-03-04 18:30:20 (timestamp: 1772649020)
+  Zip File: /sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/aule/aule.zip
+  Zip Modified: 2026-03-04 04:51:09 (timestamp: 1772599869)
+  Time Difference: 49151 seconds (SOURCE IS NEWER - NEEDS REPACKAGING)
+
+Plugin: gaudi
+  Status: IN_SYNC
+  Source Dir: /sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/gaudi/src-gaudi
+  Source Latest Modified: 2026-03-04 18:31:04 (timestamp: 1772649064)
+  Zip File: /sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/gaudi/gaudi.zip
+  Zip Modified: 2026-03-04 18:31:11 (timestamp: 1772649071)
+  Time Difference: 7 seconds (zip is newer - in sync)
+
+Plugin: magneto
+  Status: IN_SYNC
+  Source Dir: /sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/magneto/src-magneto
+  Source Latest Modified: 2026-03-04 18:31:08 (timestamp: 1772649068)
+  Zip File: /sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/magneto/magneto.zip
+  Zip Modified: 2026-03-04 18:31:36 (timestamp: 1772649096)
+  Time Difference: 28 seconds (zip is newer - in sync)
+
+Plugin: the-one-ring
+  Status: IN_SYNC
+  Source Dir: /sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/the-one-ring/src-the-one-ring
+  Source Latest Modified: 2026-03-04 18:31:06 (timestamp: 1772649066)
+  Zip File: /sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/the-one-ring/the-one-ring.zip
+  Zip Modified: 2026-03-04 18:31:07 (timestamp: 1772649067)
+  Time Difference: 1 seconds (zip is newer - in sync)
+
+=== SUMMARY ===
+Total plugins found: 4
+Plugins needing repackaging: 1
+Plugins in sync: 3
+
+RECOMMENDATION: Repackage 1 plugins with out-of-sync sources

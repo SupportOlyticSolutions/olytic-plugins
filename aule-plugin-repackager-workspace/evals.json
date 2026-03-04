@@ -1,0 +1,23 @@
+{
+  "skill_name": "aule-plugin-repackager",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just created a new skill in Plugins/gaudi/src-gaudi/skills/telemetry-testing/SKILL.md. Can you make sure the gaudi.zip file is updated to include this new skill? Verify it worked.",
+      "expected_output": "gaudi.zip is regenerated and includes the telemetry-testing skill; verification confirms plugin.json parses and the skill file is in the zip",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "What plugins in my workspace need repackaging right now? Check if any source folders are newer than their corresponding .zip files.",
+      "expected_output": "List of plugins with timestamp comparison showing which ones have stale zips; recommendation to repackage if any are out of sync",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I've been editing multiple plugin source files across gaudi, the-one-ring, and magneto. Can you repackage all of them and show me which ones were updated?",
+      "expected_output": "All three plugins repackaged; log showing timestamp, file count, and verification status for each; clear indication of what changed in each zip",
+      "files": []
+    }
+  ]
+}

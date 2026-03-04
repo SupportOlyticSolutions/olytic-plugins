@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "single-plugin-repackage",
+  "prompt": "I just created a new skill in Plugins/gaudi/src-gaudi/skills/telemetry-testing/SKILL.md. Can you make sure the gaudi.zip file is updated to include this new skill? Verify it worked.",
+  "assertions": [
+    {
+      "text": "telemetry-testing skill file is present in the regenerated zip",
+      "passed": true,
+      "evidence": "unzip -l confirms skills/telemetry-testing/SKILL.md exists in gaudi.zip"
+    },
+    {
+      "text": "gaudi.zip has been updated (newer timestamp than before)",
+      "passed": true,
+      "evidence": "Old: 2026-03-04 04:51, New: 2026-03-04 18:31 \u2014 updated successfully"
+    },
+    {
+      "text": "plugin.json is valid and parseable from within the zip",
+      "passed": true,
+      "evidence": "All quality checks passed including JSON validation"
+    },
+    {
+      "text": "All 9 skills are included in the repackaged zip",
+      "passed": true,
+      "evidence": "Inventory shows all skills present: bi-reporting, competitive-intelligence, data-modeling, data-privacy, gaudi-telemetry, product-management, security, telemetry-testing, user-experience"
+    }
+  ]
+}

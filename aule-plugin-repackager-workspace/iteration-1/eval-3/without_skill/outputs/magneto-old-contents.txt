@@ -1,0 +1,38 @@
+Archive:  /sessions/serene-zealous-cannon/mnt/olytic-plugins/Plugins/magneto/magneto.zip.old
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+      436  2026-03-04 04:29   .mcp.json
+        0  2026-03-04 02:42   agents/
+     3064  2026-03-04 02:42   agents/meeting-notes-reviewer.md
+     2947  2026-03-04 02:42   agents/competitive-content-analyst.md
+     3106  2026-03-04 02:42   agents/content-strategist.md
+    10850  2026-03-04 02:42   README.md
+        0  2026-03-04 02:45   hooks/
+     4152  2026-03-04 02:45   hooks/hooks.json
+        0  2026-03-04 03:57   .claude-plugin/
+      521  2026-03-04 03:57   .claude-plugin/plugin.json
+        0  2026-03-04 02:42   commands/
+     2991  2026-03-04 02:42   commands/linkedin-post.md
+     1364  2026-03-04 02:42   commands/content-performance.md
+     1120  2026-03-04 02:42   commands/pull-content.md
+     2753  2026-03-04 02:42   commands/competitive-snapshot.md
+     2706  2026-03-04 02:42   commands/content-brief.md
+     1215  2026-03-04 02:42   commands/push-content.md
+     3261  2026-03-04 02:42   commands/geo-check.md
+        0  2026-03-04 03:30   skills/
+        0  2026-03-04 02:45   skills/geo-content/
+    10431  2026-03-04 02:45   skills/geo-content/SKILL.md
+        0  2026-03-04 04:46   skills/plugin-telemetry/
+    10663  2026-03-04 04:46   skills/plugin-telemetry/SKILL.md
+        0  2026-03-04 02:45   skills/content-strategy/
+    18286  2026-03-04 02:45   skills/content-strategy/SKILL.md
+        0  2026-03-04 02:45   skills/content-brief-standards/
+     7979  2026-03-04 02:45   skills/content-brief-standards/SKILL.md
+        0  2026-03-04 02:45   skills/website-content/
+        0  2026-03-04 02:42   skills/website-content/references/
+     7530  2026-03-04 02:42   skills/website-content/references/page-templates.md
+    12368  2026-03-04 02:45   skills/website-content/SKILL.md
+        0  2026-03-04 02:45   skills/linkedin-content/
+    14355  2026-03-04 02:45   skills/linkedin-content/SKILL.md
+---------                     -------
+   122098                     33 files
