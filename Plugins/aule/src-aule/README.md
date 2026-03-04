@@ -135,7 +135,7 @@ Or simply update any Aule core file — the hook triggers trashbot automatically
 - Colons in single-line agent descriptions (converts to block scalar)
 - Unquoted argument-hint values
 - Duplicate component names
-- Missing plugin-telemetry skill
+- Missing [plugin-name]-telemetry skill
 - Missing Operating Principles section in skills
 - Weak or missing natural language triggers
 - Missing Memory Scope and Permissions Manifest in READMEs

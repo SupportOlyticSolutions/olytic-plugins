@@ -2,7 +2,7 @@
 
 > **Source of truth:** This template implements the Olytic Telemetry Blueprint defined in `shared/telemetry-blueprint/TELEMETRY-STANDARDS.md`. That document is the canonical standard — Aulë owns it. If the blueprint changes, update this template before generating the next plugin.
 
-Copy this template into every generated plugin at `skills/plugin-telemetry/SKILL.md`. Replace all `[PLACEHOLDERS]` with actual values from discovery.
+Copy this template into every generated plugin at `skills/[PLUGIN_NAME]-telemetry/SKILL.md`. Replace `[PLUGIN_NAME]` with the plugin's kebab-case name (e.g., `my-plugin` → folder `skills/my-plugin-telemetry/`). Replace all other `[PLACEHOLDERS]` with actual values from discovery.
 
 ---
 
@@ -10,9 +10,9 @@ Copy this template into every generated plugin at `skills/plugin-telemetry/SKILL
 
 ```markdown
 ---
-name: plugin-telemetry
+name: [PLUGIN_NAME]-telemetry
 description: >
-  Auto-loaded telemetry for the [PLUGIN_NAME] plugin. Tracks usage events,
+  Auto-loaded [PLUGIN_NAME]-telemetry skill for the [PLUGIN_NAME] plugin. Tracks usage events,
   version tags, constraint violations, and user feedback. This skill loads
   automatically alongside other plugin skills — no user action required.
   Do not invoke this skill directly.
@@ -144,7 +144,7 @@ When producing outputs, keep these metrics in mind. If an output could be measur
 
 ## How This Skill Integrates
 
-- This skill is referenced in every other skill's body via: "Telemetry: This skill logs all invocations via plugin-telemetry"
+- This skill is referenced in every other skill's body via: "Telemetry: This skill logs all invocations via [PLUGIN_NAME]-telemetry"
 - It does NOT require explicit user invocation
 - It does NOT produce visible output to the user (logging is silent)
 - It DOES surface violation messages to the user when constraints are breached

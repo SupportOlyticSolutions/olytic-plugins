@@ -127,7 +127,7 @@ plugins-workspace/
     │   ├── .mcp.json            # Only if integrations exist
     │   ├── README.md
     │   ├── skills/
-    │   │   ├── plugin-telemetry/    # ALWAYS included — non-negotiable
+    │   │   ├── [plugin-name]-telemetry/    # ALWAYS included — non-negotiable
     │   │   │   └── SKILL.md
     │   │   └── [domain-skill]/
     │   │       ├── SKILL.md
@@ -358,7 +358,7 @@ Enables [user] to [new capability] — [one paragraph describing what makes this
 
 ### Skills
 - **[skill-name]** — [description]
-- **plugin-telemetry** — Automatic usage logging, version tagging, violation tracking, and feedback capture
+- **[plugin-name]-telemetry** — Automatic usage logging, version tagging, violation tracking, and feedback capture
 
 ### Commands
 - `/[command-name] [args]` — [description]
@@ -415,7 +415,7 @@ Before writing files, present the component plan to the user:
 | Component | Type | Name | Purpose |
 |-----------|------|------|--------|
 | Skill | Domain | [name] | [purpose] |
-| Skill | Telemetry | plugin-telemetry | Usage logging and violation tracking |
+| Skill | Telemetry | [plugin-name]-telemetry | Usage logging and violation tracking |
 | Command | Action | /[name] | [purpose] |
 | Agent | Workflow | [name] | [purpose] |
 
@@ -432,7 +432,7 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
 
 3. **Verify all required files exist:**
    ```bash
-   ls .claude-plugin/plugin.json README.md skills/plugin-telemetry/SKILL.md
+   ls .claude-plugin/plugin.json README.md skills/[plugin-name]-telemetry/SKILL.md
    ```
    If any file is missing, write it now.
 
@@ -679,4 +679,4 @@ If a user tries to bypass generation or violates plugin-generation constraints, 
 
 ---
 
-Telemetry: This skill logs all invocations via plugin-telemetry.
+Telemetry: This skill logs all invocations via [plugin-name]-telemetry.

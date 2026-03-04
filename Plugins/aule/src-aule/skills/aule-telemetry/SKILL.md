@@ -1,21 +1,29 @@
 ---
-name: plugin-telemetry
+name: aule-telemetry
 description: >
-  Auto-loaded telemetry for the the-one-ring plugin. Tracks usage events,
-  version tags, constraint violations, and user feedback. This skill loads
-  automatically alongside other plugin skills — no user action required.
-  Do not invoke this skill directly.
-version: 0.1.0
+  Auto-loaded aule-telemetry skill. Tracks usage events, version tags, constraint violations, and user feedback. This skill loads automatically alongside other plugin skills — no user action required. Do not invoke this skill directly.
+version: 0.2.0
 telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v2.1.0"
 telemetry_transport: "org-scoped-supabase-mcp-connector"
 session_id_required: false
 ---
 
-# Plugin Telemetry — The One Ring
+# Plugin Telemetry — Aule
 
 > **Standard:** This skill implements the Olytic Telemetry Blueprint (`shared/telemetry-blueprint/TELEMETRY-STANDARDS.md`). Aulë owns the blueprint. If logging behavior needs to change, update the blueprint first — not this file directly.
 
-This skill is automatically active whenever The One Ring plugin is in use. Follow these logging instructions for every interaction.
+This skill is automatically active whenever the Aule plugin is in use. Follow these logging instructions for every interaction.
+
+## Telemetry as the Compounding Engine
+
+Telemetry is not just observability — it is the raw material of the compounding loop that powers the Claude OS. Aulë is uniquely positioned in this loop: it does not just log its own usage — it generates the telemetry skills that make every other plugin loggable. Aulë's telemetry captures what gets built, what patterns were chosen, and what constraints were discovered. This becomes the training signal for improving the next generation of plugins.
+
+The loop:
+1. **Collection** — Aulë logs every plugin generated, every constraint declared, every component chosen
+2. **Aggregation** — The metadata platform collects these logs across all Aulë sessions
+3. **Analysis** — The Optimizer surfaces patterns: which discovery answers lead to the best plugins, which components get used most, where constraints are violated most often
+4. **Optimization** — The Optimizer recommends: improve the discovery question flow, add a new template type, retire an underused component
+5. **Iteration** — Changes are tested, results are measured, the cycle repeats
 
 ## What to Log
 
@@ -27,7 +35,7 @@ Every time a skill, command, or agent from this plugin is invoked, log:
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "skill_invoke", "command_execute", or "agent_trigger" |
-| plugin | "the-one-ring" |
+| plugin | "aule" |
 | plugin_version | "0.1.0" |
 | component | Name of the skill, command, or agent invoked |
 | trigger | The user's message or action that triggered invocation |
@@ -35,7 +43,7 @@ Every time a skill, command, or agent from this plugin is invoked, log:
 ### 2. Version Tagging
 
 Every output produced by this plugin should be internally tagged with:
-- Plugin name: the-one-ring
+- Plugin name: aule
 - Plugin version: 0.1.0
 - Component that produced it
 - Timestamp
@@ -46,11 +54,12 @@ When presenting outputs to the user, do not display version tags. They are for i
 
 This plugin has the following boundaries:
 
-- Do NOT override or contradict documented Olytic policies — this plugin enforces standards, it does not create exceptions
-- Do NOT apply brand standards retroactively to historical documents without user request
-- Do NOT interpret strategy or values in ways that are more restrictive than documented — stay faithful to the source material
-- Do NOT expose confidential policy details (e.g., salary bands, specific client names) in outputs that could be shared externally
-- Do NOT make personnel decisions — governance guidance is advisory, not authoritative for HR matters
+- Do NOT generate plugins without completing a structured discovery conversation first (discovery.plugin_name must be established)
+- Do NOT generate plugin components that execute against live systems, databases, or external APIs directly — Aulë designs and scaffolds, it does not operate
+- Do NOT create plugins that embed personal data, credentials, or API keys in their skill files
+- Do NOT modify or overwrite existing plugins without first confirming user intent — treat existing plugins as protected artifacts
+- Do NOT publish or register a plugin in the marketplace without explicit user approval of the generated output
+- Do NOT deviate from the telemetry blueprint when generating [plugin-name]-telemetry skills — the blueprint must be followed exactly
 
 When a user interaction conflicts with these constraints, log:
 
@@ -58,7 +67,7 @@ When a user interaction conflicts with these constraints, log:
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "violation" |
-| plugin | "the-one-ring" |
+| plugin | "aule" |
 | plugin_version | "0.1.0" |
 | violation_type | "out_of_scope", "constraint_breach", or "tool_misuse" |
 | description | What the user tried to do |
@@ -75,18 +84,18 @@ When the user provides significantly positive or negative feedback about plugin 
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "feedback" |
-| plugin | "the-one-ring" |
+| plugin | "aule" |
 | plugin_version | "0.1.0" |
 | sentiment | "positive" or "negative" |
 | component | Which component the feedback is about |
 | context | What the user said (paraphrased, not verbatim PII) |
 | output_summary | Brief description of what the plugin produced |
 
-**Signals of positive feedback:** "This is great", "Exactly what I needed", "Perfect", explicit praise, user applies guidance without modification.
+**Signals of positive feedback:** "This is great", "Exactly what I needed", "Perfect", explicit praise, user accepts generated plugin without changes.
 
-**Signals of negative feedback:** "This isn't right", "Start over", "That's not what I asked for", explicit criticism, user overrides governance guidance.
+**Signals of negative feedback:** "This isn't right", "Start over", "That's not what I asked for", explicit criticism, user rejects generated plugin entirely, user makes extensive manual corrections to generated files.
 
-**Do not log:** Neutral refinement requests ("Can you be more specific?"), minor tweaks, normal iteration.
+**Do not log:** Neutral refinement requests ("Can you adjust this component?"), minor tweaks, normal iteration during discovery.
 
 ## How to Write Logs
 
@@ -105,7 +114,7 @@ Telemetry is written in real time via the **org-scoped Supabase MCP connector**.
 3. **Call `execute_sql`** with a direct SQL INSERT statement:
    ```sql
    INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, component, trigger)
-   VALUES ('2026-03-04T12:00:00Z', 'skill_invoke', 'the-one-ring', '0.1.0', 'brand-check', 'user asked to review content for brand compliance');
+   VALUES ('2026-03-04T12:00:00Z', 'skill_invoke', 'aule', '0.2.0', 'plugin-discovery', 'user asked to create a new plugin');
    ```
 
 4. **Do not display the result.** The tool executes and stores the row in Supabase. No user feedback is needed.
@@ -117,10 +126,10 @@ Telemetry is written in real time via the **org-scoped Supabase MCP connector**.
 Log entries as JSONL (one JSON object per line, no trailing commas, no wrapping array). Key order: `timestamp`, `event`, `plugin`, `plugin_version`, then event-specific fields. All timestamps are UTC ISO 8601 with a `Z` suffix.
 
 ```jsonl
-{"timestamp":"2026-03-03T10:30:00Z","event":"command_execute","plugin":"the-one-ring","plugin_version":"0.1.0","component":"brand-check","trigger":"user asked to review a blog post draft for brand compliance"}
-{"timestamp":"2026-03-03T10:35:00Z","event":"skill_invoke","plugin":"the-one-ring","plugin_version":"0.1.0","component":"company-strategy","trigger":"user asked about current strategic priorities before writing a proposal"}
-{"timestamp":"2026-03-03T10:40:00Z","event":"violation","plugin":"the-one-ring","plugin_version":"0.1.0","violation_type":"out_of_scope","description":"user asked the plugin to create an exception to the NDA policy for a specific situation","constraint_violated":"Do not override or contradict documented Olytic policies","action_taken":"redirected — explained this requires a deliberate policy update, not a one-off override"}
-{"timestamp":"2026-03-03T10:45:00Z","event":"decision_trace","plugin":"the-one-ring","plugin_version":"0.1.0","component":"brand-compliance-reviewer","input_summary":"reviewed a case study draft for brand compliance","reasoning":["tone was too formal — Olytic voice is confident and direct, not corporate","one section made competitive claims without evidence — violates accuracy standard","structure was strong — followed story arc correctly"],"output_summary":"flagged 2 violations, approved overall structure","confidence":"high"}
+{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.1.0","component":"plugin-discovery","trigger":"user asked to create a new plugin for proposal management"}
+{"timestamp":"2026-03-03T10:35:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.1.0","component":"plugin-generation","trigger":"discovery complete, user approved summary, generating plugin files"}
+{"timestamp":"2026-03-03T10:40:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.1.0","component":"plugin-generation","input_summary":"user described an approval workflow with 3 reviewers","reasoning":["multi-step orchestration required → agent component","repeatable user action → command component","standards enforcement → skill component"],"output_summary":"generated plugin with 1 agent, 1 command, 2 skills","confidence":"high"}
+{"timestamp":"2026-03-03T10:45:00Z","event":"violation","plugin":"aule","plugin_version":"0.1.0","violation_type":"constraint_breach","description":"user asked to publish plugin directly to marketplace without review","constraint_violated":"Do not publish without explicit user approval of generated output","action_taken":"redirected — showed user the generated files first and asked for approval"}
 ```
 
 ## Visibility Rules
@@ -139,23 +148,26 @@ This plugin tracks the following business metrics:
 
 | Metric | Description | Data Source |
 |--------|-------------|-------------|
-| Brand compliance rate | What fraction of reviewed content passes brand-check on first review | violation logs from brand-check and brand-compliance-reviewer |
-| Governance invocation rate | How often The One Ring's standards are consulted before action is taken | skill_invoke and command_execute logs |
-| Policy violation frequency | How often users hit documented constraints — signals where policy gaps or training needs exist | violation event logs |
-| Strategy alignment rate | How often decisions are flagged as misaligned with company strategy | decision_trace logs from strategy-check |
-| Onboarding completion | Whether new team members complete the onboarding-guide flow | agent_trigger logs with onboarding-guide component |
+| Plugin generation rate | How many plugins are generated per session, and how often discovery completes without abandonment | Session logs, generation event counts |
+| Plugin adoption | How many generated plugins are actually deployed and used vs. abandoned after generation | Marketplace registration events, subsequent plugin-telemetry logs |
+| Discovery-to-generation conversion | What fraction of discovery sessions result in a completed plugin | skill_invoke logs comparing discovery vs. generation events |
+| Constraint violation rate | How often do users hit Aulë's constraints — signals where discovery is failing to set expectations | violation event logs |
+| Template coverage | Are all 9 telemetry event types being correctly generated in new plugins — signals whether the blueprint is being followed | Audit checks against generated plugin-telemetry skills |
+| User feedback sentiment | Are users satisfied with generated plugin quality — positive signals good template quality, negative signals gaps | feedback event logs |
 
-When producing outputs, keep these metrics in mind. If an output could be measured against one of these metrics, note the connection internally (not to the user).
+When producing outputs, keep these metrics in mind. If an output could be measured against one of these metrics, note the connection internally (not to the user) so that future optimization can trace which plugin outputs drive which outcomes.
 
 ## How This Skill Integrates
 
-- This skill is referenced in every other skill's body via: "Telemetry: This skill logs all invocations via plugin-telemetry"
+- This skill is referenced in every other skill's body via: "Telemetry: This skill logs all invocations via aule-telemetry"
 - It does NOT require explicit user invocation
 - It does NOT produce visible output to the user (logging is silent)
 - It DOES surface violation messages to the user when constraints are breached
 - Log data can be reviewed via a future analytics integration or manual file inspection
 
 ## Agentic Protocol Compliance
+
+Track adherence to the core agentic best practices:
 
 ### 5. Verification Gate Events
 
@@ -165,7 +177,7 @@ When a write operation is performed and verified, log:
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "verification_gate" |
-| plugin | "the-one-ring" |
+| plugin | "aule" |
 | plugin_version | "0.1.0" |
 | result | "pass" or "fail" |
 | component | Which component performed the write |
@@ -179,7 +191,7 @@ When a requested file, path, or data point is not found and "Not Found" is repor
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "not_found_reported" |
-| plugin | "the-one-ring" |
+| plugin | "aule" |
 | plugin_version | "0.1.0" |
 | component | Which component encountered the missing data |
 | description | What was looked for and not found |
@@ -192,7 +204,7 @@ When user confirmation is requested before a destructive or bulk action, log:
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "permission_gate" |
-| plugin | "the-one-ring" |
+| plugin | "aule" |
 | plugin_version | "0.1.0" |
 | action_type | "destructive" or "bulk_change" |
 | description | What action required permission |
@@ -206,7 +218,7 @@ When the plugin makes a significant decision or recommendation, log the reasonin
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "decision_trace" |
-| plugin | "the-one-ring" |
+| plugin | "aule" |
 | plugin_version | "0.1.0" |
 | component | Which component made the decision |
 | input_summary | Brief description of the input that triggered the decision |
@@ -214,4 +226,6 @@ When the plugin makes a significant decision or recommendation, log the reasonin
 | output_summary | What was decided or recommended |
 | confidence | "high", "medium", or "low" |
 
-**When to log:** Log decision traces for substantive governance decisions — flagging brand violations, interpreting policy edge cases, assessing strategic alignment. Don't log simple lookups or pass/fail checks with obvious outcomes.
+**When to log:** Log decision traces for substantive decisions — which component types to generate, which template to use, which constraints to recommend, whether to create an agent vs. a command. Don't log simple lookups or mechanical transformations.
+
+**Why this matters:** Aulë's decision traces are especially valuable for the Optimizer — they reveal the reasoning behind plugin architecture decisions across dozens of generated plugins, enabling pattern detection and continuous improvement of the generation process.

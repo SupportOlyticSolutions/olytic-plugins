@@ -203,7 +203,7 @@ If this exits with an error, fix the file and re-run before continuing to the ne
 1. Use Glob to confirm all expected files were created
 2. Run the plugin.json validation script (from Phase 3 above) if not already done
 3. **Verify plugin.json contains ONLY valid keys:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. The key `displayName` is NOT valid and will cause an "Unrecognized key in plugin.json" upload failure. Remove any keys not in this list before proceeding.
-4. Verify plugin-telemetry/SKILL.md exists (mandatory)
+4. Verify [plugin-name]-telemetry/SKILL.md exists (mandatory)
 5. Verify every skill has SKILL.md with valid YAML frontmatter
 6. **Verify every agent file for correct frontmatter structure:** Extract the block between the first and second `---` delimiters. It must contain only valid YAML key-value pairs (`name`, `description`, `model`, `color`, `tools`). If `<example>` tags appear anywhere inside the frontmatter block, the file has the wrong structure — move them to after the closing `---` and fix before proceeding. This is a common plugin generation error and will cause upload failures if not caught here.
 7. **Verify every agent description for unquoted colons:** Read each agent's `description` value. If it contains `: ` (a colon followed by a space), it MUST use `description: >` block scalar format — not a single-line quoted or unquoted string. A colon in a single-line description will cause a "mapping values are not allowed here" YAML parse error on upload. Fix any violations before proceeding.
@@ -331,7 +331,7 @@ For every `.md` file in `commands/`, verify:
 - Has a permission gate step (if it writes or modifies external systems)
 
 **Check 5 — required components:**
-- `skills/plugin-telemetry/SKILL.md` exists (mandatory for all plugins)
+- `skills/[plugin-name]-telemetry/SKILL.md` exists (mandatory for all plugins)
 - `README.md` exists
 - `.claude-plugin/plugin.json` exists
 
@@ -380,7 +380,7 @@ Present a structured audit report before making any changes:
 | .claude-plugin/plugin.json | Contains key 'displayName' | High — upload failure | Remove key |
 | agents/analyst.md | <example> inside frontmatter | High — YAML parse error | Move to after --- |
 | skills/domain/SKILL.md | Missing Operating Principles section | Medium — best practice | Add section |
-| skills/plugin-telemetry/SKILL.md | Missing | High — required component | Create file |
+| skills/[plugin-name]-telemetry/SKILL.md | Missing | High — required component | Create file |
 
 ### Summary
 - X issues found across Y files
@@ -416,7 +416,7 @@ Apply fixes in this priority order:
 - **No hallucination:** If a variable, file path, or data point is not found, report "Not Found" immediately. Never guess or estimate.
 ```
 
-**If adding missing plugin-telemetry skill**, load `references/telemetry-template.md` from the `plugin-generation` skill and generate a customized version for this plugin.
+**If adding missing [plugin-name]-telemetry skill**, load `references/telemetry-template.md` from the `plugin-generation` skill and generate a customized version for this plugin.
 
 **If fixing agent frontmatter**, extract existing frontmatter content, rewrite ONLY the `---` block with valid YAML keys, move any `<example>` blocks to after the closing `---`, and preserve all body content unchanged.
 

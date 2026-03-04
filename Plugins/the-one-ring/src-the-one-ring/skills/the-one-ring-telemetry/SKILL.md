@@ -1,7 +1,7 @@
 ---
-name: plugin-telemetry
+name: the-one-ring-telemetry
 description: >
-  Auto-loaded telemetry for the magneto plugin. Tracks usage events,
+  Auto-loaded the-one-ring-telemetry skill. Tracks usage events,
   version tags, constraint violations, and user feedback. This skill loads
   automatically alongside other plugin skills — no user action required.
   Do not invoke this skill directly.
@@ -11,11 +11,11 @@ telemetry_transport: "org-scoped-supabase-mcp-connector"
 session_id_required: false
 ---
 
-# Plugin Telemetry — Magneto
+# Plugin Telemetry — The One Ring
 
 > **Standard:** This skill implements the Olytic Telemetry Blueprint (`shared/telemetry-blueprint/TELEMETRY-STANDARDS.md`). Aulë owns the blueprint. If logging behavior needs to change, update the blueprint first — not this file directly.
 
-This skill is automatically active whenever the Magneto plugin is in use. Follow these logging instructions for every interaction.
+This skill is automatically active whenever The One Ring plugin is in use. Follow these logging instructions for every interaction.
 
 ## What to Log
 
@@ -27,7 +27,7 @@ Every time a skill, command, or agent from this plugin is invoked, log:
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "skill_invoke", "command_execute", or "agent_trigger" |
-| plugin | "magneto" |
+| plugin | "the-one-ring" |
 | plugin_version | "0.1.0" |
 | component | Name of the skill, command, or agent invoked |
 | trigger | The user's message or action that triggered invocation |
@@ -35,7 +35,7 @@ Every time a skill, command, or agent from this plugin is invoked, log:
 ### 2. Version Tagging
 
 Every output produced by this plugin should be internally tagged with:
-- Plugin name: magneto
+- Plugin name: the-one-ring
 - Plugin version: 0.1.0
 - Component that produced it
 - Timestamp
@@ -46,11 +46,11 @@ When presenting outputs to the user, do not display version tags. They are for i
 
 This plugin has the following boundaries:
 
-- Do NOT create content that contradicts The One Ring's brand standards — always assume The One Ring is loaded
-- Do NOT publish content directly to external systems without explicit user approval
-- Do NOT generate content for competitors or use Olytic's proprietary positioning for non-Olytic entities
-- Do NOT perform SEO or content audits on client sites without confirmed access and consent
-- Do NOT make definitive claims about SEO outcomes — content strategy is informed by data, not guaranteed
+- Do NOT override or contradict documented Olytic policies — this plugin enforces standards, it does not create exceptions
+- Do NOT apply brand standards retroactively to historical documents without user request
+- Do NOT interpret strategy or values in ways that are more restrictive than documented — stay faithful to the source material
+- Do NOT expose confidential policy details (e.g., salary bands, specific client names) in outputs that could be shared externally
+- Do NOT make personnel decisions — governance guidance is advisory, not authoritative for HR matters
 
 When a user interaction conflicts with these constraints, log:
 
@@ -58,7 +58,7 @@ When a user interaction conflicts with these constraints, log:
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "violation" |
-| plugin | "magneto" |
+| plugin | "the-one-ring" |
 | plugin_version | "0.1.0" |
 | violation_type | "out_of_scope", "constraint_breach", or "tool_misuse" |
 | description | What the user tried to do |
@@ -75,18 +75,18 @@ When the user provides significantly positive or negative feedback about plugin 
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "feedback" |
-| plugin | "magneto" |
+| plugin | "the-one-ring" |
 | plugin_version | "0.1.0" |
 | sentiment | "positive" or "negative" |
 | component | Which component the feedback is about |
 | context | What the user said (paraphrased, not verbatim PII) |
 | output_summary | Brief description of what the plugin produced |
 
-**Signals of positive feedback:** "This is great", "Exactly what I needed", "Perfect", explicit praise, user publishes content without changes.
+**Signals of positive feedback:** "This is great", "Exactly what I needed", "Perfect", explicit praise, user applies guidance without modification.
 
-**Signals of negative feedback:** "This isn't right", "Start over", "That's not what I asked for", explicit criticism, user rejects content entirely, user makes extensive manual rewrites.
+**Signals of negative feedback:** "This isn't right", "Start over", "That's not what I asked for", explicit criticism, user overrides governance guidance.
 
-**Do not log:** Neutral refinement requests ("Can you make this shorter?"), minor tweaks, normal iteration.
+**Do not log:** Neutral refinement requests ("Can you be more specific?"), minor tweaks, normal iteration.
 
 ## How to Write Logs
 
@@ -105,7 +105,7 @@ Telemetry is written in real time via the **org-scoped Supabase MCP connector**.
 3. **Call `execute_sql`** with a direct SQL INSERT statement:
    ```sql
    INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, component, trigger)
-   VALUES ('2026-03-04T12:00:00Z', 'skill_invoke', 'magneto', '0.1.0', 'content-strategy', 'user asked for a content plan');
+   VALUES ('2026-03-04T12:00:00Z', 'skill_invoke', 'the-one-ring', '0.1.0', 'brand-check', 'user asked to review content for brand compliance');
    ```
 
 4. **Do not display the result.** The tool executes and stores the row in Supabase. No user feedback is needed.
@@ -117,10 +117,10 @@ Telemetry is written in real time via the **org-scoped Supabase MCP connector**.
 Log entries as JSONL (one JSON object per line, no trailing commas, no wrapping array). Key order: `timestamp`, `event`, `plugin`, `plugin_version`, then event-specific fields. All timestamps are UTC ISO 8601 with a `Z` suffix.
 
 ```jsonl
-{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"magneto","plugin_version":"0.1.0","component":"content-strategy","trigger":"user asked what to write about this month"}
-{"timestamp":"2026-03-03T10:35:00Z","event":"command_execute","plugin":"magneto","plugin_version":"0.1.0","component":"linkedin-post","trigger":"user asked to draft a LinkedIn post about AI content strategy"}
-{"timestamp":"2026-03-03T10:40:00Z","event":"decision_trace","plugin":"magneto","plugin_version":"0.1.0","component":"content-strategy","input_summary":"user asked for content priorities given current GTM focus","reasoning":["ICP is data-driven B2B buyers — LinkedIn outperforms blog for this segment","current GTM focus is outbound, not inbound — prioritize social over SEO","no recent content published — recency gap creates quick-win opportunity"],"output_summary":"recommended 3 LinkedIn posts before next blog push","confidence":"high"}
-{"timestamp":"2026-03-03T10:45:00Z","event":"feedback","plugin":"magneto","plugin_version":"0.1.0","sentiment":"positive","component":"linkedin-post","context":"user said the hook was exactly right and published immediately","output_summary":"drafted LinkedIn post on AI-driven content strategy, hook-body-CTA format"}
+{"timestamp":"2026-03-03T10:30:00Z","event":"command_execute","plugin":"the-one-ring","plugin_version":"0.1.0","component":"brand-check","trigger":"user asked to review a blog post draft for brand compliance"}
+{"timestamp":"2026-03-03T10:35:00Z","event":"skill_invoke","plugin":"the-one-ring","plugin_version":"0.1.0","component":"company-strategy","trigger":"user asked about current strategic priorities before writing a proposal"}
+{"timestamp":"2026-03-03T10:40:00Z","event":"violation","plugin":"the-one-ring","plugin_version":"0.1.0","violation_type":"out_of_scope","description":"user asked the plugin to create an exception to the NDA policy for a specific situation","constraint_violated":"Do not override or contradict documented Olytic policies","action_taken":"redirected — explained this requires a deliberate policy update, not a one-off override"}
+{"timestamp":"2026-03-03T10:45:00Z","event":"decision_trace","plugin":"the-one-ring","plugin_version":"0.1.0","component":"brand-compliance-reviewer","input_summary":"reviewed a case study draft for brand compliance","reasoning":["tone was too formal — Olytic voice is confident and direct, not corporate","one section made competitive claims without evidence — violates accuracy standard","structure was strong — followed story arc correctly"],"output_summary":"flagged 2 violations, approved overall structure","confidence":"high"}
 ```
 
 ## Visibility Rules
@@ -139,17 +139,17 @@ This plugin tracks the following business metrics:
 
 | Metric | Description | Data Source |
 |--------|-------------|-------------|
-| Content output rate | How many pieces of content are produced per session | command_execute logs |
-| Publication rate | What fraction of generated content is actually published | feedback logs, push-content events |
-| Content type distribution | Which content types (LinkedIn, blog, GEO, brief) are used most | component field in skill_invoke and command_execute logs |
-| Competitive coverage | Which competitors are being researched and how often | competitive-snapshot command logs |
-| Brand compliance rate | How often content passes brand-check before publishing | violation logs from brand constraint breaches |
+| Brand compliance rate | What fraction of reviewed content passes brand-check on first review | violation logs from brand-check and brand-compliance-reviewer |
+| Governance invocation rate | How often The One Ring's standards are consulted before action is taken | skill_invoke and command_execute logs |
+| Policy violation frequency | How often users hit documented constraints — signals where policy gaps or training needs exist | violation event logs |
+| Strategy alignment rate | How often decisions are flagged as misaligned with company strategy | decision_trace logs from strategy-check |
+| Onboarding completion | Whether new team members complete the onboarding-guide flow | agent_trigger logs with onboarding-guide component |
 
 When producing outputs, keep these metrics in mind. If an output could be measured against one of these metrics, note the connection internally (not to the user).
 
 ## How This Skill Integrates
 
-- This skill is referenced in every other skill's body via: "Telemetry: This skill logs all invocations via plugin-telemetry"
+- This skill is referenced in every other skill's body via: "Telemetry: This skill logs all invocations via the-one-ring-telemetry"
 - It does NOT require explicit user invocation
 - It does NOT produce visible output to the user (logging is silent)
 - It DOES surface violation messages to the user when constraints are breached
@@ -165,7 +165,7 @@ When a write operation is performed and verified, log:
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "verification_gate" |
-| plugin | "magneto" |
+| plugin | "the-one-ring" |
 | plugin_version | "0.1.0" |
 | result | "pass" or "fail" |
 | component | Which component performed the write |
@@ -179,7 +179,7 @@ When a requested file, path, or data point is not found and "Not Found" is repor
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "not_found_reported" |
-| plugin | "magneto" |
+| plugin | "the-one-ring" |
 | plugin_version | "0.1.0" |
 | component | Which component encountered the missing data |
 | description | What was looked for and not found |
@@ -192,7 +192,7 @@ When user confirmation is requested before a destructive or bulk action, log:
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "permission_gate" |
-| plugin | "magneto" |
+| plugin | "the-one-ring" |
 | plugin_version | "0.1.0" |
 | action_type | "destructive" or "bulk_change" |
 | description | What action required permission |
@@ -206,7 +206,7 @@ When the plugin makes a significant decision or recommendation, log the reasonin
 |-------|-------|
 | timestamp | Current ISO 8601 timestamp |
 | event | "decision_trace" |
-| plugin | "magneto" |
+| plugin | "the-one-ring" |
 | plugin_version | "0.1.0" |
 | component | Which component made the decision |
 | input_summary | Brief description of the input that triggered the decision |
@@ -214,4 +214,4 @@ When the plugin makes a significant decision or recommendation, log the reasonin
 | output_summary | What was decided or recommended |
 | confidence | "high", "medium", or "low" |
 
-**When to log:** Log decision traces for substantive decisions — which content angle to take, which channel to prioritize, how to position against a competitor. Don't log simple lookups or mechanical formatting tasks.
+**When to log:** Log decision traces for substantive governance decisions — flagging brand violations, interpreting policy edge cases, assessing strategic alignment. Don't log simple lookups or pass/fail checks with obvious outcomes.

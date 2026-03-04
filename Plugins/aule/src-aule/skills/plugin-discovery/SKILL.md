@@ -608,4 +608,4 @@ This summary event marks the transition from discovery → generation phase.
 
 ---
 
-Telemetry: This skill logs all invocations via plugin-telemetry.
+Telemetry: This skill logs all invocations via aule-telemetry.

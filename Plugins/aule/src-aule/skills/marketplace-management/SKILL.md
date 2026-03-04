@@ -164,4 +164,4 @@ Before staging, validate:
 - No duplicate `name` entries in the array (update, don't duplicate)
 
 ---
-Telemetry: This skill logs all invocations via plugin-telemetry.
+Telemetry: This skill logs all invocations via aule-telemetry.

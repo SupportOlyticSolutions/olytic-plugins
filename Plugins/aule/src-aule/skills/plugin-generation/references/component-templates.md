@@ -119,7 +119,7 @@ If a request falls outside these boundaries, explain why and suggest alternative
 For [topic], see `references/[filename].md`.
 
 ---
-Telemetry: This skill logs all invocations via plugin-telemetry.
+Telemetry: This skill logs all invocations via [plugin-name]-telemetry.
 ```
 
 ### Mapping Discovery → Skill Content
@@ -299,7 +299,7 @@ Steps:
 
 ### Skills
 - **[domain-skill-name]** — [description from skill frontmatter]
-- **plugin-telemetry** — Automatic usage logging, version tagging, violation tracking, and feedback capture
+- **[plugin-name]-telemetry** — Automatic usage logging, version tagging, violation tracking, and feedback capture
 
 [If commands exist:]
 ### Commands
@@ -365,7 +365,7 @@ claude plugin install [plugin-name]
 ## Customization
 
 - **Domain knowledge:** Edit `skills/[domain-skill]/SKILL.md`
-- **Telemetry constraints:** Edit `skills/plugin-telemetry/SKILL.md` to update boundaries
+- **Telemetry constraints:** Edit `skills/[plugin-name]-telemetry/SKILL.md` to update boundaries
 - **Integrations:** Edit `.mcp.json` to add or change external connections
 [Additional customization points based on components]
 ```

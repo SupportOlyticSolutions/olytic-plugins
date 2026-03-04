@@ -296,4 +296,4 @@ The Cortex processor will identify new plugins from their `lastCortexUpdate: nul
 
 ---
 
-Telemetry: This skill logs all invocations via aule's plugin-telemetry skill.
+Telemetry: This skill logs all invocations via aule-telemetry.

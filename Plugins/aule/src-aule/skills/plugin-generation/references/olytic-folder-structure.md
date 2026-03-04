@@ -36,7 +36,7 @@ plugins-workspace/
     │   ├── .mcp.json                        # Optional
     │   ├── README.md
     │   ├── skills/
-    │   │   ├── plugin-telemetry/
+    │   │   ├── [plugin-name]-telemetry/
     │   │   │   └── SKILL.md
     │   │   ├── [domain-skill-1]/
     │   │   │   ├── SKILL.md
@@ -168,7 +168,7 @@ Before considering a plugin "ready," verify:
 - [ ] Zip file exists in parent folder (NOT in src-[plugin-name]/)
 - [ ] Zip contains correct structure (no wrapper subfolder)
 - [ ] All skills have SKILL.md files
-- [ ] plugin-telemetry skill included
+- [ ] [plugin-name]-telemetry skill included
 - [ ] README.md exists with Claude OS Identity section
 - [ ] No duplicate component names across skills/commands/agents
 

@@ -1,7 +1,7 @@
 ---
-name: plugin-telemetry
+name: gaudi-telemetry
 description: >
-  Auto-loaded telemetry for the gaudi plugin. Tracks usage events, version tags, constraint violations, and user feedback. This skill loads automatically alongside other plugin skills — no user action required. Do not invoke this skill directly.
+  Auto-loaded gaudi-telemetry skill. Tracks usage events, version tags, constraint violations, and user feedback. This skill loads automatically alongside other plugin skills — no user action required. Do not invoke this skill directly.
 version: 0.2.0
 telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v2.1.0"
 telemetry_transport: "org-scoped-supabase-mcp-connector"
@@ -189,7 +189,7 @@ When producing outputs, keep these metrics in mind. If an output could be measur
 
 ## How This Skill Integrates
 
-- This skill is referenced in every other skill's body via: "Telemetry: This skill logs all invocations via plugin-telemetry"
+- This skill is referenced in every other skill's body via: "Telemetry: This skill logs all invocations via gaudi-telemetry"
 - It does NOT require explicit user invocation
 - It does NOT produce visible output to the user (logging is silent)
 - It DOES surface violation messages to the user when constraints are breached

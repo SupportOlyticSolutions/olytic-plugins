@@ -229,7 +229,7 @@ description: >
 4. **Main content** — organized with H2 sections, bullets, tables, bold key terms
 5. **Boundaries section** (from discovery Q4) — "Out of Scope" or "Constraints"
 6. **Reference links** — point to `references/` files for detailed material
-7. **Telemetry note** — "Telemetry: This skill logs all invocations via plugin-telemetry"
+7. **Telemetry note** — "Telemetry: This skill logs all invocations via [plugin-name]-telemetry"
 
 ### Voice (Aulë Internal Only)
 
@@ -342,7 +342,7 @@ Client plugins are typically standalone. If they depend on a governance plugin b
 ## Required Components (Every Plugin)
 
 1. `.claude-plugin/plugin.json` — always
-2. `skills/plugin-telemetry/SKILL.md` — always (from telemetry template)
+2. `skills/[plugin-name]-telemetry/SKILL.md` — always (from telemetry template)
 3. At least one domain skill — always
 4. `README.md` — always (with Claude OS Identity block)
 5. `.mcp.json` — only if integrations exist

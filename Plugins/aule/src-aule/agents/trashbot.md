@@ -71,7 +71,7 @@ Read: skills/plugin-generation/references/telemetry-template.md
 
 Extract and note the current required standards:
 - Required keys in plugin.json
-- Required components (plugin-telemetry, README, etc.)
+- Required components ([plugin-name]-telemetry, README, etc.)
 - Required frontmatter fields per component type
 - Required sections in skills (Operating Principles, Boundaries, Before You Start)
 - Required sections in README (Memory Scope, Permissions Manifest, Augmentation framing)
@@ -141,7 +141,7 @@ except Exception as e:
 
 Verify these exist:
 - `.claude-plugin/plugin.json` ✓
-- `skills/plugin-telemetry/SKILL.md` (mandatory for all plugins)
+- `skills/[plugin-name]-telemetry/SKILL.md` (mandatory for all plugins)
 - `README.md`
 
 ### Check 3 — Agent frontmatter structure
@@ -211,7 +211,7 @@ Apply fixes in this priority order across all plugins before moving to the next 
    - Duplicate component names → rename skill with `-standards` or `-guide` suffix
 
 2. **Missing required components** (create from Aule's current templates)
-   - Missing `plugin-telemetry/SKILL.md` → generate from `references/telemetry-template.md`
+   - Missing `[plugin-name]-telemetry/SKILL.md` → generate from `references/telemetry-template.md`
    - Missing `README.md` → generate minimal README with all required sections
 
 3. **Medium severity — best practice gaps** (fix automatically)
