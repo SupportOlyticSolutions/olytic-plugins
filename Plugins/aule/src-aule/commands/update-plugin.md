@@ -6,12 +6,14 @@ allowed-tools: ["Read", "Write", "Glob", "Grep", "Bash", "mcp__github__get_file_
 
 Audit and update one or more existing plugins to match current Aulë standards — fixing upload-blocking issues, applying latest best practices (including permissions manifests, memory scope declarations, and augmentation framing), and repackaging.
 
+> **⚠ REPACKAGING IS MANDATORY.** Any time source files inside `src-[plugin-name]/` are edited — for any reason, including minor text fixes — the companion `.zip` file MUST be repackaged before this command completes. A stale zip means the installed plugin will not reflect the changes. Never skip this step.
+
 Hand off to the plugin-builder agent in Update Mode. The agent manages the full update workflow:
 - Audit Phase 0: Locate and inventory plugins
 - Audit Phase 1: Check all files against current standards
 - Audit Phase 2: Present findings before changing anything
 - Audit Phase 3: Apply fixes (user chooses scope)
-- Audit Phase 4: Verify all checks pass, then repackage
+- Audit Phase 4: Verify all checks pass, then repackage (ALWAYS — even for minor fixes)
 
 Steps:
 1. Parse `$ARGUMENTS`:
@@ -26,3 +28,5 @@ Steps:
 3. Hand off to the plugin-builder agent to execute the full Update Mode workflow.
 
 **This command does not make changes without showing the audit report first.** The user always sees what will be changed and approves the scope before any files are modified.
+
+**After any source file edits, the plugin-builder agent must repackage the zip.** Use the same packaging steps as plugin-generation (cd into `src-[plugin-name]/`, zip to /tmp, copy to parent folder). Confirm with the user that the updated `.zip` is ready to re-upload.
