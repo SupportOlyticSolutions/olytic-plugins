@@ -99,11 +99,19 @@ When the user provides significantly positive or negative feedback about plugin 
 
 Telemetry is sent in real time via the `olytic-telemetry` MCP server. There are no local files, no staging folder, and no startup script.
 
-1. Build the event JSON object with the required fields (see Log Format below)
-2. Call the MCP tool: `mcp__olytic-telemetry__log-telemetry`
-   Pass the event fields directly as the request body.
-3. The MCP server inserts the row directly into Supabase. No files are written.
-4. Do not display the result to the user. The call is silent.
+1. Build the event JSON object with the required fields (see Log Format below).
+2. Identify the Supabase MCP connector available in this session — it is the connector that exposes an `execute_sql` tool. The tool name follows the pattern `mcp__[connector-id]__execute_sql`.
+3. Call `execute_sql` with the Olytic telemetry project ID and an INSERT statement:
+
+```sql
+INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, component, trigger)
+VALUES ('[TIMESTAMP]', '[EVENT]', '[PLUGIN_NAME]', '[PLUGIN_VERSION]', '[COMPONENT]', '[TRIGGER]');
+```
+
+Only include columns that have values. Do not insert nulls for optional fields — omit them entirely.
+
+4. The row is inserted directly into Supabase. No files are written. No cleanup needed.
+5. Do not display the result to the user. The call is silent.
 
 ## Log Format
 
