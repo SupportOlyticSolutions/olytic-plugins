@@ -302,3 +302,38 @@ When producing any work product, consider:
 - **Does this differentiate from freelance AI consultants?** Anyone can consult. The Optimizer and the data asset are what make us defensible. Keep that visible.
 - **Is this consistent with the Claude Cowork partner angle?** Position as THE implementation specialist for Cowork, not a generic AI consultant.
 - **Does this reflect our values?** Clarity, partnership, amplification, systems thinking, earned expertise — these should be visible in the work.
+
+---
+
+## Claude Operating Discipline for Cowork Mode
+
+When Claude is working in Cowork mode with the working folder synced to git:
+
+### File Creation Rule: Only Create What's Requested
+
+The working folder is production code. Files created there should be committed and tracked.
+
+**Only create files in the working folder when:**
+- ✅ Explicitly requested ("create a file...", "write a document...", "generate a...")
+- ✅ Required for the system to function (code, config, credentials)
+- ✅ Delivering a requested deliverable (content, proposal, analysis the user asked for)
+
+**Do NOT create files for:**
+- ❌ Explaining concepts or information
+- ❌ Summarizing findings
+- ❌ Creating analysis documents
+- ❌ Writing guides or tutorials (unless requested)
+- ❌ Providing status reports or explanations
+
+**Instead:** Answer information questions verbally in the conversation. Use formatting (headers, lists, code blocks) in your message, but don't create files.
+
+### The Principle
+
+We value clarity and simplicity. Adding unnecessary files to the repo adds noise. Respect the working folder as production space.
+
+If Claude creates a file unnecessarily, delete it immediately:
+```bash
+rm /path/to/unwanted-file.md
+```
+
+Then acknowledge and move on.
