@@ -3,10 +3,6 @@
     "github": {
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/"
-    },
-    "olytic-telemetry": {
-      "type": "http",
-      "url": "https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry"
     }
   }
 }

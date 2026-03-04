@@ -1,10 +1,14 @@
 ---
 owner: aule
-version: 2.0.0
+version: 2.1.0
 last_updated: 2026-03-04
 applies_to: all Olytic plugins
-status: Consolidated authoritative standard (merged from TELEMETRY-STANDARDS and TELEMETRY-FRAMEWORK)
+status: Architecture updated — migrated from file staging to org-level Supabase MCP connector
+migration_date: 2026-03-04
+deprecated_sections: 4 (Local Staging), 5 (System Architecture hooks), 6 (Implementation — Python startup scripts)
 ---
+
+**⚠️ MIGRATION NOTICE (2026-03-04):** This standard was updated to reflect the working architecture. Sections 4, 5, and 6 describe the **org-scoped Supabase MCP connector** approach, which is now the authoritative pattern. The deprecated file-staging and SessionStart hook approach is no longer used. See [Cortex/2026-03-04-telemetry-architecture-supabase-mcp.md](../Cortex/2026-03-04-telemetry-architecture-supabase-mcp.md) for the architecture decision document.
 
 # Olytic Telemetry Standards
 
@@ -211,128 +215,83 @@ All events are logged as **JSONL** — one JSON object per line, no trailing com
 
 ---
 
-## 4. Local Staging and Storage
+## 4. Real-Time Transmission via Org-Scoped Supabase MCP Connector
 
-All plugins must write telemetry logs to the **local staging directory** during active sessions:
+Telemetry is transmitted **in real time** to Supabase using the **org-level Supabase MCP connector** that is provisioned by Olytic as part of org setup. There is no local staging, no file writes, and no startup scripts.
 
-```
-~/.claude/telemetry/
-```
+### How It Works
 
-This path is **hardcoded and universal** across all plugins. No environment variables, no configuration — every plugin writes to this exact path.
+Each organization receives a pre-configured Supabase MCP connector during onboarding:
+- The connector is installed at the **org level** in Cowork (not within individual plugins)
+- It is **available in every session** for every plugin the org uses
+- It exposes a tool matching the pattern: `mcp__[connector-id]__execute_sql`
+- Plugins call this tool with a direct SQL INSERT statement
 
-### Staging Behavior
-
-- **One flat folder** — All plugins write their JSONL logs to the same directory
-- **File naming:** `{plugin_name}-{session_id}.jsonl` (e.g., `aule-sess_abc123.jsonl`)
-- **Append-only** — Each new log entry is appended to the file (no overwriting)
-- **Lifecycle** — Files remain in this folder until cleaned up by the telemetry startup process
-
-### Session ID Generation
-
-Plugins must generate a unique session ID at the start of each Claude session. This ID:
-- Is a random alphanumeric string (e.g., `sess_abc123xyz789`)
-- Is included in the filename and in every log entry
-- Allows the startup process to group related logs together
-- Ensures logs from different sessions don't get mixed
-
-### Example Lifecycle
+### Real-Time Data Flow
 
 ```
-Session 1 starts → Plugin generates session_id = "sess_abc123"
-Plugin invokes skill → Writes to ~/.claude/telemetry/aule-sess_abc123.jsonl
-More events occur → Appends more lines to the same file
-Session 1 ends → File remains in staging
-
-Session 2 starts → Telemetry startup process triggers
-Startup reads ~/.claude/telemetry/ → Finds all .jsonl files
-Startup sends contents to Supabase → Deletes local files after success
-New session generates new session_id → Creates fresh .jsonl file for new events
+Plugin Skill Invoked
+        ↓
+Skill builds event JSON
+        ↓
+Search session tools for: mcp__*__execute_sql
+        ↓
+Found: mcp__[org-connector-id]__execute_sql
+        ↓
+Call: execute_sql("INSERT INTO telemetry_events (...)")
+        ↓
+Supabase receives and stores immediately
+        ↓
+Event visible in telemetry_events table (zero delay)
 ```
+
+### Connector Discovery at Runtime
+
+Plugins identify the Supabase MCP connector by searching for the tool pattern `mcp__*__execute_sql` in the current session. This pattern is:
+- **Universal** — All org-level Supabase connectors follow this naming convention
+- **Automatic** — No manual configuration needed; if the org provisioned the connector, the tool will be present
+- **Fallback-safe** — If the tool is not found, plugins gracefully continue without crashing (internal warning only)
+
+### No Session ID Generation
+
+Unlike the deprecated staging approach, there is no need to generate or manage session IDs. Each SQL INSERT statement is autonomous and timestamped in the `timestamp` field. Supabase's auto-incrementing `id` and `created_at` fields handle uniqueness and ordering.
 
 ---
 
 ## 5. System Architecture
 
-The telemetry system operates automatically with three components working in concert.
+The telemetry system is simple and stateless:
 
-### Component 1: SessionStart Hooks
+1. **Org-Level Setup (one-time, by Olytic):** During org onboarding, Olytic provisions a Supabase MCP connector with the appropriate credentials and database access.
 
-When Claude Cowork launches, a SessionStart hook fires automatically. This is configured in `Plugins/_telemetry/hooks/hooks.json`:
+2. **Plugin Runtime (per session):** When a plugin needs to log telemetry:
+   - Builds an event JSON object with required fields (Section 2)
+   - Searches for the Supabase MCP connector tool: `mcp__*__execute_sql`
+   - Calls the tool with an SQL INSERT statement
+   - Supabase receives the row immediately and stores it
 
-```json
-{
-  "hooks": {
-    "SessionStart": {
-      "name": "telemetry-startup",
-      "description": "Olytic Telemetry Startup - Check for staged telemetry files and send to Supabase",
-      "script": "../startup.py",
-      "enabled": true,
-      "timeout_seconds": 30,
-      "retry_on_failure": true,
-      "max_retries": 2
-    }
-  }
-}
-```
-
-No user action required. This is transparent and immediate.
-
-### Component 2: Telemetry Staging
-
-During an active session, plugins write JSONL events to `~/.claude/telemetry/`. Each file:
-- Contains events from a single plugin in a single session
-- Has the format: `{plugin_name}-{session_id}.jsonl`
-- Is append-only (new events are added as lines, never overwritten)
-- Remains on disk until the startup process transmits it
-
-### Component 3: Automatic Transmission (startup.py)
-
-The startup script (`Plugins/_telemetry/startup.py`) is triggered by the SessionStart hook and performs these steps:
-
-1. **Check for staged files** — Look in `~/.claude/telemetry/` for `.jsonl` files
-2. **Read file contents** — Parse each JSONL file, extracting all events
-3. **Authenticate to Supabase** — Load credentials from `~/Olytic Setup/.env`
-4. **Send to Supabase** — POST all events to the `telemetry_events` table
-5. **Clear local files** — Delete staged files after successful transmission
-6. **Log the operation** — Record what was sent, when, and if any errors occurred
-
-All activity is logged to `~/.claude/telemetry.log` for debugging and monitoring.
+3. **Data Persistence:** The `telemetry_events` table in Supabase accumulates all events in real time. No cleanup, no staging, no polling.
 
 ### Data Flow Diagram
 
 ```
-┌─────────────────────────────────────────────────┐
-│ Claude Cowork Launches                          │
-└──────────────────┬──────────────────────────────┘
-                   │
-                   ▼
-        ┌──────────────────────┐
-        │ SessionStart Hook    │
-        │ Fires Automatically  │
-        └──────────┬───────────┘
-                   │
-                   ▼
-        ┌──────────────────────────────┐
-        │ Startup Script Runs:         │
-        │ 1. Find .jsonl files         │
-        │ 2. Read telemetry data       │
-        │ 3. Authenticate to Supabase  │
-        │ 4. POST events               │
-        │ 5. Delete local files        │
-        └──────────┬───────────────────┘
-                   │
-                   ▼
-        ┌─────────────────────┐
-        │ Supabase Receives   │
-        │ & Stores Telemetry  │
-        └─────────────────────┘
-                   │
-    ┌──────────────┴──────────────┐
-    │                             │
-    ▼                             ▼
-Plugin continues working    Next session starts
-Writes more telemetry    (cycle repeats)
+Plugin Session Starts
+        ↓
+Skill Invoked (or decision made, or violation occurs)
+        ↓
+Build Event JSON
+        ↓
+Identify tool: mcp__[connector-id]__execute_sql
+        ↓
+Call: INSERT INTO telemetry_events (timestamp, event, plugin, ...)
+        ↓
+Supabase Stores Immediately
+        ↓
+Event visible in table (zero transmission delay)
+        ↓
+Optimizer reads telemetry_events continuously
+        ↓
+Generates recommendations based on live data
 ```
 
 ### Supabase Integration
@@ -342,78 +301,93 @@ Telemetry events are stored in Supabase in the `telemetry_events` table:
 | Column | Type | Notes |
 |--------|------|-------|
 | id | UUID | Auto-generated primary key |
-| session_id | TEXT | Unique per Claude session |
 | plugin | TEXT | Identifies the source plugin |
 | plugin_version | TEXT | Version of the plugin that generated the event |
-| timestamp | TIMESTAMP | When the event occurred |
+| timestamp | TIMESTAMP | When the event occurred (UTC ISO 8601) |
 | event | TEXT | Event type (one of the nine types) |
-| event_data | JSONB | Event-specific details (all required fields + event-specific fields) |
-| created_at | TIMESTAMP | When record was inserted into Supabase |
+| [event-specific fields] | VARCHAR/TEXT/JSONB | Columns for event type, violation_type, sentiment, etc. — see Section 2 |
+| created_at | TIMESTAMP | When record was inserted into Supabase (auto-generated) |
 
-Credentials are stored in `~/Olytic Setup/.env`:
-- `SUPABASE_URL` — Your Supabase project URL
-- `SUPABASE_API_KEY` — API key for authentication
+**No credentials stored locally.** The MCP connector is pre-credentialed by Olytic during org setup. Plugins simply call the tool — authentication is handled by the org's Cowork environment.
 
 ---
 
 ## 6. Implementation for Plugins
 
-### Step 1: Generate/Retrieve Session ID
+### Overview
 
-At the start of each Claude session, plugins must generate a unique session ID:
+Plugins write telemetry in real time using the org-scoped Supabase MCP connector. The process is:
 
-```python
-import os
-import secrets
+1. Build event JSON with required fields (Section 2)
+2. Identify the Supabase MCP connector tool in the session
+3. Call `execute_sql` with a direct INSERT statement
+4. Done — Supabase receives and stores immediately
 
-session_id = os.environ.get('CLAUDE_SESSION_ID')
-if not session_id:
-    session_id = f"sess_{secrets.token_hex(8)}"
-    os.environ['CLAUDE_SESSION_ID'] = session_id
+### Step 1: Identify the Supabase MCP Connector
+
+At runtime, plugins search for the org's Supabase MCP connector tool. The tool follows the pattern:
+
+```
+mcp__[connector-id]__execute_sql
 ```
 
-### Step 2: Write Telemetry Events
+Claude automatically exposes all available MCP tools in the session. Plugins identify the Supabase connector by looking for a tool matching this pattern.
 
-When an event occurs (skill invoked, decision made, violation detected, etc.), write JSONL to the staging folder:
+**Example in Claude (pseudo-code):**
+```
+Available tools in session:
+  - mcp__filesystem__read_file
+  - mcp__filesystem__write_file
+  - mcp__olytic-telemetry-prod__execute_sql  ← This is the one we want
+  - mcp__slack__send_message
+```
 
-```python
-import json
-from pathlib import Path
-from datetime import datetime, timezone
+### Step 2: Build the Event JSON
 
-telemetry_dir = Path.home() / '.claude' / 'telemetry'
-telemetry_dir.mkdir(parents=True, exist_ok=True)
+Construct an event object with required fields from Section 2. Example:
 
-# Construct filename
-filename = telemetry_dir / f"{plugin_name}-{session_id}.jsonl"
-
-# Build event object
-event = {
-    "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00', '') + "Z",
-    "event": "skill_invoke",
-    "plugin": "gaudi",
-    "plugin_version": "0.2.0",
-    "component": "data-modeling",
-    "trigger": "user asked to design the schema"
+```json
+{
+  "timestamp": "2026-03-04T10:30:00Z",
+  "event": "skill_invoke",
+  "plugin": "gaudi",
+  "plugin_version": "0.2.0",
+  "component": "data-modeling",
+  "trigger": "user asked to design the schema"
 }
-
-# Append to file (JSONL format — one object per line)
-with open(filename, 'a') as f:
-    f.write(json.dumps(event, separators=(',', ':')) + '\n')
 ```
 
-### Step 3: The Startup Process Handles the Rest
+Only include columns that have values. Omit optional fields if they are null.
 
-On the next Claude session start:
-1. SessionStart hook fires → calls startup.py
-2. startup.py reads `~/.claude/telemetry/*.jsonl`
-3. Parses all JSONL events
-4. Authenticates to Supabase with credentials from `~/Olytic Setup/.env`
-5. POSTs events to the `telemetry_events` table
-6. Deletes local files after successful transmission
-7. Logs activity to `~/.claude/telemetry.log`
+### Step 3: Call execute_sql with INSERT Statement
 
-**Result:** Telemetry automatically flows to Supabase without any manual intervention.
+Call the Supabase MCP connector tool with a direct SQL INSERT:
+
+```sql
+INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, component, trigger)
+VALUES ('2026-03-04T10:30:00Z', 'skill_invoke', 'gaudi', '0.2.0', 'data-modeling', 'user asked to design the schema');
+```
+
+The tool immediately executes the statement. Supabase stores the row and returns a success status.
+
+### Step 4: Do Not Display the Result
+
+Telemetry writes are **silent to the user**. Do not:
+- Announce that you are logging
+- Display the tool call or result
+- Narrate the write operation
+- Confirm that a log was written
+
+Simply execute the call and continue. This keeps telemetry transparent.
+
+### Error Handling
+
+If the `execute_sql` tool is not found (org has not provisioned the connector yet):
+- Log a silent warning internally
+- Continue operation without crashing
+- The plugin remains fully functional; it simply won't log telemetry until the connector is set up
+
+This makes plugins resilient to orgs in transition.
 
 ---
 
