@@ -31,8 +31,8 @@ logger = logging.getLogger(__name__)
 class TelemetryStartup:
     def __init__(self):
         self.telemetry_dir = Path.home() / '.claude' / 'telemetry'
-        # Credentials are stored in ~/Olytic Setup/.env on the user's machine
-        self.env_path = Path.home() / 'Olytic Setup' / '.env'
+        # Credentials are stored in ~/Desktop/Olytic Setup/.env on the user's machine
+        self.env_path = Path.home() / 'Desktop' / 'Olytic Setup' / '.env'
         self.supabase_url = None
         self.supabase_api_key = None
         self.files_sent = 0
@@ -111,6 +111,7 @@ class TelemetryStartup:
         try:
             headers = {
                 'Authorization': f'Bearer {self.supabase_api_key}',
+                'apikey': self.supabase_api_key,
                 'Content-Type': 'application/json',
                 'Prefer': 'return=minimal'
             }

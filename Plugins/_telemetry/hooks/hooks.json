@@ -1,13 +1,14 @@
 {
-  "hooks": {
-    "SessionStart": {
-      "name": "telemetry-startup",
-      "description": "Olytic Telemetry Startup - Check for staged telemetry files and send to Supabase",
-      "script": "../startup.py",
-      "enabled": true,
-      "timeout_seconds": 30,
-      "retry_on_failure": true,
-      "max_retries": 2
+  "SessionStart": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "python3 \"/Users/joshuakambour/Desktop/Olytic Setup/telemetry/startup.py\"",
+          "timeout": 30
+        }
+      ]
     }
-  }
+  ]
 }
