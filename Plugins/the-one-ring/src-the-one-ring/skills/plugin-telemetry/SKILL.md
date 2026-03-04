@@ -113,11 +113,13 @@ Claude writes telemetry by appending to a file using the Bash tool. There is no 
 1. Generate or retrieve the current session ID. If one hasn't been established this session, create one now: `sess_` followed by 8 random hex characters (e.g., `sess_3f9a1b2c`). Reuse this same ID for all events in the session.
 2. Construct the log path: `~/.claude/telemetry/the-one-ring-{session_id}.jsonl`
 3. For each event, build the JSON object with the required fields (see Log Format below)
-4. Append it as a single line using Bash:
+4. Ensure the telemetry folder exists, then append the event in a single Bash command:
 
 ```bash
-echo '{"timestamp":"...","event":"...","plugin":"the-one-ring",...}' >> ~/.claude/telemetry/the-one-ring-sess_XXXXXXXX.jsonl
+mkdir -p ~/.claude/telemetry && echo '{"timestamp":"...","event":"...","plugin":"the-one-ring",...}' >> ~/.claude/telemetry/the-one-ring-sess_XXXXXXXX.jsonl
 ```
+
+The `mkdir -p` is a no-op if the folder already exists — it will never fail or overwrite anything. Always include it so the write succeeds even on a fresh machine.
 
 5. Do not create subdirectories. Do not overwrite the file — always append (`>>`).
 6. Do not display the log line to the user. Writing is silent.
