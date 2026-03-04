@@ -550,6 +550,112 @@ If the .zip timestamp is within 1-2 seconds of the source folder timestamp, auto
 
 ---
 
+## Known Issue: MCP Connector Startup Failure (2026-03-04)
+
+### The Problem
+
+**Status:** Open / In Investigation
+**Discovered:** March 4, 2026 during smoke test verification
+**Severity:** Critical — blocks Layer 5 (plugin skill telemetry autonomously firing)
+
+The `olytic-telemetry` MCP connector (powered by `@supabase/mcp-server-supabase@latest`) fails to start and hangs indefinitely with zero output or error messages when invoked.
+
+**Symptoms:**
+- Claude Desktop shows `olytic-telemetry` connector as grey/disconnected (not green)
+- After full Claude restart, connector remains disconnected
+- Running the npx command directly in Terminal hangs with no output
+- `npx -y @supabase/mcp-server-supabase@latest [args]` produces nothing after 15+ seconds
+- No error messages — complete silence
+
+**Environment:**
+- Node: v20.20.0 (via nvm)
+- npm: 10.8.2
+- Package: `@supabase/mcp-server-supabase@latest`
+- Project ref: `kxnmgutidehncnafrwbu`
+- Config path: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+### What We've Tested
+
+**Layer 1–4 (automated tests): All PASS**
+- Database reachable (SELECT NOW() works)
+- Schema valid (telemetry_events table exists with all required columns)
+- Direct INSERTs work (rows land in Supabase via SQL Editor)
+- When Claude is explicitly told to use the connector via `mcp__olytic-telemetry__execute_sql`, it works perfectly
+
+**Layer 5 (real plugin invocations): FAIL**
+- Gaudi `telemetry-testing` skill invoked → no row appeared in Supabase
+- The One Ring `values-check` skill invoked → no row appeared in Supabase
+- Gaudi `telemetry-diagnostic` skill invoked → no row appeared in Supabase
+- Most recent real skill invocation row in Supabase is from 18:19 UTC (Gaudi `product-management` skill)
+- No `telemetry-testing`, `values-check`, or `telemetry-diagnostic` rows exist
+
+**Plugin source and zip files: Both confirmed correct**
+- `gaudi/src-gaudi/skills/gaudi-telemetry/SKILL.md` references `mcp__olytic-telemetry__execute_sql` by exact name ✅
+- `the-one-ring/src-the-one-ring/skills/the-one-ring-telemetry/SKILL.md` references `mcp__olytic-telemetry__execute_sql` by exact name ✅
+- `gaudi.zip` contains correct telemetry skill (verified via unzip) ✅
+- `the-one-ring.zip` contains correct telemetry skill (verified via unzip) ✅
+
+**Connector configuration: Verified correct**
+- npx path in config: `/Users/joshuakambour/.nvm/versions/node/v20.20.0/bin/npx`
+- `which npx` returns: `/Users/joshuakambour/.nvm/versions/node/v20.20.0/bin/npx`
+- Paths match exactly ✅
+- Service role token replaced (old JWT token was invalid) ✅
+- npm cache cleared (`npm cache clean --force`) ✅
+- Full Claude restart performed multiple times ✅
+
+**Direct command execution: Hangs**
+```bash
+/Users/joshuakambour/.nvm/versions/node/v20.20.0/bin/npx -y @supabase/mcp-server-supabase@latest \
+  --project-ref kxnmgutidehncnafrwbu \
+  --access-token "[service-role-jwt]" \
+2>&1
+```
+Result: Complete hang, no output, no error, must Ctrl+C to exit.
+
+### Root Cause Analysis
+
+The hanging behavior with zero output suggests:
+
+1. **Most likely:** The `@supabase/mcp-server-supabase@latest` package has a bug or incompatibility that prevents startup
+2. **Possible:** The package is trying to reach Supabase at startup and timing out (network issue)
+3. **Possible:** The service role token is being rejected at connection time (silent failure)
+4. **Possible:** Node v20.20.0 has compatibility issues with the package
+
+### Next Steps for Future Investigation
+
+1. **Try pinning to a specific version** instead of `@latest`:
+   ```json
+   "@supabase/mcp-server-supabase@1.0.0"
+   ```
+   (Replace with a known stable version from npm registry)
+
+2. **Enable verbose logging** to see what the package is doing:
+   ```bash
+   DEBUG=* /Users/joshuakambour/.nvm/versions/node/v20.20.0/bin/npx -y @supabase/mcp-server-supabase@latest ...
+   ```
+
+3. **Check npm registry for the package** — visit https://www.npmjs.com/package/@supabase/mcp-server-supabase and verify if there are known issues, deprecations, or recent breaking changes
+
+4. **Try a different Supabase MCP package** if one exists — search npm for `supabase mcp` alternatives
+
+5. **Implement a custom minimal MCP connector** if the existing package cannot be fixed — a simple Node.js script that wraps Supabase SQL execution
+
+6. **Check if the issue is specific to this machine** — test on another Mac or in a fresh Terminal environment
+
+### Impact on Telemetry Pipeline
+
+- **Layers 1–4 work:** Database is reachable, schema is correct, direct INSERTs work, connector *can* be used when explicitly invoked
+- **Layer 5 broken:** Plugin skills cannot autonomously fire telemetry because they can't find the connector at runtime
+- **Workaround available:** Manual telemetry logging is possible via explicit SQL (as demonstrated in smoke test)
+- **Path forward:** Either fix the connector startup issue or implement custom alternative
+
+### Document This Issue In
+
+- `TELEMETRY-ARCHITECTURE.md` — add as Known Issue with "Open" status
+- Future engineering sessions should reference this section and the troubleshooting steps taken
+
+---
+
 ## Document Maintenance
 
 Update this document whenever:
@@ -559,3 +665,4 @@ Update this document whenever:
 - A new plugin is added to the compliance audit table
 - The blueprint version changes (update smoke test SQL and compliance table)
 - Plugin source/zip drift detected (see "Known Issue: Plugin Source vs. .ZIP File Drift" above)
+- MCP connector startup issues occur (see "Known Issue: MCP Connector Startup Failure" above)

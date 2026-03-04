@@ -244,6 +244,52 @@ This section documents current gaps in the implementation. It will be updated as
 
 ---
 
+### Issue 6: MCP Connector Package Fails to Start (CRITICAL BLOCKER)
+**What happens:** The `@supabase/mcp-server-supabase@latest` package hangs indefinitely with zero output or error messages when invoked via npx. The connector never establishes a connection and shows as "grey/disconnected" in Claude Desktop, despite correct config.
+
+**Environment:** Node v20.20.0 (nvm), npm 10.8.2, config path: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+**Symptoms:**
+- Claude Desktop shows olytic-telemetry connector with grey circle (not green)
+- After full Claude restart, connector remains disconnected
+- Direct command execution: `/path/to/npx -y @supabase/mcp-server-supabase@latest --project-ref kxnmgutidehncnafrwbu --access-token [token]` produces zero output and hangs indefinitely
+- No error messages, no debug output, must Ctrl+C to exit
+
+**Impact:** Layer 5 (plugin skill telemetry) completely broken. Layers 1–4 work fine — database is reachable, schema is correct, direct INSERTs work, and the connector *can* be used when Claude is explicitly directed to use it. But plugin skills cannot autonomously fire telemetry because the MCP connector isn't running to be discovered at runtime.
+
+**What we've ruled out:**
+- Config path is correct
+- npx path matches `which npx` output exactly
+- Service role JWT token was used (old JWT token was invalid, replaced with fresh Supabase-generated service role key)
+- npm cache cleared
+- Full Claude restarts performed
+- Plugin source and zip files both reference the correct connector name by exact spelling
+- Nothing is wrong with the skill code itself
+
+**Root cause theories:**
+1. **Most likely:** `@supabase/mcp-server-supabase@latest` has a bug or critical incompatibility that prevents startup
+2. **Possible:** The package is trying to reach Supabase at startup and silently timing out
+3. **Possible:** Node v20.20.0 has compatibility issues with the package
+4. **Possible:** The specific version of the package available on npm is broken
+
+**Next steps for future investigation:**
+1. Pin to a specific stable version instead of `@latest` — try older known-good versions (e.g., `@supabase/mcp-server-supabase@1.0.0`)
+2. Enable verbose debugging: `DEBUG=* npx -y @supabase/mcp-server-supabase@latest ...`
+3. Check npm registry at https://www.npmjs.com/package/@supabase/mcp-server-supabase for known issues, deprecations, or breaking changes
+4. Try alternative Supabase MCP packages if one exists (search npm for `supabase mcp`)
+5. Implement a custom minimal MCP connector in Node.js if the package cannot be fixed
+6. Test on another Mac to determine if issue is machine-specific or systemic
+
+**DO NOT spend more time troubleshooting the `@supabase/mcp-server-supabase@latest` package itself without first trying a pinned version or checking the npm registry for known issues.** The hanging-with-zero-output behavior suggests a fundamental package problem, not a config or credential issue.
+
+**Workaround (temporary):** Manual telemetry logging is possible by explicitly running SQL inserts via Supabase, but this defeats the purpose of autonomous plugin telemetry. Use this only for critical diagnostics, not as a permanent solution.
+
+**Status:** CRITICAL BLOCKER. This is the primary blocker preventing end-to-end telemetry verification (Layer 5). Resolving this is higher priority than Issue 5 (plugin compliance), because Issue 5 is moot if the connector doesn't run.
+
+**Referenced in:** `TELEMETRY-TESTING.md` → "Known Issue: MCP Connector Startup Failure (2026-03-04)"
+
+---
+
 ## Source of Truth Hierarchy
 
 When there's a conflict between files about how telemetry should work, use this hierarchy:
