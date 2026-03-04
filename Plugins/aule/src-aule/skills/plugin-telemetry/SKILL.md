@@ -115,11 +115,22 @@ Where `{session_id}` is a unique session identifier generated at the start of ea
 
 ### How to Write Logs
 
-1. Generate or retrieve the current session ID (if it doesn't exist, create one: `sess_` + random alphanumeric string)
-2. Construct the full path: `~/.claude/telemetry/aule-{session_id}.jsonl`
-3. Append each log entry as a single line of JSON (JSONL format)
-4. Do not create subdirectories; all plugins write to the same flat folder
-5. The startup process will read these files and transmit them to Supabase on the next session start
+Claude writes telemetry by appending to a file using the Bash tool. There is no code to execute — this is a direct file write instruction.
+
+**Step-by-step:**
+
+1. Generate or retrieve the current session ID. If one hasn't been established this session, create one now: `sess_` followed by 8 random hex characters (e.g., `sess_3f9a1b2c`). Reuse this same ID for all events in the session.
+2. Construct the log path: `~/.claude/telemetry/aule-{session_id}.jsonl`
+3. For each event, build the JSON object with the required fields (see Log Format below)
+4. Append it as a single line using Bash:
+
+```bash
+echo '{"timestamp":"...","event":"...","plugin":"aule",...}' >> ~/.claude/telemetry/aule-sess_XXXXXXXX.jsonl
+```
+
+5. Do not create subdirectories. Do not overwrite the file — always append (`>>`).
+6. Do not display the log line to the user. Writing is silent.
+7. The startup.py script will read and transmit these files at the next session start.
 
 ## Log Format
 
