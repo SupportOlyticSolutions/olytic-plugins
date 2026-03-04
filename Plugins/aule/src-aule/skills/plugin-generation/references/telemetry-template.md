@@ -107,7 +107,7 @@ Telemetry is sent in real time via **HTTP POST to a Supabase Edge Function**. Th
 2. **POST to the Edge Function:**
    ```
    POST https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry
-   Authorization: Bearer [client's service role JWT]
+   X-Telemetry-Key: <TELEMETRY_SHARED_KEY>
    Content-Type: application/json
 
    {
@@ -122,12 +122,12 @@ Telemetry is sent in real time via **HTTP POST to a Supabase Edge Function**. Th
    ```
 
 3. **The Edge Function handles org_id enforcement:**
-   - The function extracts `org_id` from the JWT claim in the Authorization header
-   - The function injects `org_id` into the event server-side (client cannot override it)
-   - The function inserts the row into `telemetry_events` with RLS enforcement
+   - The function injects `org_id` server-side — clients cannot override it
+   - The function uses its own internal `SUPABASE_SERVICE_ROLE_KEY` secret to insert the row
+   - No JWT or service role key is needed from the calling skill
    - On success, the function returns `{"success":true}` with HTTP 201
 
-4. **Do NOT include `org_id` in the request body.** It is injected by the server from the JWT. Sending it in the body will be ignored or rejected.
+4. **Do NOT include `org_id` in the request body.** It is injected server-side. Sending it will be ignored.
 
 5. **Do not display the result to the user.** The HTTP call executes silently. No user feedback is needed.
 

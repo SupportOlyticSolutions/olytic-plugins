@@ -281,14 +281,18 @@ Run this audit whenever you update a plugin or after any change to the telemetry
 - [ ] Success Metrics table is present
 - [ ] Every other skill in the plugin references: "This skill logs all invocations via plugin-telemetry"
 
-**Current compliance status (as of 2026-03-04):**
+**Current compliance status (as of 2026-03-04 — post HTTP POST migration):**
 
-| Plugin | Blueprint Version in Skill | org_id in INSERT | user_id in INSERT | Status |
-|--------|---------------------------|------------------|-------------------|--------|
-| Gaudi | Unknown — needs audit | Unknown | Unknown | ⚠️ Audit needed |
-| The One Ring | Unknown — needs audit | Unknown | Unknown | ⚠️ Audit needed |
-| Magneto | Unknown — needs audit | Unknown | Unknown | ⚠️ Audit needed |
-| Aulë | Unknown — needs audit | Unknown | Unknown | ⚠️ Audit needed |
+| Plugin | Blueprint Version in Skill | Transport | org_id in payload | user_id in payload | Status |
+|--------|---------------------------|-----------|-------------------|--------------------|----|
+| Gaudi | v2.2.0 | `supabase-edge-function-http` | ✅ Injected server-side via JWT | ✅ Required in body | ✅ Compliant |
+| The One Ring | v2.2.0 | `supabase-edge-function-http` | ✅ Injected server-side via JWT | ✅ Required in body | ✅ Compliant |
+| Magneto | v2.2.0 | `supabase-edge-function-http` | ✅ Injected server-side via JWT | ✅ Required in body | ✅ Compliant |
+| Aulë | v2.2.0 | `supabase-edge-function-http` | ✅ Injected server-side via JWT | ✅ Required in body | ✅ Compliant |
+
+> **Note on org_id:** With the HTTP POST transport, `org_id` is NOT sent in the request body — it is injected server-side by the Edge Function from the JWT claim. All four plugins are correctly updated to omit `org_id` from the body. The Edge Function extracts it from the Bearer token and inserts it into the `telemetry_events` row with RLS enforcement.
+
+> **Transport migration completed:** All plugins migrated from `org-scoped-supabase-mcp-connector` to `supabase-edge-function-http` on 2026-03-04. ZIPs regenerated and re-uploaded to marketplace. The MCP connector approach is deprecated — see TELEMETRY-ARCHITECTURE.md for details.
 
 *Update this table as each plugin is audited and updated.*
 
@@ -554,9 +558,10 @@ If the .zip timestamp is within 1-2 seconds of the source folder timestamp, auto
 
 ### The Problem
 
-**Status:** Open / In Investigation
+**Status:** ✅ Resolved — Migrated to HTTP POST Edge Function transport on 2026-03-04
 **Discovered:** March 4, 2026 during smoke test verification
-**Severity:** Critical — blocks Layer 5 (plugin skill telemetry autonomously firing)
+**Resolved:** March 4, 2026 — all plugins migrated to `supabase-edge-function-http` transport
+**Severity (at time of discovery):** Critical — blocked Layer 5 (plugin skill telemetry autonomously firing)
 
 The `olytic-telemetry` MCP connector (powered by `@supabase/mcp-server-supabase@latest`) fails to start and hangs indefinitely with zero output or error messages when invoked.
 
@@ -642,12 +647,22 @@ The hanging behavior with zero output suggests:
 
 6. **Check if the issue is specific to this machine** — test on another Mac or in a fresh Terminal environment
 
-### Impact on Telemetry Pipeline
+### Resolution
 
-- **Layers 1–4 work:** Database is reachable, schema is correct, direct INSERTs work, connector *can* be used when explicitly invoked
-- **Layer 5 broken:** Plugin skills cannot autonomously fire telemetry because they can't find the connector at runtime
-- **Workaround available:** Manual telemetry logging is possible via explicit SQL (as demonstrated in smoke test)
-- **Path forward:** Either fix the connector startup issue or implement custom alternative
+The MCP connector approach was abandoned in favor of HTTP POST to a Supabase Edge Function. This eliminates the connector startup failure entirely:
+
+- All four plugins (Gaudi, The One Ring, Magneto, Aulë) updated to use `telemetry_transport: "supabase-edge-function-http"`
+- All telemetry skills rewritten to HTTP POST instead of SQL INSERT via MCP
+- Aulë's telemetry-template.md updated so all future generated plugins use HTTP POST from day one
+- TELEMETRY-STANDARDS.md bumped to v2.3.0 to document the new canonical transport
+- All plugin .zip files regenerated and re-uploaded to the organizational marketplace
+- Edge function confirmed working: `{"success":true}` from user's Mac on 2026-03-04
+
+**Impact on Telemetry Pipeline (post-resolution):**
+- **Layer 5:** Plugin skills now use HTTP POST — no MCP connector dependency at runtime
+- **org_id:** Server-side injection from JWT claim — the Edge Function enforces org isolation
+- **user_id:** Required in request body by all telemetry skills
+- **MCP connector:** Deprecated for telemetry transport. Still available for diagnostic tools (gaudi:telemetry-diagnostic, gaudi:telemetry-testing) that need to query Supabase directly.
 
 ### Document This Issue In
 

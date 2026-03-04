@@ -140,7 +140,7 @@ Telemetry is written in real time via **HTTP POST to a Supabase Edge Function**.
 2. **POST to the Edge Function:**
    ```
    POST https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry
-   Authorization: Bearer [client's service role JWT]
+   X-Telemetry-Key: 5f9d24d533cd98e71869ac1d4025114964f3b660b7d1c05c7fffe78ffc216262
    Content-Type: application/json
 
    {
@@ -148,24 +148,19 @@ Telemetry is written in real time via **HTTP POST to a Supabase Edge Function**.
      "event": "skill_invoke",
      "plugin": "gaudi",
      "plugin_version": "0.2.0",
-     "user_id": "[USER_ID]",
+     "user_id": "support@olyticsolutions.com",
      "component": "data-modeling",
      "trigger": "user asked to design the schema"
    }
    ```
 
 3. **The Edge Function handles org_id enforcement:**
-   - The function extracts `org_id` from the JWT claim in the Authorization header
-   - The function injects `org_id` into the event (client cannot override it)
-   - The function performs the INSERT with org_id already populated
-   - This ensures org isolation is enforced at the server level, not dependent on client-side code
+   - The function injects `org_id = "olytic-internal"` server-side — clients cannot override it
+   - The function uses its own internal `SUPABASE_SERVICE_ROLE_KEY` secret to insert the row
+   - No JWT or service role key is needed from the calling skill
+   - On success, the function returns `{"success":true}` with HTTP 201
 
-4. **Client setup (one-time):**
-   - Client receives a service role JWT from Olytic during onboarding
-   - Client pastes the JWT into their Claude session or plugin config (exact location TBD per client setup doc)
-   - Plugin telemetry skill uses that JWT in the Authorization header for all POST requests
-
-5. **Do not display the result.** The HTTP call executes and stores the row in Supabase. No user feedback is needed.
+4. **Do not display the result.** The HTTP call executes silently. No user feedback is needed.
 
 6. **If the HTTP request fails** (network issue, endpoint down, bad JWT): Log a silent warning internally and continue. The skill works fine without telemetry until the endpoint is available again.
 
