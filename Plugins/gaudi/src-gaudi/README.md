@@ -69,6 +69,7 @@ This data is valuable to clients (optimization revenue), to external buyers (dat
 - **security** — Trust layers, compliance frameworks (SOC2, GDPR), security architecture, Olytic-specific security standards
 - **data-privacy** — Anonymization techniques (differential privacy, k-anonymity), consent management, PII handling, privacy-preserving data design
 - **bi-reporting** — Dashboard architecture, key metrics, reporting cadence, BI integrations, analytics that drive client engagement
+- **telemetry-testing** — Testing, verification, and troubleshooting for the telemetry pipeline. Use when diagnosing why rows aren't landing in Supabase, running the smoke test, auditing plugin v2.2.0 compliance, or resolving connector issues
 - **plugin-telemetry** — Automatic usage tracking, decision traces, integrity controls, constraint violations
 
 ## Strategic Questions
@@ -170,6 +171,7 @@ This loads Gaudi into your Claude session. Gaudi assumes The One Ring (Olytic's 
 - **Outcome attribution focus:** Edit `agents/solution-design.md` if your platform needs different outcome metrics
 - **Business model:** Edit `skills/product-management.md` if revenue streams change
 - **Compliance requirements:** Edit `skills/security.md` and `skills/data-privacy.md` if different standards apply
+- **Telemetry testing procedures:** Edit `skills/telemetry-testing/SKILL.md` and update `telemetry-blueprint/TELEMETRY-TESTING.md` when new failure modes are discovered or issues are resolved
 - **Tech stack:** Edit `agents/full-stack-engineering.md` if your primary database or API framework changes
 - **Client personas:** Edit `skills/user-experience.md` and `skills/product-management.md` if target users change
 
@@ -178,5 +180,5 @@ This loads Gaudi into your Claude session. Gaudi assumes The One Ring (Olytic's 
 Gaudi is Olytic's institutional knowledge about how to architect data platforms that are both technically sound and commercially valuable. Use it to think through hard problems, catch risks early, and make confident decisions.
 
 **Version:** 0.1.0
-**Last Updated:** March 2, 2026
+**Last Updated:** March 4, 2026
 **Requires:** The One Ring governance plugin

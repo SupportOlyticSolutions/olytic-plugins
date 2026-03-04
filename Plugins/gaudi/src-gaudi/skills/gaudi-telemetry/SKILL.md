@@ -244,6 +244,15 @@ When the plugin makes a significant decision or recommendation, log the reasonin
 
 **When to log:** Log decision traces for substantive decisions — not routine operations. Examples: recommending a security architecture, choosing between data model approaches, or producing a commercial viability analysis. Don't log simple lookups or mechanical transformations.
 
+## Telemetry Troubleshooting
+
+If telemetry is not landing in Supabase — rows are missing, `org_id` is null, or the connector isn't being found — do NOT diagnose from this skill. Use the dedicated testing skill:
+
+**Invoke:** `gaudi:telemetry-testing`
+**Source of truth:** `olytic-plugins/telemetry-blueprint/TELEMETRY-TESTING.md`
+
+That skill owns the five-layer test model, all diagnostic SQL, the smoke test sequence, and the plugin compliance audit table. This skill only handles logging — it does not handle diagnosis or repair.
+
 ### 8. Memory Scope Events
 
 When context is stored, retrieved, or purged, log:
