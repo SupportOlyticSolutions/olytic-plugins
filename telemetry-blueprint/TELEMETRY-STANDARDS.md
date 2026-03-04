@@ -1,14 +1,16 @@
 ---
 owner: aule
-version: 2.1.0
+version: 2.2.0
 last_updated: 2026-03-04
 applies_to: all Olytic plugins
-status: Architecture updated — migrated from file staging to org-level Supabase MCP connector
+status: Multi-tenant RLS support added — org_id and user_id now required on every INSERT
 migration_date: 2026-03-04
 deprecated_sections: 4 (Local Staging), 5 (System Architecture hooks), 6 (Implementation — Python startup scripts)
 ---
 
 **⚠️ MIGRATION NOTICE (2026-03-04):** This standard was updated to reflect the working architecture. Sections 4, 5, and 6 describe the **org-scoped Supabase MCP connector** approach, which is now the authoritative pattern. The deprecated file-staging and SessionStart hook approach is no longer used. See [Cortex/2026-03-04-telemetry-architecture-supabase-mcp.md](../Cortex/2026-03-04-telemetry-architecture-supabase-mcp.md) for the architecture decision document.
+
+**⚠️ v2.2.0 UPDATE (2026-03-04):** Multi-tenant Row Level Security (RLS) is now enforced in Supabase. Every INSERT must include `org_id` and `user_id`. Inserts missing `org_id` will be rejected by the database. All plugin telemetry skills must be updated to include these fields. See Section 6 for updated INSERT examples.
 
 # Olytic Telemetry Standards
 
@@ -199,11 +201,13 @@ Fires when the plugin requests user confirmation before a destructive or bulk ac
 All events are logged as **JSONL** — one JSON object per line, no trailing commas, no wrapping array. This format is compact, appendable, and easy to stream into analytics pipelines.
 
 ```jsonl
-{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"gaudi","plugin_version":"0.1.0","component":"data-modeling","trigger":"what object schema would we use for the metadata platform"}
-{"timestamp":"2026-03-03T10:35:00Z","event":"decision_trace","plugin":"gaudi","plugin_version":"0.1.0","component":"solution-design","input_summary":"user asked how to connect plugin usage to Supabase","reasoning":["Supabase supports Postgres wire protocol enabling direct query","OTLP span format maps cleanly to relational tables","client_id linkage is required for CRM attribution"],"output_summary":"recommended OTLP → Supabase pipeline with event_spans and org_context tables","confidence":"high"}
-{"timestamp":"2026-03-03T10:40:00Z","event":"feedback","plugin":"gaudi","plugin_version":"0.1.0","sentiment":"positive","component":"solution-design","context":"user said the end-to-end flow exactly matched what they were thinking","output_summary":"architected Aulë → Doer → Optimizer → metadata platform integration"}
-{"timestamp":"2026-03-03T10:45:00Z","event":"violation","plugin":"gaudi","plugin_version":"0.1.0","violation_type":"out_of_scope","description":"user asked Gaudi to implement the database schema directly in Supabase","constraint_violated":"Gaudi designs templates — it does not operate or execute","action_taken":"redirected to implementation consultant or manual execution"}
+{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"gaudi","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","component":"data-modeling","trigger":"what object schema would we use for the metadata platform"}
+{"timestamp":"2026-03-03T10:35:00Z","event":"decision_trace","plugin":"gaudi","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","component":"solution-design","input_summary":"user asked how to connect plugin usage to Supabase","reasoning":["Supabase supports Postgres wire protocol enabling direct query","OTLP span format maps cleanly to relational tables","client_id linkage is required for CRM attribution"],"output_summary":"recommended OTLP → Supabase pipeline with event_spans and org_context tables","confidence":"high"}
+{"timestamp":"2026-03-03T10:40:00Z","event":"feedback","plugin":"gaudi","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","sentiment":"positive","component":"solution-design","context":"user said the end-to-end flow exactly matched what they were thinking","output_summary":"architected Aulë → Doer → Optimizer → metadata platform integration"}
+{"timestamp":"2026-03-03T10:45:00Z","event":"violation","plugin":"gaudi","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","violation_type":"out_of_scope","description":"user asked Gaudi to implement the database schema directly in Supabase","constraint_violated":"Gaudi designs templates — it does not operate or execute","action_taken":"redirected to implementation consultant or manual execution"}
 ```
+
+`org_id` and `user_id` appear on every event, immediately after `plugin_version`. They are never optional.
 
 ### Format Rules
 
@@ -305,10 +309,14 @@ Telemetry events are stored in Supabase in the `telemetry_events` table:
 | plugin_version | TEXT | Version of the plugin that generated the event |
 | timestamp | TIMESTAMP | When the event occurred (UTC ISO 8601) |
 | event | TEXT | Event type (one of the nine types) |
+| org_id | TEXT | **Required.** The client organisation identifier. Must match the `org_id` claim in the connector's JWT. Enforced by RLS — inserts without this value are rejected. |
+| user_id | TEXT | **Required.** The authenticated user's ID from the Supabase Auth JWT (`auth.uid()`). Controls per-user read isolation. |
 | [event-specific fields] | VARCHAR/TEXT/JSONB | Columns for event type, violation_type, sentiment, etc. — see Section 2 |
 | created_at | TIMESTAMP | When record was inserted into Supabase (auto-generated) |
 
 **No credentials stored locally.** The MCP connector is pre-credentialed by Olytic during org setup. Plugins simply call the tool — authentication is handled by the org's Cowork environment.
+
+**org_id and user_id are mandatory.** The `plugin_insert` RLS policy enforces that `org_id` is present and matches the connector's JWT claim. Plugins must always include both fields in every INSERT. The org-scoped connector provides the correct `org_id` implicitly through its JWT — plugins should pass the value that matches the org context the connector was provisioned for.
 
 ---
 
@@ -364,9 +372,11 @@ Only include columns that have values. Omit optional fields if they are null.
 Call the Supabase MCP connector tool with a direct SQL INSERT:
 
 ```sql
-INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, component, trigger)
-VALUES ('2026-03-04T10:30:00Z', 'skill_invoke', 'gaudi', '0.2.0', 'data-modeling', 'user asked to design the schema');
+INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, org_id, user_id, component, trigger)
+VALUES ('2026-03-04T10:30:00Z', 'skill_invoke', 'gaudi', '0.2.0', '[ORG_ID]', '[USER_ID]', 'data-modeling', 'user asked to design the schema');
 ```
+
+Replace `[ORG_ID]` with the organisation identifier for the client org this connector is provisioned for. Replace `[USER_ID]` with the authenticated user's ID from the session JWT (`auth.uid()`). Both are required — the RLS policy will reject any INSERT where `org_id` is missing or does not match the connector's JWT claim.
 
 The tool immediately executes the statement. Supabase stores the row and returns a success status.
 
@@ -464,7 +474,7 @@ When plugins write telemetry, they follow this schema exactly. This ensures:
 Use this checklist to verify any plugin's telemetry implementation is standard-compliant:
 
 - [ ] Telemetry skill exists at `skills/plugin-telemetry/SKILL.md`
-- [ ] Frontmatter declares `version`, `telemetry_blueprint: "TELEMETRY-STANDARDS.md v2.0.0"`, `telemetry_path: "~/.claude/telemetry/"`
+- [ ] Frontmatter declares `version`, `telemetry_blueprint: "TELEMETRY-STANDARDS.md v2.2.0"`
 - [ ] All 9 event types are documented
 - [ ] Every event type includes all required fields from Section 2
 - [ ] Log format examples use JSONL specification from Section 3

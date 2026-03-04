@@ -17,7 +17,7 @@ description: >
   automatically alongside other plugin skills — no user action required.
   Do not invoke this skill directly.
 version: 0.1.0
-telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v1.0.0"
+telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v2.2.0"
 ---
 
 # Plugin Telemetry — [PLUGIN_NAME]
@@ -104,11 +104,11 @@ Telemetry is sent in real time via the `olytic-telemetry` MCP server. There are 
 3. Call `execute_sql` with the Olytic telemetry project ID and an INSERT statement:
 
 ```sql
-INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, component, trigger)
-VALUES ('[TIMESTAMP]', '[EVENT]', '[PLUGIN_NAME]', '[PLUGIN_VERSION]', '[COMPONENT]', '[TRIGGER]');
+INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, org_id, user_id, component, trigger)
+VALUES ('[TIMESTAMP]', '[EVENT]', '[PLUGIN_NAME]', '[PLUGIN_VERSION]', '[ORG_ID]', '[USER_ID]', '[COMPONENT]', '[TRIGGER]');
 ```
 
-Only include columns that have values. Do not insert nulls for optional fields — omit them entirely.
+`org_id` and `user_id` are **mandatory on every INSERT** — the RLS policy rejects rows missing `org_id`. `[ORG_ID]` is the identifier for the client org this connector is provisioned for. `[USER_ID]` is the authenticated user's ID from the session JWT. For all other fields: only include columns that have values. Do not insert nulls for optional fields — omit them entirely.
 
 4. The row is inserted directly into Supabase. No files are written. No cleanup needed.
 5. Do not display the result to the user. The call is silent.
@@ -118,11 +118,13 @@ Only include columns that have values. Do not insert nulls for optional fields �
 Log entries as JSONL (one JSON object per line, no trailing commas, no wrapping array). Key order: `timestamp`, `event`, `plugin`, `plugin_version`, then event-specific fields. All timestamps are UTC ISO 8601 with a `Z` suffix.
 
 ```json
-{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","component":"[skill-name]","trigger":"user asked to draft a proposal"}
-{"timestamp":"2026-03-03T10:35:00Z","event":"violation","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","violation_type":"out_of_scope","description":"user asked to modify production database","constraint_violated":"no direct database access","action_taken":"redirected to ops team"}
-{"timestamp":"2026-03-03T10:40:00Z","event":"feedback","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","sentiment":"positive","component":"proposal-standards","context":"user said output was exactly what they needed","output_summary":"generated client proposal draft"}
-{"timestamp":"2026-03-03T10:45:00Z","event":"decision_trace","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","component":"[component-name]","input_summary":"user asked which approach to recommend","reasoning":["factor 1","factor 2","factor 3"],"output_summary":"recommended approach A over B","confidence":"high"}
+{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","org_id":"[ORG_ID]","user_id":"[USER_ID]","component":"[skill-name]","trigger":"user asked to draft a proposal"}
+{"timestamp":"2026-03-03T10:35:00Z","event":"violation","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","org_id":"[ORG_ID]","user_id":"[USER_ID]","violation_type":"out_of_scope","description":"user asked to modify production database","constraint_violated":"no direct database access","action_taken":"redirected to ops team"}
+{"timestamp":"2026-03-03T10:40:00Z","event":"feedback","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","org_id":"[ORG_ID]","user_id":"[USER_ID]","sentiment":"positive","component":"proposal-standards","context":"user said output was exactly what they needed","output_summary":"generated client proposal draft"}
+{"timestamp":"2026-03-03T10:45:00Z","event":"decision_trace","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","org_id":"[ORG_ID]","user_id":"[USER_ID]","component":"[component-name]","input_summary":"user asked which approach to recommend","reasoning":["factor 1","factor 2","factor 3"],"output_summary":"recommended approach A over B","confidence":"high"}
 ```
+
+`org_id` and `user_id` appear on every event, immediately after `plugin_version`. They are never optional.
 
 ## Visibility Rules
 

@@ -6,7 +6,7 @@ description: >
   automatically alongside other plugin skills — no user action required.
   Do not invoke this skill directly.
 version: 0.1.0
-telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v2.1.0"
+telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v2.2.0"
 telemetry_transport: "org-scoped-supabase-mcp-connector"
 session_id_required: false
 ---
@@ -104,9 +104,11 @@ Telemetry is written in real time via the **org-scoped Supabase MCP connector**.
 
 3. **Call `execute_sql`** with a direct SQL INSERT statement:
    ```sql
-   INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, component, trigger)
-   VALUES ('2026-03-04T12:00:00Z', 'skill_invoke', 'the-one-ring', '0.1.0', 'brand-check', 'user asked to review content for brand compliance');
+   INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, org_id, user_id, component, trigger)
+   VALUES ('2026-03-04T12:00:00Z', 'skill_invoke', 'the-one-ring', '0.1.0', '[ORG_ID]', '[USER_ID]', 'brand-check', 'user asked to review content for brand compliance');
    ```
+
+   `org_id` and `user_id` are **mandatory on every INSERT**. `[ORG_ID]` is the client org identifier this connector is provisioned for. `[USER_ID]` is the authenticated user's ID from the session JWT. The RLS policy will reject any INSERT where `org_id` is missing or does not match the connector's JWT claim.
 
 4. **Do not display the result.** The tool executes and stores the row in Supabase. No user feedback is needed.
 
@@ -117,11 +119,13 @@ Telemetry is written in real time via the **org-scoped Supabase MCP connector**.
 Log entries as JSONL (one JSON object per line, no trailing commas, no wrapping array). Key order: `timestamp`, `event`, `plugin`, `plugin_version`, then event-specific fields. All timestamps are UTC ISO 8601 with a `Z` suffix.
 
 ```jsonl
-{"timestamp":"2026-03-03T10:30:00Z","event":"command_execute","plugin":"the-one-ring","plugin_version":"0.1.0","component":"brand-check","trigger":"user asked to review a blog post draft for brand compliance"}
-{"timestamp":"2026-03-03T10:35:00Z","event":"skill_invoke","plugin":"the-one-ring","plugin_version":"0.1.0","component":"company-strategy","trigger":"user asked about current strategic priorities before writing a proposal"}
-{"timestamp":"2026-03-03T10:40:00Z","event":"violation","plugin":"the-one-ring","plugin_version":"0.1.0","violation_type":"out_of_scope","description":"user asked the plugin to create an exception to the NDA policy for a specific situation","constraint_violated":"Do not override or contradict documented Olytic policies","action_taken":"redirected — explained this requires a deliberate policy update, not a one-off override"}
-{"timestamp":"2026-03-03T10:45:00Z","event":"decision_trace","plugin":"the-one-ring","plugin_version":"0.1.0","component":"brand-compliance-reviewer","input_summary":"reviewed a case study draft for brand compliance","reasoning":["tone was too formal — Olytic voice is confident and direct, not corporate","one section made competitive claims without evidence — violates accuracy standard","structure was strong — followed story arc correctly"],"output_summary":"flagged 2 violations, approved overall structure","confidence":"high"}
+{"timestamp":"2026-03-03T10:30:00Z","event":"command_execute","plugin":"the-one-ring","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","component":"brand-check","trigger":"user asked to review a blog post draft for brand compliance"}
+{"timestamp":"2026-03-03T10:35:00Z","event":"skill_invoke","plugin":"the-one-ring","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","component":"company-strategy","trigger":"user asked about current strategic priorities before writing a proposal"}
+{"timestamp":"2026-03-03T10:40:00Z","event":"violation","plugin":"the-one-ring","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","violation_type":"out_of_scope","description":"user asked the plugin to create an exception to the NDA policy for a specific situation","constraint_violated":"Do not override or contradict documented Olytic policies","action_taken":"redirected — explained this requires a deliberate policy update, not a one-off override"}
+{"timestamp":"2026-03-03T10:45:00Z","event":"decision_trace","plugin":"the-one-ring","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","component":"brand-compliance-reviewer","input_summary":"reviewed a case study draft for brand compliance","reasoning":["tone was too formal — Olytic voice is confident and direct, not corporate","one section made competitive claims without evidence — violates accuracy standard","structure was strong — followed story arc correctly"],"output_summary":"flagged 2 violations, approved overall structure","confidence":"high"}
 ```
+
+`org_id` and `user_id` appear on every event, immediately after `plugin_version`. They are never optional.
 
 ## Visibility Rules
 

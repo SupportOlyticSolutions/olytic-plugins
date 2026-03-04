@@ -3,7 +3,7 @@ name: aule-telemetry
 description: >
   Auto-loaded aule-telemetry skill. Tracks usage events, version tags, constraint violations, and user feedback. This skill loads automatically alongside other plugin skills — no user action required. Do not invoke this skill directly.
 version: 0.2.0
-telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v2.1.0"
+telemetry_blueprint: "shared/telemetry-blueprint/TELEMETRY-STANDARDS.md v2.2.0"
 telemetry_transport: "org-scoped-supabase-mcp-connector"
 session_id_required: false
 ---
@@ -113,9 +113,11 @@ Telemetry is written in real time via the **org-scoped Supabase MCP connector**.
 
 3. **Call `execute_sql`** with a direct SQL INSERT statement:
    ```sql
-   INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, component, trigger)
-   VALUES ('2026-03-04T12:00:00Z', 'skill_invoke', 'aule', '0.2.0', 'plugin-discovery', 'user asked to create a new plugin');
+   INSERT INTO telemetry_events (timestamp, event, plugin, plugin_version, org_id, user_id, component, trigger)
+   VALUES ('2026-03-04T12:00:00Z', 'skill_invoke', 'aule', '0.2.0', '[ORG_ID]', '[USER_ID]', 'plugin-discovery', 'user asked to create a new plugin');
    ```
+
+   `org_id` and `user_id` are **mandatory on every INSERT**. `[ORG_ID]` is the client org identifier this connector is provisioned for. `[USER_ID]` is the authenticated user's ID from the session JWT. The RLS policy will reject any INSERT where `org_id` is missing or does not match the connector's JWT claim.
 
 4. **Do not display the result.** The tool executes and stores the row in Supabase. No user feedback is needed.
 
@@ -126,11 +128,13 @@ Telemetry is written in real time via the **org-scoped Supabase MCP connector**.
 Log entries as JSONL (one JSON object per line, no trailing commas, no wrapping array). Key order: `timestamp`, `event`, `plugin`, `plugin_version`, then event-specific fields. All timestamps are UTC ISO 8601 with a `Z` suffix.
 
 ```jsonl
-{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.1.0","component":"plugin-discovery","trigger":"user asked to create a new plugin for proposal management"}
-{"timestamp":"2026-03-03T10:35:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.1.0","component":"plugin-generation","trigger":"discovery complete, user approved summary, generating plugin files"}
-{"timestamp":"2026-03-03T10:40:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.1.0","component":"plugin-generation","input_summary":"user described an approval workflow with 3 reviewers","reasoning":["multi-step orchestration required → agent component","repeatable user action → command component","standards enforcement → skill component"],"output_summary":"generated plugin with 1 agent, 1 command, 2 skills","confidence":"high"}
-{"timestamp":"2026-03-03T10:45:00Z","event":"violation","plugin":"aule","plugin_version":"0.1.0","violation_type":"constraint_breach","description":"user asked to publish plugin directly to marketplace without review","constraint_violated":"Do not publish without explicit user approval of generated output","action_taken":"redirected — showed user the generated files first and asked for approval"}
+{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","component":"plugin-discovery","trigger":"user asked to create a new plugin for proposal management"}
+{"timestamp":"2026-03-03T10:35:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","component":"plugin-generation","trigger":"discovery complete, user approved summary, generating plugin files"}
+{"timestamp":"2026-03-03T10:40:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","component":"plugin-generation","input_summary":"user described an approval workflow with 3 reviewers","reasoning":["multi-step orchestration required → agent component","repeatable user action → command component","standards enforcement → skill component"],"output_summary":"generated plugin with 1 agent, 1 command, 2 skills","confidence":"high"}
+{"timestamp":"2026-03-03T10:45:00Z","event":"violation","plugin":"aule","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","violation_type":"constraint_breach","description":"user asked to publish plugin directly to marketplace without review","constraint_violated":"Do not publish without explicit user approval of generated output","action_taken":"redirected — showed user the generated files first and asked for approval"}
 ```
+
+`org_id` and `user_id` appear on every event, immediately after `plugin_version`. They are never optional.
 
 ## Visibility Rules
 
