@@ -158,17 +158,11 @@ Write to `.claude-plugin/plugin.json`. Use ONLY these keys — no others:
     "name": "[Olytic Solutions for internal, client name for client plugins]",
     "email": "[support@olyticsolutions.com for internal, client email for client plugins]"
   },
-  "keywords": ["keyword1", "keyword2", "keyword3"],
-  "sublabel": "[1–3 words describing what the plugin does — unique across the catalog]",
-  "icon": "[single emoji — thematically relevant, unique across the catalog]"
+  "keywords": ["keyword1", "keyword2", "keyword3"]
 }
 ```
 
-**⚠️ Valid keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`, `sublabel`, `icon`. Do NOT include `displayName` or any other key — unrecognized keys cause upload failure. Keywords must be an array of plain strings, not a single placeholder string.
-
-**⚠️ Sublabel:** 1–3 words, title case, describes what the plugin *does*. Must be unique across the Olytic plugin catalog. Check `references/olytic-patterns.md` for current catalog values before assigning.
-
-**⚠️ Icon:** Single emoji character, thematically relevant to the plugin's function. Must be unique across the Olytic plugin catalog. Check `references/olytic-patterns.md` for current catalog values before assigning.
+**⚠️ Valid keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. Do NOT include `sublabel`, `icon`, `displayName`, `permissions`, or any other key — unrecognized keys cause upload failure. Keywords must be an array of plain strings, not a single placeholder string.
 
 **Immediately after writing plugin.json**, run this validation bash command to confirm the file was written correctly. Do NOT proceed until this passes:
 
@@ -182,11 +176,11 @@ try:
         print('FAIL: plugin.json is empty — rewrite the file')
         sys.exit(1)
     data = json.loads(content)
-    valid_keys = {'name','version','description','author','keywords','hooks','sublabel','icon'}
+    valid_keys = {'name','version','description','author','keywords','hooks'}
     bad_keys = [k for k in data if k not in valid_keys]
     missing = [k for k in ['name','version','description','author'] if k not in data]
     if bad_keys:
-        print('FAIL: unrecognized keys:', bad_keys)
+        print('FAIL: unrecognized keys (will cause upload failure):', bad_keys)
         sys.exit(1)
     if missing:
         print('FAIL: missing required fields:', missing)
@@ -508,11 +502,28 @@ Ask: "Does this look right? Any components to add, remove, or change before I ge
    ```
    **Critical:** The `cd` must go INTO the `src-[plugin-name]/` directory (e.g., `plugins-workspace/my-plugin/src-my-plugin`), not the parent folder. If you zip from the parent, the zip will have a subfolder wrapper and the validator will not find `.claude-plugin/plugin.json`.
 
-9. **Verify the zip contains the right structure:**
+9. **Verify the zip contains the right structure AND valid plugin.json:**
    ```bash
-   unzip -l /tmp/[plugin-name].plugin | grep -E "plugin\.json|SKILL\.md"
+   # Step 1: Confirm plugin.json is at root level (not inside a subfolder)
+   unzip -l /tmp/[plugin-name].zip | grep -E "plugin\.json|SKILL\.md"
    ```
-   The output must show `.claude-plugin/plugin.json` at the root (not inside a subdirectory). If you see `src/.claude-plugin/plugin.json`, the zip is wrong — you ran it from the parent directory. Fix the cd path and repackage.
+   The output must show `.claude-plugin/plugin.json` at the root (not inside a subdirectory). If you see `src-[plugin-name]/.claude-plugin/plugin.json`, the zip is wrong — you ran it from the parent directory. Fix the cd path and repackage.
+
+   ```bash
+   # Step 2: Extract plugin.json from the zip and validate its keys
+   unzip -p /tmp/[plugin-name].zip .claude-plugin/plugin.json | python3 -c "
+   import json, sys
+   data = json.load(sys.stdin)
+   valid_keys = {'name','version','description','author','keywords','hooks'}
+   bad_keys = [k for k in data if k not in valid_keys]
+   if bad_keys:
+       print('FAIL: zip contains plugin.json with unrecognized keys (will cause upload failure):', bad_keys)
+       sys.exit(1)
+   print('OK — plugin.json inside zip is valid, no unrecognized keys')
+   print('Keys present:', list(data.keys()))
+   "
+   ```
+   If this fails, the zip is packaging the wrong plugin.json. Fix the source file, re-run the validation script from Step 4, then repackage.
 
 10. **Copy the zip to the parent folder:**
     ```bash

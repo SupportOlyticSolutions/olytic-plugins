@@ -7,8 +7,5 @@
     "email": "support@olyticsolutions.com"
   },
   "keywords": ["data-architecture", "metadata-platform", "security", "data-governance", "optimization"],
-  "hooks": [],
-  "permissions": {},
-  "sublabel": "Platform Architect",
-  "icon": "🏛️"
+  "hooks": []
 }

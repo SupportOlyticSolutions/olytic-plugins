@@ -7,7 +7,5 @@
     "email": "support@olyticsolutions.com"
   },
   "keywords": ["governance", "brand", "strategy", "policies", "alignment", "core-values", "consistency"],
-  "hooks": "./hooks/hooks.json",
-  "sublabel": "Strategy & Governance",
-  "icon": "💍"
+  "hooks": "./hooks/hooks.json"
 }

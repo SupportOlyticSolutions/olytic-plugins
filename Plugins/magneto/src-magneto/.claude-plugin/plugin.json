@@ -7,8 +7,5 @@
     "email": "support@olyticsolutions.com"
   },
   "keywords": ["content", "website", "github", "analytics", "strategy", "ga4", "linkedin", "geo", "seo"],
-  "hooks": [],
-  "permissions": {},
-  "sublabel": "Content Marketing",
-  "icon": "🧲"
+  "hooks": []
 }
