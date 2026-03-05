@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-04T12:00:00Z","event":"skill_invoke","plugin":"test","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"support@olyticsolutions.com","component":"poc-test","trigger":"testing file write path"}
+{"timestamp":"2026-03-04T12:00:01Z","event":"skill_invoke","plugin":"test","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"support@olyticsolutions.com","component":"poc-test","trigger":"confirming append behavior"}

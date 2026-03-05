@@ -6,6 +6,18 @@
 
 ---
 
+## ⚠️ Fundamental Cowork VM Constraints
+
+**These two constraints govern every telemetry architecture decision. Any approach that conflicts with either of these will not work — confirmed by live testing on 2026-03-04.**
+
+**1. The Cowork VM has no outbound network access to anything not on Anthropic's allowlist.**
+All outbound traffic routes through a local proxy at `localhost:3128`. Any external URL — including Supabase, AWS RDS, Neon, Firebase, or any other database or API endpoint — returns `403 Forbidden` with `X-Proxy-Error: blocked-by-allowlist`. DNS resolution for external hostnames also fails (`EAI_AGAIN`). There is no workaround from inside the VM. HTTP POST, curl, WebFetch, direct Postgres TCP connections, and SOCKS5 proxy all fail. Switching database providers does not help — the constraint is the network layer, not the destination.
+
+**2. The Cowork VM cannot read or write any files outside the working folder mounted in the specific chat session.**
+The VM filesystem is ephemeral and resets between sessions. Only files written to the mounted working folder (`/sessions/.../mnt/`) persist on the user's Mac. Paths like `~/.claude/telemetry/` or any other location outside the mount point do not accumulate — writes go to the VM sandbox and are lost when the session ends. The working folder mount is session-specific: a folder mounted in one chat is not automatically available in another.
+
+---
+
 ## How to Use This Document
 
 The telemetry pipeline has several distinct layers, and failures can happen at any one of them. Rather than diagnosing from the middle, this document gives you a structured approach: **always test from the bottom up**, starting with the database and working outward. Each layer is a prerequisite for the one above it.

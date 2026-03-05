@@ -6,20 +6,59 @@
 
 ---
 
+## ⚠️ Fundamental Cowork VM Constraints
+
+**These two constraints govern every telemetry architecture decision. Any approach that conflicts with either of these will not work — confirmed by live testing on 2026-03-04.**
+
+**1. The Cowork VM has no outbound network access to anything not on Anthropic's allowlist.**
+All outbound traffic routes through a local proxy at `localhost:3128`. Any external URL — including Supabase, AWS RDS, Neon, Firebase, or any other database or API endpoint — returns `403 Forbidden` with `X-Proxy-Error: blocked-by-allowlist`. DNS resolution for external hostnames also fails (`EAI_AGAIN`). There is no workaround from inside the VM. HTTP POST, curl, WebFetch, direct Postgres TCP connections, and SOCKS5 proxy all fail. Switching database providers does not help — the constraint is the network layer, not the destination.
+
+**2. The Cowork VM cannot read or write any files outside the working folder mounted in the specific chat session.**
+The VM filesystem is ephemeral and resets between sessions. Only files written to the mounted working folder (`/sessions/.../mnt/`) persist on the user's Mac. Paths like `~/.claude/telemetry/` or any other location outside the mount point do not accumulate — writes go to the VM sandbox and are lost when the session ends. The working folder mount is session-specific: a folder mounted in one chat is not automatically available in another.
+
+---
+
 ## Current State and Known Future Work
 
 ### What is implemented today (2026-03-04)
 
-The telemetry pipeline uses a **single-tenant, single shared key** architecture:
+**⚠️ No fully working telemetry transport exists as of 2026-03-04. Both approaches attempted have confirmed failure modes.**
 
-- All four plugins (Gaudi, The One Ring, Magneto, Aulë) POST to the same Supabase Edge Function endpoint
-- Authentication uses a single static `X-Telemetry-Key` header shared across all internal plugins
-- The edge function hardcodes `org_id = "olytic-internal"` server-side — all events land under one org
-- The `SUPABASE_SERVICE_ROLE_KEY` lives as a Supabase environment secret — never in any plugin file
-- The `X-Telemetry-Key` value is baked into each plugin's telemetry skill file at packaging time
-- The plugin repo is **private** — the key is never exposed publicly
+#### Attempted Approach 1: MCP Connector (`execute_sql`) — Abandoned
 
-This is secure and correct for internal Olytic use. It is not yet ready for multi-tenant client deployment.
+The MCP connector approach was the first architecture. It required machine-level setup in `claude_desktop_config.json` and the underlying `@supabase/mcp-server-supabase@latest` package had unresolvable startup failures — it hung indefinitely with zero output when invoked via npx. This approach has been abandoned.
+
+#### Attempted Approach 2: HTTP POST to Supabase Edge Function — Not Viable
+
+A migration to HTTP POST was designed, partially implemented, and then confirmed non-viable due to the Cowork VM network constraint documented above. The Cowork VM proxy blocks all outbound HTTP to external URLs — including `https://kxnmgutidehncnafrwbu.supabase.co`. Neither `curl` nor `WebFetch` can reach the edge function from inside the VM.
+
+**What was built (and remains available for when a viable transport is found):**
+
+1. Edge function (`log-telemetry`) written and deployed to Supabase. Source file lives at `telemetry-blueprint/edge-function/index.ts`. The function itself is correctly designed — authentication via `X-Telemetry-Key` header, server-side `org_id` injection, service role key kept in Supabase secrets, never exposed in plugin files.
+2. `TELEMETRY_SHARED_KEY` secret is set in the Supabase dashboard.
+3. All four plugin telemetry skills were updated to use the HTTP POST pattern. These files exist in source but the transport they rely on does not work from the VM.
+4. Aulë's `telemetry-template.md` was updated to match.
+5. All four plugins were repackaged and re-uploaded to the marketplace.
+
+**Status: Transport layer is broken.** The edge function is live and correct. The plugins are updated. But the VM cannot reach the edge function endpoint. No telemetry events are landing in Supabase from live skill invocations.
+
+#### Current Open Problem
+
+The fundamental constraint is: **the Cowork VM has no outbound network access to anything not on Anthropic's allowlist.** This blocks every HTTP-based transport approach unless the Supabase endpoint is added to that allowlist, or the transport is replaced with a mechanism that does not require outbound HTTP from the VM.
+
+**Known transport options and their status:**
+
+| Transport | Status | Reason |
+|-----------|--------|--------|
+| MCP connector (`execute_sql`) via local config | ❌ Abandoned | Package startup failure; machine-level setup friction |
+| HTTP POST to Supabase Edge Function via curl | ❌ Blocked | VM proxy blocks all external HTTP |
+| WebFetch to Edge Function | ❌ Blocked | Same proxy restriction |
+| File write to `~/.claude/telemetry/` | ❌ Doesn't work | VM filesystem is ephemeral; files don't persist |
+| `.mcp.json` in plugin zip to register MCP server | ❌ Doesn't work | Cowork does not load MCP servers from plugin zips |
+| Org-level Supabase MCP connector (Cowork-provisioned) | 🔲 Unverified | Requires Anthropic to provision connector at org level in Cowork; not yet attempted |
+| Web-distributed MCP connector (hosted by Olytic) | 🔲 Unverified | Requires Anthropic allowlist approval for hosted URL; significant infrastructure build |
+
+---
 
 ### What needs to change before the first client is onboarded
 
@@ -27,11 +66,11 @@ This is secure and correct for internal Olytic use. It is not yet ready for mult
 
 1. **Edge function update** — replace the hardcoded `org_id = "olytic-internal"` constant with a key-to-org lookup map. The map lives as a Supabase secret (`TELEMETRY_KEY_MAP`) in JSON format: `{"<key1>":"olytic-internal","<key2>":"client-acme"}`. The function resolves `org_id` from the incoming key server-side. Unknown keys are rejected with 401.
 
-2. **Aulë reference file** — create `plugin-generation/references/telemetry-keys.md` as the single source of truth mapping org names to their assigned keys. Private repo only. Aulë reads this file when generating a new client plugin and substitutes the correct key into that plugin's telemetry skill.
+2. **Aulë reference file** — create `plugin-generation/references/telemetry-keys.md` as the single source of truth mapping org names to their assigned keys. Private repo only. Aulë reads this file when generating a new client plugin and substitutes the correct key into that plugin's telemetry skill at packaging time.
 
 3. **Per-client key generation** — when onboarding a new client: run `openssl rand -hex 32`, add the key to `TELEMETRY_KEY_MAP` in Supabase secrets, add it to `telemetry-keys.md`, generate the client's plugin with their key baked in.
 
-4. **Repackage and re-upload** — all existing plugins need to be repackaged once the edge function is updated, since the key resolution logic changes server-side.
+4. **Repackage and re-upload** — all existing plugins need to be repackaged once the edge function is updated, since the org resolution logic changes server-side.
 
 Until that upgrade is done, do not deploy plugins to external clients — all telemetry will log under `olytic-internal` regardless of who is using the plugin.
 
@@ -61,7 +100,7 @@ The Telemetry Blueprint (`TELEMETRY-STANDARDS.md`, in this same folder) is the c
 
 Aulë owns this blueprint. When Aulë generates a plugin's telemetry skill, it stamps which version of the blueprint it followed. If the blueprint changes, Aulë's template gets updated first — then new plugins inherit the new standard automatically.
 
-**Current version:** `TELEMETRY-STANDARDS.md v2.2.0`
+**Current version:** `TELEMETRY-STANDARDS.md v2.3.0`
 **Important change in v2.2.0:** Every INSERT into Supabase now requires `org_id` and `user_id`. Inserts missing these fields are rejected at the database level.
 
 ### Plugin Telemetry Skills
@@ -86,34 +125,30 @@ The MCP connector is the bridge between a Claude session and the Supabase databa
 
 **Limitation:** The MCP connector requires machine-level setup in `claude_desktop_config.json`. This creates friction for client onboarding and cannot be automated. The connector package also has known startup reliability issues (see Issue 6).
 
-#### Option 2: Supabase Edge Function HTTP POST — Current Preferred Pattern
-**As of 2026-03-04**, new plugins should use HTTP POST to a Supabase Edge Function instead of the MCP connector. This approach is more reliable, client-agnostic, and requires zero client setup.
+#### Option 2: Supabase Edge Function HTTP POST — Designed but Not Viable from Cowork VM
 
-**How it works:**
+**⚠️ Confirmed non-working as of 2026-03-04.** The Cowork VM's outbound proxy blocks all HTTP requests to external URLs, including the Supabase edge function endpoint. This approach was fully designed and the infrastructure was built, but it cannot be used from inside the VM.
+
+**How it was designed to work:**
 - Plugin telemetry skill builds an event JSON object: `{ timestamp, event, plugin, plugin_version, org_id, user_id, component, trigger }`
-- Telemetry skill calls `curl` or an equivalent HTTP client to POST the JSON to the edge function:
+- Telemetry skill calls `curl` to POST the JSON to the edge function:
   ```
   POST https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry
-  Authorization: Bearer [SERVICE_ROLE_JWT]
+  X-Telemetry-Key: <TELEMETRY_SHARED_KEY>
   Content-Type: application/json
   ```
-- Edge function receives the request, validates the JWT, extracts `org_id` from the JWT claim (server-side, client cannot override)
-- Edge function inserts the row into `telemetry_events` with RLS enforcement
-- Plugin receives `{"success":true}` confirmation and continues
+- Edge function validates the key, injects `org_id = "olytic-internal"` server-side, and inserts the row using its own `SUPABASE_SERVICE_ROLE_KEY`
+- Plugin receives `{"success":true}` and continues
 
-**Advantages over MCP:**
-- No machine-level configuration required in Claude Desktop
-- Works consistently across all clients and environments
-- HTTP is universally available (no special MCP package needed)
-- org_id is injected server-side, making client tampering impossible
-- Clients cannot use a global Supabase connector to bypass telemetry tracking
-- Simpler troubleshooting (HTTP status codes, standard error responses)
+**Why it fails:** The VM proxy intercepts the curl request and returns `403 Forbidden` with `X-Proxy-Error: blocked-by-allowlist`. The edge function never receives the request.
 
-**For Olytic internally:** Edge function is at `https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry`, ready to receive HTTP POST requests with a valid service role JWT.
+**What is still live and usable if the transport problem is solved:**
+- Edge function is deployed at `https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry`
+- `TELEMETRY_SHARED_KEY` secret is set in Supabase dashboard
+- Source at `telemetry-blueprint/edge-function/index.ts`
+- All four plugin telemetry skills contain the HTTP POST implementation
 
-**For future clients:** Generate a service role JWT for the client's org_id and provide it to them. The same edge function endpoint is used for all orgs; the JWT claim carries the org isolation.
-
-**Migration status:** ✅ All four plugins fully migrated to HTTP POST transport as of 2026-03-04. Gaudi, The One Ring, Magneto, and Aulë all updated, repackaged, and re-uploaded to the organizational marketplace.
+**For future clients:** This design is still the right architecture if a viable transport is found (e.g., if the endpoint is added to Anthropic's allowlist, or if a hosted MCP connector approach is pursued). No changes to the edge function or plugin skills would be needed — only the transport mechanism needs to work.
 
 ### The Supabase Edge Function
 When a plugin calls the MCP connector with a SQL INSERT, where does that INSERT go?
@@ -130,7 +165,7 @@ This is referenced in Aulë's `.mcp.json` as the `olytic-telemetry` server URL. 
 
 ## End-to-End Data Flow
 
-### HTTP POST Edge Function Approach (Current)
+### HTTP POST Edge Function Approach (Designed — Transport Currently Blocked)
 
 Here's the full journey of a single telemetry event, from user action to database row using the HTTP POST edge function:
 
@@ -150,9 +185,9 @@ Here's the full journey of a single telemetry event, from user action to databas
    Content-Type: application/json
    Body: JSON event object
         ↓
-6. Sends HTTP POST with curl or equivalent client
+6. Sends HTTP POST with curl — ⚠️ BLOCKED HERE by VM proxy (403 Forbidden)
         ↓
-7. Edge function receives request and validates JWT signature
+7. [If transport were working] Edge function receives request and validates key
         ↓
 8. Edge function extracts org_id from JWT claim (server-side, immutable)
         ↓
@@ -330,36 +365,23 @@ This section documents current gaps in the implementation. It will be updated as
 
 ---
 
-### Issue 6: MCP Connector Package Startup Failure (Resolved via HTTP POST Migration)
+### Issue 6: MCP Connector Package Startup Failure
 **What happened:** The `@supabase/mcp-server-supabase@latest` package hung indefinitely with zero output when invoked via npx, preventing the connector from running.
 
-**Resolution (2026-03-04):** Instead of continuing to troubleshoot the MCP connector package, the architecture was pivoted to use Supabase Edge Function HTTP POST. This approach eliminates the MCP dependency entirely and provides better reliability, simpler onboarding, and stronger security (server-side org_id injection).
+**Attempted resolution (2026-03-04):** The architecture was pivoted to use Supabase Edge Function HTTP POST, which was expected to eliminate the MCP dependency. However, this pivot was itself found to be non-viable — see Issue 7.
 
-**Migration status:** ✅ Complete. All four organizational plugins (Gaudi, The One Ring, Magneto, Aulë) migrated to HTTP POST transport on 2026-03-04. Source files updated, ZIPs regenerated, plugins re-uploaded to the marketplace.
-
-**Legacy note:** The MCP connector is now deprecated for telemetry transport. It may still be used in diagnostic skills (gaudi:telemetry-diagnostic, gaudi:telemetry-testing) for querying Supabase directly. All new plugins generated by Aulë will use `supabase-edge-function-http` from the updated telemetry template.
-
-**Referenced in:** `TELEMETRY-TESTING.md` → "MCP Connector Migration to HTTP POST (2026-03-04)"
+**Status:** ⚠️ Open. The MCP connector startup failure was never resolved. The HTTP POST pivot that was intended to replace it is also blocked. No working transport exists.
 
 ---
 
-### Issue 7: Plugin Telemetry Skills Migration to HTTP POST
-**What happened:** Existing plugins (The One Ring, Magneto, Aulë) were generated with MCP connector telemetry transport and needed to be updated to use the new HTTP POST edge function approach.
+### Issue 7: HTTP POST Transport Blocked by VM Proxy
+**What happened:** All four plugins were updated to use HTTP POST to the Supabase edge function as a replacement for the MCP connector. Source files, ZIPs, and the marketplace were all updated. Then confirmed via live testing that this transport does not work — the Cowork VM proxy blocks outbound HTTP to external URLs, returning `403 Forbidden` with `X-Proxy-Error: blocked-by-allowlist`.
 
-**Resolution (2026-03-04):** All three plugins updated in the same session as Gaudi's migration:
+**Current state of the plugin files:** All four plugin telemetry skills contain the HTTP POST implementation (`telemetry_transport: "supabase-edge-function-http"`). The ZIPs and marketplace are updated. But the transport those skills rely on is blocked at the network layer.
 
-**Migration checklist:**
-- [x] The One Ring plugin telemetry skill updated (`telemetry_transport: "supabase-edge-function-http"`)
-- [x] Magneto plugin telemetry skill updated (`telemetry_transport: "supabase-edge-function-http"`)
-- [x] Aulë plugin telemetry skill updated (`telemetry_transport: "supabase-edge-function-http"`)
-- [x] Aulë's generation template (`telemetry-template.md`) updated — all future plugins will emit HTTP POST telemetry from day one
-- [x] All ZIPs regenerated with correct telemetry skills (verified via `unzip -p` content check)
-- [x] All plugins re-uploaded to organizational marketplace and reloaded
-- [x] TELEMETRY-STANDARDS.md bumped to v2.3.0 to document canonical HTTP POST transport
+**Status:** ⚠️ Open. The plugin skill files are updated but non-functional for telemetry. The edge function infrastructure is live and correct. The blocker is Anthropic's VM network allowlist — not anything in the plugin or Supabase.
 
-**Verification:** ZIP contents confirmed to contain `telemetry_transport: "supabase-edge-function-http"` and HTTP POST `log-telemetry` endpoint in all four plugin telemetry skills.
-
-**Status:** ✅ Resolved — 2026-03-04.
+**What "fixing" this requires:** Either (a) the Supabase edge function URL gets added to Anthropic's allowlist, (b) a hosted MCP connector approach is pursued and approved, or (c) a different transport mechanism is found that works within the VM's network constraints. Until one of these is resolved, no telemetry data will reach Supabase from live skill invocations.
 
 ---
 
