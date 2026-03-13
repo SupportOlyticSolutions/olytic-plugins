@@ -91,28 +91,39 @@ For plugins with `memory_scope: persistent`:
 
 ### 8. Package Integrity
 
-For each plugin, locate the companion `.plugin` file (same directory as `src-[name]/`, named `[name].plugin`):
+For each plugin, **both** `[name].plugin` and `[name].zip` must exist alongside the source folder. These are **always required together** — one without the other is a failure.
 
-- **File exists:** Verify `[name].plugin` is present alongside the source folder. If missing, flag as **High severity** — plugin cannot be uploaded as an org plugin without it.
-- **Exactly one `plugin.json`:** Unzip and count `plugin.json` entries. Must be exactly 1. If 2+ are found, the zip was built from the wrong directory level (parent instead of inside `src-[name]/`) — flag as **High severity** (upload blocker).
+- **Both files exist:** Verify `[name].plugin` AND `[name].zip` are present alongside the source folder. If either is missing, flag as **High severity** — they must always be produced together. `.plugin` is required for org plugin upload; `.zip` is required for distribution and non-plugin-runtime platforms.
+- **Exactly one `plugin.json`:** Unzip and count `plugin.json` entries in `.plugin` (and optionally `.zip`). Must be exactly 1. If 2+ are found, the zip was built from the wrong directory level (parent instead of inside `src-[name]/`) — flag as **High severity** (upload blocker).
 - **Built from correct root:** Confirm the zip contains `.claude-plugin/plugin.json` at the root (not `src-[name]/.claude-plugin/plugin.json`). If the path includes the `src-[name]/` prefix, the zip is stale and must be rebuilt from inside `src-[name]/`.
 - **In sync with source:** Compare the `version` field inside the zipped `plugin.json` against `src-[name]/.claude-plugin/plugin.json`. If they differ, the package is stale — flag as **Medium severity**.
-- **Correct extension:** Warn if only a `.zip` exists and no `.plugin` file — the org plugin uploader requires the `.plugin` extension.
+- **Both files in sync with each other:** Verify `[name].plugin` and `[name].zip` have identical file sizes. If they differ, they were built at different times — flag as **High severity** and rebuild both.
 
 ```python
 import zipfile, json, os
 
 def check_package(plugin_path, plugin_name):
     plugin_file = f"{plugin_path}/{plugin_name}.plugin"
+    zip_file = f"{plugin_path}/{plugin_name}.zip"
     src_json_path = f"{plugin_path}/src-{plugin_name}/.claude-plugin/plugin.json"
+    failures = []
 
+    # Both files must exist — no exceptions
     if not os.path.exists(plugin_file):
-        # Check if a .zip exists instead — softer warning
-        zip_file = f"{plugin_path}/{plugin_name}.zip"
-        if os.path.exists(zip_file):
-            return {"status": "warn", "reason": f"only {plugin_name}.zip found — rename to {plugin_name}.plugin for org plugin upload"}
-        return {"status": "fail", "reason": f"{plugin_name}.plugin not found — cannot upload as org plugin"}
+        failures.append(f"{plugin_name}.plugin not found — ALWAYS required for org plugin upload")
+    if not os.path.exists(zip_file):
+        failures.append(f"{plugin_name}.zip not found — ALWAYS required alongside .plugin")
 
+    if failures:
+        return {"status": "fail", "reason": "; ".join(failures)}
+
+    # Both files must be identical in size (same archive, different extension)
+    plugin_size = os.path.getsize(plugin_file)
+    zip_size = os.path.getsize(zip_file)
+    if plugin_size != zip_size:
+        return {"status": "fail", "reason": f"{plugin_name}.plugin ({plugin_size}B) and {plugin_name}.zip ({zip_size}B) are different sizes — they were built at different times, rebuild both"}
+
+    # Verify archive integrity using .plugin
     with zipfile.ZipFile(plugin_file) as z:
         names = z.namelist()
         plugin_json_entries = [n for n in names if n.endswith('plugin.json')]
@@ -139,7 +150,9 @@ Report output additions for this check:
 ```json
 "package_integrity": "pass"
 // or
-"package_integrity": "fail — zip contains 2 plugin.json files; rebuild from inside src-magneto/"
+"package_integrity": "fail — magneto.zip not found — ALWAYS required alongside .plugin"
+// or
+"package_integrity": "fail — magneto.plugin (71680B) and magneto.zip (70400B) are different sizes — rebuild both"
 // or
 "package_integrity": "warn — package version 0.1.0 does not match source version 0.2.0"
 ```
