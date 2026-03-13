@@ -3,7 +3,7 @@
   "$id": "session-summary-schema",
   "title": "Olytic Session Summary",
   "description": "Canonical schema for episodic session memory content. This is the CONTENT payload — it is wrapped in vault-entry-schema.json before being written to the vault. Skills read this file at runtime at SessionClose — do not bake field definitions into plugin source.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "owner": "aule",
   "read_timing": "runtime — read at SessionClose invocation, not deploy time",
   "relationship": "Content payload — wrapped in vault-entry-schema.json envelope before vault write",
@@ -13,6 +13,13 @@
       "enum": ["claude", "chatgpt", "copilot", "other"],
       "description": "The AI platform this session ran on. Hardcoded per plugin at generation time — never inferred at runtime.",
       "required": true
+    },
+    "loop": {
+      "type": "string",
+      "enum": ["plugin", "user", "client"],
+      "description": "Which refinement loop this summary feeds. Maps to memory_entries.loop. Default 'plugin' for auto-generated session summaries — use 'user' for summaries about user preferences/patterns, 'client' for org-level facts.",
+      "required": true,
+      "default": "plugin"
     },
     "primary_topic": {
       "type": "string",

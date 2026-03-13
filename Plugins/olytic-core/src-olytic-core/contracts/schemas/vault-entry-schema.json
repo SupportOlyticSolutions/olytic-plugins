@@ -2,60 +2,76 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "vault-entry-schema",
   "title": "Olytic Vault Entry",
-  "description": "Canonical envelope schema for all vault writes. Every piece of data written to the Olytic vault is wrapped in this envelope regardless of content type. The content field contains the payload — e.g., a session-summary-schema.json object, a document, or analysis results.",
-  "version": "1.1.0",
+  "description": "Canonical envelope schema for all vault writes. Maps 1:1 to a memory_entries row in Supabase. The content field contains the payload — e.g., a session-summary-schema.json object — and is stored in memory_entries.payload (jsonb). client_id and user_id are never included in the plugin payload — they are resolved and injected by the gateway.",
+  "version": "1.2.0",
   "owner": "aule",
   "read_timing": "runtime — read at vault write time, not deploy time",
-  "relationship": "Envelope wrapper — wraps session-summary-schema.json (or other content payloads) for vault storage",
+  "relationship": "Envelope wrapper — maps to memory_entries row. content field → memory_entries.payload. narrative/summary → memory_entries.content (text).",
+  "db_table": "memory_entries",
   "properties": {
     "entry_id": {
       "type": "string",
       "format": "uuid",
-      "description": "Unique identifier for this vault entry — generate per write",
+      "description": "Unique identifier for this vault entry — generate per write. Maps to memory_entries.id.",
       "required": true
+    },
+    "session_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID FK to sessions.id. Include if the gateway session_id is known at write time (typically available at SessionClose). Gateway will create/link the session row if omitted.",
+      "required": false
     },
     "plugin": {
       "type": "string",
-      "description": "Kebab-case name of the plugin that created this entry",
+      "description": "Kebab-case name of the plugin that created this entry. Maps to memory_entries.source_plugin.",
       "required": true
     },
     "plugin_version": {
       "type": "string",
-      "description": "Semver version of the plugin at time of write",
+      "description": "Semver version of the plugin at time of write. Stored in memory_entries.payload.",
       "required": true
     },
     "session_timestamp": {
       "type": "string",
       "format": "date-time",
-      "description": "ISO 8601 UTC timestamp of when this entry was written (typically SessionClose time)",
+      "description": "ISO 8601 UTC timestamp of when this entry was written (typically SessionClose time). Maps to memory_entries.created_at.",
       "required": true
     },
     "entry_type": {
       "type": "string",
-      "enum": ["session-summary", "document", "analysis", "preference", "fact"],
-      "description": "Type tag that determines vault routing and retention policy",
+      "enum": ["session_summary", "user_preference", "decision_record", "correction", "business_fact", "plugin_feedback"],
+      "description": "Type tag mapping to memory_entries.entity_type. Determines vault routing and retention policy — choose carefully.",
+      "required": true
+    },
+    "loop": {
+      "type": "string",
+      "enum": ["plugin", "user", "client"],
+      "description": "Which refinement loop this entry feeds. Maps to memory_entries.loop. Use 'plugin' for session summaries and plugin-level signals, 'user' for user preference and behavior signals, 'client' for org-level facts.",
       "required": true
     },
     "schema_version": {
       "type": "string",
-      "description": "Version of the content schema used (e.g., '1.0.0' from session-summary-schema.json)",
+      "description": "Version of the content schema used (e.g., '1.2.0' from session-summary-schema.json). Stored in memory_entries.payload for server-side validation.",
       "required": true
     },
     "platform": {
       "type": "string",
       "enum": ["claude", "chatgpt", "copilot", "other"],
-      "description": "The AI platform this vault entry was written from. Hardcoded per plugin at generation time — never inferred at runtime.",
+      "description": "The AI platform this vault entry was written from. Hardcoded per plugin at generation time — never inferred at runtime. Stored in memory_entries.payload.",
       "required": true
     },
     "content": {
       "type": "object",
-      "description": "The actual payload — shape depends on entry_type. For session-summary, this is a session-summary-schema.json object.",
+      "description": "The actual payload — shape depends on entry_type. For session_summary, this is a session-summary-schema.json object. Stored in memory_entries.payload (jsonb). The narrative/primary_topic text is also written to memory_entries.content for full-text search.",
       "required": true
     }
   },
   "notes": [
-    "org_id is injected server-side by the vault gateway — never include it in the entry body",
-    "The entry_type tag determines vault partition and retention policy — choose carefully",
-    "content is untyped at the envelope level — validation against the content schema is done server-side using schema_version"
+    "client_id and user_id are resolved and injected server-side by the gateway via auth.uid() → client_users — never include in the entry body",
+    "client_id maps to clients.id; user_id maps to client_users.id — both are gateway concerns only",
+    "entry_type enum values use underscores to match memory_entries.entity_type exactly",
+    "loop maps directly to memory_entries.loop — drives the review cycle bucketing in review_cycles table",
+    "content is untyped at the envelope level — server-side validation uses schema_version from payload",
+    "memory_entries.status defaults to 'soft' on insert — the portal review cycle promotes entries to 'committed'"
   ]
 }

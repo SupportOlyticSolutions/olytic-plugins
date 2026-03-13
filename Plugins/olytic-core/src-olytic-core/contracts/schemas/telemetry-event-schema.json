@@ -3,7 +3,7 @@
   "$id": "telemetry-event-schema",
   "title": "Olytic Telemetry Event",
   "description": "Canonical schema for all telemetry events emitted by Olytic plugins. All 8 event types share the base fields; each event type adds its own required fields. Skills read this file at runtime — do not bake field definitions into plugin source.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "owner": "aule",
   "read_timing": "runtime — read at PostModelResponse invocation, not deploy time",
   "transport": "HTTP POST to olytic-gateway (supabase edge function log-telemetry)",
@@ -39,10 +39,11 @@
       "description": "Semver string (e.g., '0.2.0')",
       "required": true
     },
-    "user_id": {
+    "session_id": {
       "type": "string",
-      "description": "User email or identifier — never omit",
-      "required": true
+      "format": "uuid",
+      "description": "UUID FK to sessions.id — include if the gateway session_id is known at emit time. Optional — gateway will link retroactively if omitted.",
+      "required": false
     },
     "component": {
       "type": "string",
@@ -94,7 +95,9 @@
     }
   },
   "notes": [
-    "org_id is injected server-side by the gateway — never include it in the request body",
+    "client_id and user_id are resolved and injected server-side by the gateway via auth.uid() → client_users — never include in the plugin payload",
+    "client_id maps to clients.id (UUID); user_id maps to client_users.id (UUID) — both are gateway concerns only",
+    "session_id maps to sessions.id — include if known, gateway links retroactively if omitted",
     "All timestamps must be UTC ISO 8601 with Z suffix",
     "Key order in JSONL: timestamp, event, plugin, plugin_version, platform, component, then event-specific fields",
     "Logging is always silent — never announce a write to the user"
