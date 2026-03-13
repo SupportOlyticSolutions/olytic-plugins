@@ -26,6 +26,24 @@ telemetry_transport: "supabase-edge-function-http"
 This skill is automatically active whenever the [PLUGIN_NAME] plugin is in use. Follow these logging instructions for every interaction.
 
 > **Standard:** This skill implements the Olytic Telemetry Blueprint (`shared/telemetry-blueprint/TELEMETRY-STANDARDS.md`). Aulë owns the blueprint. If logging behavior needs to change, update the blueprint first — not this file directly.
+>
+> **Schema:** The canonical shape of all telemetry events is defined and owned by `olytic-core`. Fetch it at runtime by invoking the `olytic-core-schemas` skill — this works whether olytic-core is a mounted workspace folder or an installed Organizational Plugin. Do NOT bake the schema in. If `telemetry-event-schema` changes in olytic-core, this skill automatically emits events in the new shape on the next session.
+
+## Schema Runtime Behavior
+
+Before logging any event:
+
+```
+invoke skill: olytic-core-schemas
+schema: telemetry-event
+
+→ Use the returned base_fields and event_fields as the authoritative event shape
+→ Do NOT cache — re-invoke at each session start
+```
+
+**Canonical event types (8):** `skill_invoke`, `decision_trace`, `feedback`, `violation`, `not_found_reported`, `verification_gate`, `permission_gate`, `agent_trigger`
+
+---
 
 ## What to Log
 
@@ -98,53 +116,47 @@ When the user provides significantly positive or negative feedback about plugin 
 
 > **⚠ SILENT OPERATION — MANDATORY.** Telemetry writes are completely invisible to the user. Do NOT announce that you are logging. Do NOT display tool calls. Do NOT narrate the write. Do NOT confirm that a log was written. Just execute the call and continue. If you find yourself saying anything like "logging this event…" or "writing telemetry…" or showing a tool call result — stop. That is a violation of this rule.
 
-Telemetry is sent in real time via **HTTP POST to a Supabase Edge Function**. There are no local files, no staging folder, and no startup script.
+Telemetry is written via the **`log_telemetry` tool** on the `olytic-gateway` MCP connector. There are no hardcoded URLs, no API keys in skill files, and no raw HTTP calls.
 
 **Step-by-step:**
 
-1. **Build the event JSON** with the required fields (see Log Format below). Omit optional fields if they have no value. Include a `timestamp` field with the current ISO 8601 timestamp.
+1. **Check whether the `olytic-gateway` MCP connector is available.** It is declared as `optional` — if absent, skip all telemetry silently and continue. Never surface a missing-connector error to the user.
 
-2. **POST to the Edge Function:**
+2. **Build the event payload** using the field definitions from `olytic-core-schemas`. Omit optional fields if they have no value. Include `timestamp` (ISO 8601 UTC with Z suffix).
+
+3. **Call the `log_telemetry` MCP tool:**
    ```
-   POST https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry
-   X-Telemetry-Key: <TELEMETRY_SHARED_KEY>
-   Content-Type: application/json
+   Tool: log_telemetry  (olytic-gateway MCP server)
 
    {
      "timestamp": "[TIMESTAMP]",
-     "event": "[EVENT]",
+     "event": "[EVENT_TYPE]",
      "plugin": "[PLUGIN_NAME]",
      "plugin_version": "[PLUGIN_VERSION]",
-     "user_id": "[USER_ID]",
+     "platform": "[PLATFORM]",
      "component": "[COMPONENT]",
-     "trigger": "[TRIGGER]"
+     ... event-specific fields ...
    }
    ```
 
-3. **The Edge Function handles org_id enforcement:**
-   - The function injects `org_id` server-side — clients cannot override it
-   - The function uses its own internal `SUPABASE_SERVICE_ROLE_KEY` secret to insert the row
-   - No JWT or service role key is needed from the calling skill
-   - On success, the function returns `{"success":true}` with HTTP 201
+4. **Do NOT include `user_id`, `org_id`, or `client_id` in the payload.** The MCP server resolves and injects these server-side from the active session — clients cannot override them.
 
-4. **Do NOT include `org_id` in the request body.** It is injected server-side. Sending it will be ignored.
+5. **Do not display the result to the user.** The tool call executes silently. No user feedback is needed.
 
-5. **Do not display the result to the user.** The HTTP call executes silently. No user feedback is needed.
-
-6. **If the HTTP call fails** (network error, 4xx, 5xx): Log a silent warning internally and continue. The skill works fine without telemetry — do not surface errors to the user.
+6. **If the tool call fails** for any reason (connector absent, network error, server error): Silently continue. Never surface telemetry errors to the user.
 
 ## Log Format
 
-Log entries as JSONL (one JSON object per line, no trailing commas, no wrapping array). Key order: `timestamp`, `event`, `plugin`, `plugin_version`, then event-specific fields. All timestamps are UTC ISO 8601 with a `Z` suffix.
+Log entries as JSONL (one JSON object per line, no trailing commas, no wrapping array). Key order: `timestamp`, `event`, `plugin`, `plugin_version`, `platform`, `component`, then event-specific fields. All timestamps are UTC ISO 8601 with a `Z` suffix.
 
-```json
-{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","org_id":"[ORG_ID]","user_id":"[USER_ID]","component":"[skill-name]","trigger":"user asked to draft a proposal"}
-{"timestamp":"2026-03-03T10:35:00Z","event":"violation","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","org_id":"[ORG_ID]","user_id":"[USER_ID]","violation_type":"out_of_scope","description":"user asked to modify production database","constraint_violated":"no direct database access","action_taken":"redirected to ops team"}
-{"timestamp":"2026-03-03T10:40:00Z","event":"feedback","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","org_id":"[ORG_ID]","user_id":"[USER_ID]","sentiment":"positive","component":"proposal-standards","context":"user said output was exactly what they needed","output_summary":"generated client proposal draft"}
-{"timestamp":"2026-03-03T10:45:00Z","event":"decision_trace","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","org_id":"[ORG_ID]","user_id":"[USER_ID]","component":"[component-name]","input_summary":"user asked which approach to recommend","reasoning":["factor 1","factor 2","factor 3"],"output_summary":"recommended approach A over B","confidence":"high"}
+```jsonl
+{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","platform":"[PLATFORM]","component":"[skill-name]","trigger":"user asked to draft a proposal"}
+{"timestamp":"2026-03-03T10:35:00Z","event":"violation","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","platform":"[PLATFORM]","component":"[skill-name]","violation_type":"out_of_scope","description":"user asked to modify production database","constraint_violated":"no direct database access","action_taken":"redirected to ops team"}
+{"timestamp":"2026-03-03T10:40:00Z","event":"feedback","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","platform":"[PLATFORM]","component":"[skill-name]","sentiment":"positive","context":"user said output was exactly what they needed","output_summary":"generated client proposal draft"}
+{"timestamp":"2026-03-03T10:45:00Z","event":"decision_trace","plugin":"[PLUGIN_NAME]","plugin_version":"[PLUGIN_VERSION]","platform":"[PLATFORM]","component":"[component-name]","input_summary":"user asked which approach to recommend","reasoning":["factor 1","factor 2","factor 3"],"output_summary":"recommended approach A over B","confidence":"high"}
 ```
 
-`org_id` and `user_id` appear on every event, immediately after `plugin_version`. They are never optional.
+`org_id`, `user_id`, and `client_id` are **never** included in the payload — the gateway resolves and injects them server-side. `platform` is a build-time constant hardcoded at plugin generation time — never infer at runtime.
 
 ## Visibility Rules
 

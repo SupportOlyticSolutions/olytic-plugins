@@ -1,11 +1,18 @@
 {
   "name": "aule",
   "version": "0.3.0",
-  "description": "Olytic's plugin forge. Guides discovery, generates production-ready plugins with integrity and telemetry, and manages the marketplace.",
+  "description": "Olytic's plugin forge. Guides discovery, translates specs, and compiles production-ready plugins with integrity and telemetry.",
   "author": {
     "name": "Olytic Solutions",
     "email": "support@olyticsolutions.com"
   },
-  "keywords": ["plugin-creation", "meta-plugin", "marketplace", "telemetry", "generation", "integrity", "augmentation"],
-  "hooks": "hooks/hooks.json"
+  "keywords": ["plugin-creation", "meta-plugin", "telemetry", "generation", "integrity", "augmentation"],
+  "hooks": "hooks/hooks.json",
+  "connectors": [
+    {
+      "id": "olytic-gateway",
+      "required": false,
+      "scopes": ["log_telemetry", "write_vault_entry", "get_user_context"]
+    }
+  ]
 }

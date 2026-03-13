@@ -7,7 +7,8 @@ Aule populates this model from discovery output. Pydantic validates it. If valid
 fails, Aule reads the error and asks the user for the missing information. Only a clean
 PluginSpec reaches the compiler.
 
-Source of truth for field definitions: olytic-core/contracts/schemas/*.json
+Source of truth for field definitions: invoke the olytic-core-schemas skill at runtime
+(e.g., "invoke skill: olytic-core-schemas / schema: plugin-identity").
 This model must stay in sync with those schemas — if schemas change, update this file.
 
 Version: 1.1.0

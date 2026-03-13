@@ -3,6 +3,12 @@
     "github": {
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "olytic-gateway": {
+      "type": "http",
+      "url": "${OLYTIC_GATEWAY_MCP_URL}",
+      "optional": true,
+      "description": "Olytic org-level gateway. Resolves user_id and client_id automatically. Provides log_telemetry, write_vault_entry, and get_user_context tools. Install once per organization — all plugins reference this same server. If absent, telemetry and vault operations silently no-op."
     }
   }
 }

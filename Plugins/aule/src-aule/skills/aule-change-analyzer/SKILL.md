@@ -50,15 +50,18 @@ When an Aule standard file changes:
 ### Category 3: Schema Change
 
 **What triggers this:**
-- Changes to data structures
+- Changes to data structures in any source file
 - Keywords: "new field", "schema", "breaking change"
-- Examples: telemetry event schema changes
+- Examples: telemetry event schema changes in plugin source files
+- **Also triggers on:** Any write to `olytic-core/contracts/schemas/*.json` at the workspace root
 
 **What to do:**
 - ✅ Invoke aule-skill-updater to update plugin-generation/SKILL.md
 - ✅ Trigger trashbot to sweep all existing plugins
 - ✅ Notify user (log prominently)
 - ℹ️ Log: "Schema Change detected — updated SKILL.md, swept plugins, manual verification recommended"
+
+> **Note on `olytic-core/contracts/schemas/` changes:** These are workspace-root contract files, not plugin source files. A change here propagates automatically to all plugins at their NEXT runtime invocation (because skills invoke the `olytic-core-schemas` skill at runtime, not at deploy time). Trashbot still runs to update any skill that bakes the schema in rather than invoking `olytic-core-schemas` at runtime — those are bugs to fix.
 
 ## How to Determine the Category
 
@@ -72,6 +75,8 @@ If path contains:
   "references/telemetry-template" → Category 1 (Generation Requirement)
   "references/olytic-patterns" → Category 2 (Reference Update)
   "references/agentic-best-practices" → Category 2 (Reference Update)
+  "olytic-core/contracts/schemas/" → Category 3 (Schema Change) — olytic-core schema definitions (sourced at runtime via olytic-core-schemas skill)
+  "olytic-core/contracts/protocols/" → Category 2 (Reference Update) — protocol docs are reference, not executable
 ```
 
 ### Step 2: Read the File and Check Contents

@@ -88,7 +88,7 @@ Map discovery answers to component types:
 | Success metrics + data sources | Performance command (if data source is accessible) | Enable self-measurement |
 | Memory scope declared (from Q5) | Memory declaration in skill + README | Plugin declares its context retention requirements |
 | Memory access control declared (from Q5 branch) | Memory access control block in README | Declares who/what can read the plugin's stored vault data; defaults to private if absent |
-| Memory scope = persistent (from Q5) | `[plugin-name]-session-summarizer/SKILL.md` | Captures episodic memory at SessionClose; reads `olytic-core/contracts/schemas/session-summary-schema.json` and `olytic-core/contracts/schemas/vault-entry-schema.json` at runtime |
+| Memory scope = persistent (from Q5) | `[plugin-name]-session-summarizer/SKILL.md` | Captures episodic memory at SessionClose; invokes `olytic-core-schemas` skill at runtime to fetch `session-summary` and `vault-entry` schemas — never reads schema files from the filesystem |
 | Workflow context mapped (from Q6) | Augmentation framing in README + skill descriptions | Positions plugin around new capabilities, not just task speedup |
 | Augmentation signal weak | Advisory note in README | Flags the plugin as primarily an accelerator, suggests augmentation opportunities |
 | Claude OS framing (from new questions) | Claude OS Identity block in README | Declares hat role, relationships, governance, dimension, compounding |

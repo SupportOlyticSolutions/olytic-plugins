@@ -12,28 +12,24 @@ session_id_required: false
 
 > **Standard:** This skill implements the Olytic Telemetry Blueprint (`shared/telemetry-blueprint/TELEMETRY-STANDARDS.md`). Aulë owns the blueprint. If logging behavior needs to change, update the blueprint first — not this file directly.
 >
-> **Schema:** The canonical shape of all telemetry events is defined in `olytic-core/contracts/schemas/telemetry-event-schema.json` at the workspace root. This skill reads that schema at runtime on every PostModelResponse invocation — it does NOT bake the schema in. If `telemetry-event-schema.json` changes, this skill automatically emits events in the new shape on the next session without any file edit required.
+> **Schema:** The canonical shape of all telemetry events is defined and owned by `olytic-core`. At runtime, fetch the live schema by invoking the `olytic-core-schemas` skill — this works whether olytic-core is a mounted workspace folder or an installed Organizational Plugin. This skill does NOT bake the schema in. If `telemetry-event-schema` changes in olytic-core, this skill automatically emits events in the new shape on the next session without any file edit required.
 
 This skill is automatically active whenever the Aule plugin is in use. Follow these logging instructions for every interaction.
 
 ## Schema Runtime Behavior
 
-Before logging any event, check whether `olytic-core/contracts/schemas/telemetry-event-schema.json` exists at the workspace root:
+Before logging any event, fetch the authoritative schema from olytic-core:
 
 ```
-If olytic-core/contracts/schemas/telemetry-event-schema.json exists:
-  → Read it and use its field definitions as the authoritative event shape
-  → This overrides the hardcoded examples below if there is a conflict
-  → Do NOT cache the schema between sessions — re-read it at each invocation
-
-If the file does not exist yet:
-  → Use the hardcoded event structure defined in this skill as the fallback
-  → Log a silent internal note that the schema file is missing
+invoke skill: olytic-core-schemas
+schema: telemetry-event
 ```
+
+Use the returned schema's `base_fields` and `event_fields` as the authoritative event shape. Do NOT cache the schema between sessions — re-invoke at each session start.
 
 **Event types (canonical 8):** `skill_invoke`, `decision_trace`, `feedback`, `violation`, `not_found_reported`, `verification_gate`, `permission_gate`, `agent_trigger`
 
-This runtime-read pattern is intentional: updating `olytic-core/contracts/schemas/telemetry-event-schema.json` at the workspace root automatically changes all plugins' telemetry behavior on the next session, without requiring individual skill updates or a plugin repackage.
+This runtime-fetch pattern is intentional: updating the schema in olytic-core automatically changes all plugins' telemetry behavior on the next session, without requiring individual skill updates or a plugin repackage. The `olytic-core-schemas` skill is the single source of truth — no filesystem path assumptions, no embedded schema copies.
 
 ---
 
@@ -59,7 +55,7 @@ Every time a skill, command, or agent from this plugin is invoked, log:
 | timestamp | Current ISO 8601 timestamp |
 | event | "skill_invoke", "command_execute", or "agent_trigger" |
 | plugin | "aule" |
-| plugin_version | "0.1.0" |
+| plugin_version | current plugin version (from plugin.json) |
 | component | Name of the skill, command, or agent invoked |
 | trigger | The user's message or action that triggered invocation |
 
@@ -91,7 +87,7 @@ When a user interaction conflicts with these constraints, log:
 | timestamp | Current ISO 8601 timestamp |
 | event | "violation" |
 | plugin | "aule" |
-| plugin_version | "0.1.0" |
+| plugin_version | current plugin version (from plugin.json) |
 | violation_type | "out_of_scope", "constraint_breach", or "tool_misuse" |
 | description | What the user tried to do |
 | constraint_violated | Which specific constraint was triggered |
@@ -108,7 +104,7 @@ When the user provides significantly positive or negative feedback about plugin 
 | timestamp | Current ISO 8601 timestamp |
 | event | "feedback" |
 | plugin | "aule" |
-| plugin_version | "0.1.0" |
+| plugin_version | current plugin version (from plugin.json) |
 | sentiment | "positive" or "negative" |
 | component | Which component the feedback is about |
 | context | What the user said (paraphrased, not verbatim PII) |
@@ -164,13 +160,13 @@ Telemetry is written via the **`olytic-gateway` MCP connector** — an org-insta
 Log entries as JSONL (one JSON object per line, no trailing commas, no wrapping array). Key order: `timestamp`, `event`, `plugin`, `plugin_version`, then event-specific fields. All timestamps are UTC ISO 8601 with a `Z` suffix.
 
 ```jsonl
-{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","component":"plugin-discovery","trigger":"user asked to create a new plugin for proposal management"}
-{"timestamp":"2026-03-03T10:35:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","component":"plugin-generation","trigger":"discovery complete, user approved summary, generating plugin files"}
-{"timestamp":"2026-03-03T10:40:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","component":"plugin-generation","input_summary":"user described an approval workflow with 3 reviewers","reasoning":["multi-step orchestration required → agent component","repeatable user action → command component","standards enforcement → skill component"],"output_summary":"generated plugin with 1 agent, 1 command, 2 skills","confidence":"high"}
-{"timestamp":"2026-03-03T10:45:00Z","event":"violation","plugin":"aule","plugin_version":"0.1.0","org_id":"olytic-internal","user_id":"usr_abc123","violation_type":"constraint_breach","description":"user asked to publish plugin directly to marketplace without review","constraint_violated":"Do not publish without explicit user approval of generated output","action_taken":"redirected — showed user the generated files first and asked for approval"}
+{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-discovery","trigger":"user asked to create a new plugin for proposal management"}
+{"timestamp":"2026-03-03T10:35:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-generation","trigger":"discovery complete, user approved summary, generating plugin files"}
+{"timestamp":"2026-03-03T10:40:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-generation","input_summary":"user described an approval workflow with 3 reviewers","reasoning":["multi-step orchestration required → agent component","repeatable user action → command component","standards enforcement → skill component"],"output_summary":"generated plugin with 1 agent, 1 command, 2 skills","confidence":"high"}
+{"timestamp":"2026-03-03T10:45:00Z","event":"violation","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-generation","violation_type":"constraint_breach","description":"user asked to publish plugin directly to marketplace without review","constraint_violated":"Do not publish without explicit user approval of generated output","action_taken":"redirected — showed user the generated files first and asked for approval"}
 ```
 
-`org_id` and `user_id` appear on every event, immediately after `plugin_version`. They are never optional.
+`org_id`, `user_id`, and `client_id` are **never** included in the payload — the gateway resolves and injects them server-side. Key order: `timestamp`, `event`, `plugin`, `plugin_version`, `platform`, `component`, then event-specific fields.
 
 ## Visibility Rules
 
@@ -218,7 +214,7 @@ When a write operation is performed and verified, log:
 | timestamp | Current ISO 8601 timestamp |
 | event | "verification_gate" |
 | plugin | "aule" |
-| plugin_version | "0.1.0" |
+| plugin_version | current plugin version (from plugin.json) |
 | result | "pass" or "fail" |
 | component | Which component performed the write |
 | description | What was written and what was checked |
@@ -232,7 +228,7 @@ When a requested file, path, or data point is not found and "Not Found" is repor
 | timestamp | Current ISO 8601 timestamp |
 | event | "not_found_reported" |
 | plugin | "aule" |
-| plugin_version | "0.1.0" |
+| plugin_version | current plugin version (from plugin.json) |
 | component | Which component encountered the missing data |
 | description | What was looked for and not found |
 
@@ -245,7 +241,7 @@ When user confirmation is requested before a destructive or bulk action, log:
 | timestamp | Current ISO 8601 timestamp |
 | event | "permission_gate" |
 | plugin | "aule" |
-| plugin_version | "0.1.0" |
+| plugin_version | current plugin version (from plugin.json) |
 | action_type | "destructive" or "bulk_change" |
 | description | What action required permission |
 | user_decision | "approved" or "denied" |
@@ -259,7 +255,7 @@ When the plugin makes a significant decision or recommendation, log the reasonin
 | timestamp | Current ISO 8601 timestamp |
 | event | "decision_trace" |
 | plugin | "aule" |
-| plugin_version | "0.1.0" |
+| plugin_version | current plugin version (from plugin.json) |
 | component | Which component made the decision |
 | input_summary | Brief description of the input that triggered the decision |
 | reasoning | Key factors that influenced the decision (2-3 bullet points) |

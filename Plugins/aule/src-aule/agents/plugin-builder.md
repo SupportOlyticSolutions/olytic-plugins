@@ -146,8 +146,8 @@ Present the spec JSON to the user for review before running the compiler.
 Run the compiler in validation mode to check the spec. Keep running this loop until the compiler exits 0.
 
 ```bash
-cd /sessions/eloquent-busy-keller/mnt/olytic-plugins && \
-python3 src-aule/tools/plugin-compiler.py --dry-run [plugin-name]-spec.json
+# Run from the olytic-plugins workspace root
+python3 Plugins/aule/src-aule/tools/plugin-compiler.py --dry-run [plugin-name]-spec.json
 ```
 
 **On failure:**
@@ -168,8 +168,8 @@ Do not proceed to Phase 4 until the dry run passes cleanly.
 Run the compiler for real:
 
 ```bash
-cd /sessions/eloquent-busy-keller/mnt/olytic-plugins && \
-python3 src-aule/tools/plugin-compiler.py [plugin-name]-spec.json
+# Run from the olytic-plugins workspace root
+python3 Plugins/aule/src-aule/tools/plugin-compiler.py [plugin-name]-spec.json
 ```
 
 The compiler writes all plugin files and produces a `.zip`. After it completes:
@@ -327,7 +327,7 @@ Verify the README describes the plugin's augmentation — what new capabilities 
 Open `skills/[plugin-name]-telemetry/SKILL.md`. Verify:
 - The 8 canonical event types are referenced: `skill_invoke`, `decision_trace`, `feedback`, `violation`, `not_found_reported`, `verification_gate`, `permission_gate`, `agent_trigger`
 - Events are sent via HTTP POST (not written to local files)
-- The skill does not hardcode telemetry event shape — it defers to `olytic-core/contracts/schemas/telemetry-event-schema.json` at runtime if available
+- The skill does not hardcode telemetry event shape — it invokes `olytic-core-schemas` skill with `schema: telemetry-event` at runtime to fetch the authoritative field definitions
 
 **Check 12 — Memory access control declaration:**
 If the README declares `memory_scope: persistent`, verify:
@@ -399,8 +399,8 @@ Apply fixes in this priority order:
 After applying all fixes, run the compiler's `--validate-dir` against the edited plugin directory. This extracts a PluginSpec from the actual files and validates it through Pydantic — the same guarantee as Create Mode.
 
 ```bash
-cd /sessions/eloquent-busy-keller/mnt/olytic-plugins && \
-python3 src-aule/tools/plugin-compiler.py --validate-dir [path/to/plugin-src-dir]
+# Run from the olytic-plugins workspace root
+python3 Plugins/aule/src-aule/tools/plugin-compiler.py --validate-dir [path/to/plugin-src-dir]
 ```
 
 **On failure:**
@@ -453,7 +453,7 @@ This agent orchestrates the entire plugin creation or update workflow. Log telem
 At activation, log:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:30:00Z","event":"agent_trigger","plugin":"aule","plugin_version":"0.2.0","component":"plugin-builder","trigger":"user asked to create a new plugin for their sales team"}
+{"timestamp":"2026-03-03T10:30:00Z","event":"agent_trigger","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-builder","trigger":"user asked to create a new plugin for their sales team"}
 ```
 
 **When:** Log this immediately after the agent is invoked and you've determined which mode to enter (Create or Update).
@@ -463,7 +463,7 @@ At activation, log:
 At each phase transition, log:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:32:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.2.0","component":"plugin-builder","input_summary":"user completed discovery: 3 key functions, memory scope, workflow context, and success metrics defined","reasoning":["discovery identified need for 2 skills and 1 agent","memory scope is session-based, not persistent","augmentation signal strong: plugin enables new compliance review capability"],"output_summary":"advancing to Phase 2 (component planning) with 2 skill + 1 agent architecture","confidence":"high"}
+{"timestamp":"2026-03-03T10:32:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-builder","input_summary":"user completed discovery: 3 key functions, memory scope, workflow context, and success metrics defined","reasoning":["discovery identified need for 2 skills and 1 agent","memory scope is session-based, not persistent","augmentation signal strong: plugin enables new compliance review capability"],"output_summary":"advancing to Phase 2 (component planning) with 2 skill + 1 agent architecture","confidence":"high"}
 ```
 
 **When:**
@@ -478,15 +478,15 @@ At each phase transition, log:
 During Phase 4 (Compile & Verify), as you run each post-compile check, log verification events:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:40:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.2.0","result":"pass","component":"plugin-builder","description":"Check 1: plugin.json validation passed — all required fields present, no unrecognized keys"}
+{"timestamp":"2026-03-03T10:40:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.3.0","platform":"claude","result":"pass","component":"plugin-builder","description":"Check 1: plugin.json validation passed — all required fields present, no unrecognized keys"}
 ```
 
 ```jsonl
-{"timestamp":"2026-03-03T10:41:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.2.0","result":"pass","component":"plugin-builder","description":"Check 3: skill frontmatter valid — all SKILL.md files have required frontmatter"}
+{"timestamp":"2026-03-03T10:41:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.3.0","platform":"claude","result":"pass","component":"plugin-builder","description":"Check 3: skill frontmatter valid — all SKILL.md files have required frontmatter"}
 ```
 
 ```jsonl
-{"timestamp":"2026-03-03T10:42:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.2.0","result":"pass","component":"plugin-builder","description":"Check 6: agentic best practices embedded — discovery first, source of truth, atomic operations patterns present"}
+{"timestamp":"2026-03-03T10:42:00Z","event":"verification_gate","plugin":"aule","plugin_version":"0.3.0","platform":"claude","result":"pass","component":"plugin-builder","description":"Check 6: agentic best practices embedded — discovery first, source of truth, atomic operations patterns present"}
 ```
 
 **Required fields:**
@@ -509,14 +509,14 @@ During Phase 4 (Compile & Verify), as you run each post-compile check, log verif
 Before the compiler runs for real in Phase 4, log:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:35:00Z","event":"permission_gate","plugin":"aule","plugin_version":"0.2.0","action_type":"bulk_change","description":"spec validated — compiler is about to create 9 files for plugin 'content-reviewer': .claude-plugin/plugin.json, README.md, hooks/hooks.json, 4 skill SKILL.md files, metadata.json, zip archive","user_decision":"approved"}
+{"timestamp":"2026-03-03T10:35:00Z","event":"permission_gate","plugin":"aule","plugin_version":"0.3.0","platform":"claude","action_type":"bulk_change","description":"spec validated — compiler is about to create 9 files for plugin 'content-reviewer': .claude-plugin/plugin.json, README.md, hooks/hooks.json, 4 skill SKILL.md files, metadata.json, zip archive","user_decision":"approved"}
 ```
 
 **When:** After dry run passes in Phase 3 and before running the compiler for real in Phase 4.
 
 In UPDATE Mode:
 ```jsonl
-{"timestamp":"2026-03-03T10:38:00Z","event":"permission_gate","plugin":"aule","plugin_version":"0.2.0","action_type":"bulk_change","description":"audit found 6 issues in 'proposal-analyzer' plugin; 2 are upload-blocking. Fix all, just the blocking ones, or review each?","user_decision":"fix all"}
+{"timestamp":"2026-03-03T10:38:00Z","event":"permission_gate","plugin":"aule","plugin_version":"0.3.0","platform":"claude","action_type":"bulk_change","description":"audit found 6 issues in 'proposal-analyzer' plugin; 2 are upload-blocking. Fix all, just the blocking ones, or review each?","user_decision":"fix all"}
 ```
 
 **When:** After presenting the audit report in Update Phase 2 and before applying fixes in Phase 3.
@@ -526,7 +526,7 @@ In UPDATE Mode:
 If the user provides explicit feedback on the generated/updated plugin, log:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:50:00Z","event":"feedback","plugin":"aule","plugin_version":"0.2.0","sentiment":"positive","component":"plugin-builder","context":"user said the plugin captured exactly what they wanted to build","output_summary":"generated complete 'content-reviewer' plugin: 4 skills, 1 agent, 2 commands, full telemetry setup"}
+{"timestamp":"2026-03-03T10:50:00Z","event":"feedback","plugin":"aule","plugin_version":"0.3.0","platform":"claude","sentiment":"positive","component":"plugin-builder","context":"user said the plugin captured exactly what they wanted to build","output_summary":"generated complete 'content-reviewer' plugin: 4 skills, 1 agent, 2 commands, full telemetry setup"}
 ```
 
 **When:** Log ONLY if user explicitly praises ("This is exactly right", "Perfect") or criticizes ("This isn't what I asked for") the generated/updated plugin output.
@@ -538,7 +538,7 @@ If the user provides explicit feedback on the generated/updated plugin, log:
 If a user tries to bypass phases or violates plugin-builder constraints:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:33:00Z","event":"violation","plugin":"aule","plugin_version":"0.2.0","violation_type":"out_of_scope","description":"user asked to skip discovery and jump directly to generating plugin files","constraint_violated":"Phase 1 (discovery) is mandatory before generation — cannot skip to Phase 3","action_taken":"redirected — explained why discovery is required and restarted Phase 1"}
+{"timestamp":"2026-03-03T10:33:00Z","event":"violation","plugin":"aule","plugin_version":"0.3.0","platform":"claude","violation_type":"out_of_scope","description":"user asked to skip discovery and jump directly to generating plugin files","constraint_violated":"Phase 1 (discovery) is mandatory before generation — cannot skip to Phase 3","action_taken":"redirected — explained why discovery is required and restarted Phase 1"}
 ```
 
 **Plugin-builder constraints are:**
@@ -556,7 +556,7 @@ If a user tries to bypass phases or violates plugin-builder constraints:
 In UPDATE Mode, if you cannot locate the plugin the user references:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:34:00Z","event":"not_found_reported","plugin":"aule","plugin_version":"0.2.0","component":"plugin-builder","description":"user asked to update plugin 'sales-enabler' but no plugin with that name found in plugins-workspace/ or as .plugin file — suggested alternatives or asked user to clarify"}
+{"timestamp":"2026-03-03T10:34:00Z","event":"not_found_reported","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-builder","description":"user asked to update plugin 'sales-enabler' but no plugin with that name found in plugins-workspace/ or as .plugin file — suggested alternatives or asked user to clarify"}
 ```
 
 **When:** Before proceeding with Update Mode, if you can't find the plugin.
@@ -566,7 +566,7 @@ In UPDATE Mode, if you cannot locate the plugin the user references:
 When packaging completes successfully, log a final decision trace:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:48:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.2.0","component":"plugin-builder","input_summary":"plugin 'content-reviewer' passed all 10 verification checks and is ready for delivery","reasoning":["all files generated without errors","verification gates passed: plugin.json valid, agent frontmatter correct, natural language triggers present","telemetry skill generated and integrated"],"output_summary":"packaged and ready for deployment or marketplace registration","confidence":"high"}
+{"timestamp":"2026-03-03T10:48:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-builder","input_summary":"plugin 'content-reviewer' passed all 10 verification checks and is ready for delivery","reasoning":["all files generated without errors","verification gates passed: plugin.json valid, agent frontmatter correct, natural language triggers present","telemetry skill generated and integrated"],"output_summary":"packaged and ready for deployment or marketplace registration","confidence":"high"}
 ```
 
 ---

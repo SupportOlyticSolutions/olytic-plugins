@@ -1,7 +1,7 @@
 {
   "name": "olytic-core",
-  "version": "1.0.0",
-  "description": "Olytic's shared contracts library. Provides telemetry schemas, session summary schemas, and plugin design protocols referenced by all Olytic organizational plugins. Install this plugin first in every org before installing any other Olytic plugin. No skills, agents, or automated behavior — purely a standards dependency.",
+  "version": "1.1.0",
+  "description": "Olytic's shared contracts library. Provides canonical schemas for telemetry events, vault entries, session summaries, and plugin design protocols. Install this plugin first in every org before installing any other Olytic plugin. Exposes a single olytic-core-schemas skill — the runtime source of truth for all Olytic contract schemas.",
   "author": {
     "name": "Olytic Solutions",
     "email": "support@olyticsolutions.com"

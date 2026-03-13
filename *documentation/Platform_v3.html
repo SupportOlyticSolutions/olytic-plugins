@@ -1,0 +1,2352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Aule Axiom and Olytic Intelligence Platform — Olytic Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── RESET & BASE ────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:       #1B2A4A;
+    --navy-light: #EEF1F7;
+    --gold:       #C8A96E;
+    --gold-light: #FAF5EC;
+    --teal:       #0D6B6E;
+    --teal-light: #E8F4F4;
+    --surface:    #F7F7F5;
+    --body:       #344054;
+    --muted:      #667085;
+    --border:     #E4E7EC;
+    --white:      #FFFFFF;
+    --sidebar-w:  260px;
+    --header-h:   56px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--body);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ── TOP HEADER ──────────────────────────────────────────────── */
+  .top-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--header-h);
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    z-index: 100;
+    border-bottom: 2px solid var(--gold);
+  }
+  .top-header .brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-right: 24px;
+    white-space: nowrap;
+  }
+  .top-header .doc-title {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .top-header .badge {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    opacity: 0.8;
+    white-space: nowrap;
+  }
+
+  /* ── LAYOUT ──────────────────────────────────────────────────── */
+  .layout {
+    display: flex;
+    margin-top: var(--header-h);
+    min-height: calc(100vh - var(--header-h));
+  }
+
+  /* ── SIDEBAR ─────────────────────────────────────────────────── */
+  .sidebar {
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    width: var(--sidebar-w);
+    height: calc(100vh - var(--header-h));
+    background: var(--navy);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px 0 40px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(200,169,110,0.3) transparent;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(200,169,110,0.3); border-radius: 2px; }
+
+  .sidebar-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    color: rgba(200,169,110,0.5);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 20px 20px 8px;
+  }
+  .sidebar-section-label:first-child { padding-top: 8px; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px 9px 20px;
+    cursor: pointer;
+    transition: background 0.15s, border-left-color 0.15s;
+    border-left: 3px solid transparent;
+    text-decoration: none;
+  }
+  .nav-item:hover {
+    background: rgba(255,255,255,0.06);
+    border-left-color: rgba(200,169,110,0.4);
+  }
+  .nav-item.active {
+    background: rgba(200,169,110,0.12);
+    border-left-color: var(--gold);
+  }
+  .nav-item .nav-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    opacity: 0.7;
+    min-width: 24px;
+    flex-shrink: 0;
+  }
+  .nav-item.active .nav-num { opacity: 1; }
+  .nav-item .nav-label {
+    font-size: 12.5px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.3;
+  }
+  .nav-item.active .nav-label {
+    color: rgba(255,255,255,0.95);
+    font-weight: 500;
+  }
+  .sidebar-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+    margin: 12px 20px;
+  }
+
+  /* ── MAIN CONTENT ────────────────────────────────────────────── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ── SECTIONS ────────────────────────────────────────────────── */
+  .section {
+    display: none;
+    padding: 56px 64px 80px;
+    max-width: 900px;
+  }
+  .section.active { display: block; }
+
+  /* Cover section */
+  .section.cover {
+    max-width: 100%;
+    padding: 72px 80px 80px;
+    min-height: calc(100vh - var(--header-h));
+    background: linear-gradient(135deg, var(--navy) 0%, #243960 100%);
+    display: none;
+  }
+  .section.cover.active { display: flex; flex-direction: column; }
+
+  /* ── TYPOGRAPHY ──────────────────────────────────────────────── */
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-top: 48px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--teal);
+    margin-top: 28px;
+    margin-bottom: 8px;
+  }
+  p {
+    margin-bottom: 16px;
+    color: var(--body);
+  }
+  p:last-child { margin-bottom: 0; }
+
+  .lead {
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1.75;
+    margin-bottom: 24px;
+  }
+
+  /* ── CALLOUT ─────────────────────────────────────────────────── */
+  .callout {
+    padding: 20px 24px;
+    border-left: 4px solid var(--teal);
+    background: var(--teal-light);
+    border-radius: 0 8px 8px 0;
+    margin: 28px 0;
+    font-size: 14.5px;
+    font-style: italic;
+    color: var(--body);
+    line-height: 1.65;
+  }
+  .callout.gold {
+    border-left-color: var(--gold);
+    background: var(--gold-light);
+  }
+  .callout.navy {
+    border-left-color: var(--navy);
+    background: var(--navy-light);
+  }
+
+  /* ── DIVIDER ─────────────────────────────────────────────────── */
+  .divider {
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
+    margin: 32px 0;
+    border: none;
+  }
+
+  /* ── BULLET LISTS ────────────────────────────────────────────── */
+  ul.doc-list {
+    list-style: none;
+    margin: 8px 0 20px;
+    padding: 0;
+  }
+  ul.doc-list li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 10px;
+    line-height: 1.65;
+  }
+  ul.doc-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  ul.doc-list li strong { color: var(--navy); }
+
+  ol.doc-list {
+    list-style: none;
+    counter-reset: doc-counter;
+    margin: 8px 0 20px;
+    padding: 0;
+  }
+  ol.doc-list li {
+    counter-increment: doc-counter;
+    position: relative;
+    padding-left: 32px;
+    margin-bottom: 10px;
+    line-height: 1.65;
+  }
+  ol.doc-list li::before {
+    content: counter(doc-counter) ".";
+    position: absolute;
+    left: 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gold);
+    top: 2px;
+  }
+  ol.doc-list li strong { color: var(--navy); }
+
+  /* ── THREE-TIER TILES ────────────────────────────────────────── */
+  .tile-grid {
+    display: grid;
+    gap: 16px;
+    margin: 28px 0;
+  }
+  .tile-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .tile-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+  .tile {
+    padding: 24px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+  }
+  .tile.tier1 { border-top: 4px solid var(--muted);  background: var(--surface); }
+  .tile.tier2 { border-top: 4px solid var(--teal);   background: var(--teal-light); }
+  .tile.tier3 { border-top: 4px solid var(--navy);   background: var(--navy-light); }
+  .tile.signal-dormant { border-top: 4px solid var(--muted);  background: var(--surface); }
+  .tile.signal-suggest { border-top: 4px solid var(--teal);   background: var(--teal-light); }
+  .tile.signal-enforce { border-top: 4px solid var(--navy);   background: var(--navy-light); }
+
+  .tile-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .tile-tag.muted  { color: var(--muted); }
+  .tile-tag.teal   { color: var(--teal);  }
+  .tile-tag.navy   { color: var(--navy);  }
+
+  .tile-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .tile-title.muted { color: var(--muted); }
+  .tile-title.teal  { color: var(--teal);  }
+  .tile-title.navy  { color: var(--navy);  }
+
+  .tile-question {
+    font-size: 13px;
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+  .tile-question.muted { color: var(--muted); }
+  .tile-question.teal  { color: var(--teal);  }
+  .tile-question.navy  { color: var(--navy);  }
+
+  .tile-body {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--body);
+  }
+
+  /* ── TABLES ──────────────────────────────────────────────────── */
+  .doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0 32px;
+    font-size: 13.5px;
+  }
+  .doc-table th {
+    background: var(--navy);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 12.5px;
+    padding: 11px 14px;
+    text-align: left;
+    letter-spacing: 0.02em;
+  }
+  .doc-table th:first-child { border-radius: 6px 0 0 0; }
+  .doc-table th:last-child  { border-radius: 0 6px 0 0; }
+  .doc-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.55;
+    color: var(--body);
+  }
+  .doc-table tr:nth-child(even) td { background: var(--navy-light); }
+  .doc-table tr:last-child td { border-bottom: none; }
+  .doc-table td.td-key {
+    font-weight: 600;
+    color: var(--navy);
+    white-space: nowrap;
+  }
+  .doc-table td.td-teal {
+    font-weight: 600;
+    color: var(--teal);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+  }
+  .doc-table td.td-muted {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 13px;
+  }
+  .doc-table td .yes {
+    font-weight: 700;
+    color: var(--teal);
+  }
+  .doc-table td .dash {
+    color: var(--muted);
+  }
+  .doc-table td.center { text-align: center; }
+
+  /* ── COVER PAGE ──────────────────────────────────────────────── */
+  .cover-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+    opacity: 0.8;
+  }
+  .cover-title {
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 28px;
+    max-width: 700px;
+  }
+  .cover-divider {
+    width: 80px;
+    height: 3px;
+    background: var(--gold);
+    margin-bottom: 32px;
+  }
+  .cover-subtitle {
+    font-size: 18px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.7;
+    max-width: 560px;
+    margin-bottom: 64px;
+    font-style: italic;
+  }
+  .cover-meta {
+    margin-top: auto;
+    display: flex;
+    gap: 32px;
+    align-items: flex-end;
+  }
+  .cover-meta-item label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: rgba(200,169,110,0.6);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .cover-meta-item span {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+  }
+
+  /* ── APPENDIX ────────────────────────────────────────────────── */
+  .appendix-header {
+    background: var(--navy);
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 40px;
+  }
+  .appendix-header .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.8;
+  }
+  .appendix-header h1 {
+    color: var(--white);
+    margin-bottom: 8px;
+    font-size: 28px;
+  }
+  .appendix-header p {
+    color: rgba(255,255,255,0.5);
+    font-size: 13.5px;
+    margin: 0;
+  }
+
+  /* ── LOOP TABLE ──────────────────────────────────────────────── */
+  .loop-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0 32px;
+    font-size: 13.5px;
+  }
+  .loop-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  .loop-table tr:last-child td { border-bottom: none; }
+  .loop-table td.loop-stage {
+    font-weight: 700;
+    color: var(--navy);
+    background: var(--gold-light);
+    font-size: 13px;
+    white-space: nowrap;
+    width: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-right: 2px solid var(--gold);
+  }
+  .loop-table td.loop-desc {
+    background: var(--white);
+    color: var(--body);
+  }
+  .loop-table tr:nth-child(even) td.loop-desc { background: var(--gold-light); }
+
+  /* ── CODE ────────────────────────────────────────────────────── */
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--teal);
+  }
+
+  /* ── SCROLL SPY OFFSET ───────────────────────────────────────── */
+  .section { scroll-margin-top: calc(var(--header-h) + 24px); }
+
+  /* ── RESPONSIVE ──────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .tile-grid.cols-3 { grid-template-columns: 1fr; }
+    .section { padding: 40px 28px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP HEADER -->
+<header class="top-header">
+  <span class="brand">Olytic Solutions</span>
+  <span class="doc-title">The Aule Axiom and Olytic Intelligence Platform</span>
+  <span class="badge">v3.0 &nbsp;·&nbsp; Mar 2026 &nbsp;·&nbsp; Confidential</span>
+</header>
+
+<div class="layout">
+
+
+<!-- SIDEBAR NAV -->
+<nav class="sidebar">
+  <div class="sidebar-section-label">Overview</div>
+  <a class="nav-item active" onclick="showSection('cover')">
+    <span class="nav-num">—</span>
+    <span class="nav-label">Cover</span>
+  </a>
+
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section-label">Main Document</div>
+
+  <a class="nav-item" onclick="showSection('s00')">
+    <span class="nav-num">01</span>
+    <span class="nav-label">The Problem</span>
+  </a>
+  <a class="nav-item" onclick="showSection('sAnswer')">
+    <span class="nav-num">02</span>
+    <span class="nav-label">The Answer</span>
+  </a>
+  <a class="nav-item" onclick="showSection('s06')">
+    <span class="nav-num">03</span>
+    <span class="nav-label">Aule Axiom</span>
+  </a>
+  <a class="nav-item" onclick="showSection('sCrossPlatform')">
+    <span class="nav-num">04</span>
+    <span class="nav-label">Cross-Platform Strategy</span>
+  </a>
+  <a class="nav-item" onclick="showSection('s01')">
+    <span class="nav-num">05</span>
+    <span class="nav-label">Memory Architecture</span>
+  </a>
+  <a class="nav-item" onclick="showSection('s02')">
+    <span class="nav-num">06</span>
+    <span class="nav-label">Anti-Drift Protocols</span>
+  </a>
+  <a class="nav-item" onclick="showSection('s08')">
+    <span class="nav-num">07</span>
+    <span class="nav-label">Policy Enforcement</span>
+  </a>
+  <a class="nav-item" onclick="showSection('s07')">
+    <span class="nav-num">08</span>
+    <span class="nav-label">Ambient Intelligence</span>
+  </a>
+  <a class="nav-item" onclick="showSection('s04')">
+    <span class="nav-num">09</span>
+    <span class="nav-label">Governance</span>
+  </a>
+  <a class="nav-item" onclick="showSection('s05')">
+    <span class="nav-num">10</span>
+    <span class="nav-label">Implementation Standards</span>
+  </a>
+
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section-label">The Forge</div>
+
+  <a class="nav-item" onclick="showSection('sForge')">
+    <span class="nav-num">11</span>
+    <span class="nav-label">Aule — The Forge</span>
+  </a>
+  <a class="nav-item" onclick="showSection('sLifecycle')">
+    <span class="nav-num">12</span>
+    <span class="nav-label">AI Agent Lifecycle</span>
+  </a>
+
+  <div class="sidebar-divider"></div>
+  <a class="nav-item" onclick="showSection('closing')">
+    <span class="nav-num">—</span>
+    <span class="nav-label">Closing</span>
+  </a>
+
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section-label">Appendix</div>
+
+  <a class="nav-item" onclick="showSection('appA')">
+    <span class="nav-num">A</span>
+    <span class="nav-label">Memory Entry Schema</span>
+  </a>
+  <a class="nav-item" onclick="showSection('appB')">
+    <span class="nav-num">B</span>
+    <span class="nav-label">Payload Conventions</span>
+  </a>
+  <a class="nav-item" onclick="showSection('appC')">
+    <span class="nav-num">C</span>
+    <span class="nav-label">Anti-Drift Full Rules</span>
+  </a>
+  <a class="nav-item" onclick="showSection('appD')">
+    <span class="nav-num">D</span>
+    <span class="nav-label">Engineering &amp; Versioning</span>
+  </a>
+  <a class="nav-item" onclick="showSection('appE')">
+    <span class="nav-num">E</span>
+    <span class="nav-label">Constraint Manifest</span>
+  </a>
+  <a class="nav-item" onclick="showSection('appF')">
+    <span class="nav-num">F</span>
+    <span class="nav-label">Failure Modes</span>
+  </a>
+  <a class="nav-item" onclick="showSection('appG')">
+    <span class="nav-num">G</span>
+    <span class="nav-label">Master Instruction Template</span>
+  </a>
+  <a class="nav-item" onclick="showSection('appH')">
+    <span class="nav-num">H</span>
+    <span class="nav-label">Aule Axiom Validation</span>
+  </a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<section id="cover" class="section cover active">
+    <div class="cover-tag">Olytic Solutions &nbsp;·&nbsp; Source of Truth Document</div>
+    <h1 class="cover-title">The Aule Axiom and Olytic Intelligence Platform</h1>
+    <div class="cover-divider"></div>
+    <p class="cover-subtitle">A design standard for AI plugins that accumulate, govern, and compound institutional memory — automatically, across every session.</p>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <label>Version</label>
+        <span>v3.0</span>
+      </div>
+      <div class="cover-meta-item">
+        <label>Date</label>
+        <span>March 2026</span>
+      </div>
+      <div class="cover-meta-item">
+        <label>Classification</label>
+        <span>Confidential</span>
+      </div>
+      <div class="cover-meta-item">
+        <label>Type</label>
+        <span>Companion Document &nbsp;·&nbsp; Reference Standard</span>
+      </div>
+    </div>
+  </section>
+
+<section id="s00" class="section">
+    <div class="section-tag">01 &nbsp;·&nbsp; The Problem</div>
+    <h1>The Problem: AI Systems Forget</h1>
+    <hr class="divider">
+    <p class="lead">Every AI session starts from zero. The model has no memory of the client's business, no record of past decisions, no awareness of standing preferences.</p>
+    <p>The user re-explains context they explained last month. The model re-learns what it was already told. Nothing accumulates. Nothing improves on its own. And the firm pays — in time, in inconsistency, and in the slow erosion of quality that no one can easily attribute to a single cause.</p>
+
+    <h2>Why This Matters to a Professional Services Firm</h2>
+    <p>For a managing partner or operations leader, AI is only valuable if it produces consistent, trustworthy output at scale. A tool that requires re-briefing every session is not a productivity multiplier — it is a productivity tax. Consider what gets lost:</p>
+    <ul class="doc-list">
+      <li><strong>Client context</strong> — preferences, deal history, communication style, standing instructions. Rebuilt from scratch each session, or forgotten entirely.</li>
+      <li><strong>Institutional standards</strong> — how the firm writes, prices, structures deliverables, and speaks to clients. Not enforced. Drifting with every user and every session.</li>
+      <li><strong>Decision continuity</strong> — commitments made last quarter, approaches agreed last month, corrections applied last week. Gone. The AI doesn't know, and it doesn't know it doesn't know.</li>
+    </ul>
+    <p>The compounding effect is what makes this serious. Every session lost is a session that didn't add to the knowledge base. Every inconsistency is a quality risk. Every re-briefing is a senior professional spending time on overhead instead of work. At scale — across dozens of employees and hundreds of client engagements — this is a material problem.</p>
+
+    <div class="callout gold">
+      The standard that matters: a client's AI system should know more about their business at the end of month twelve than it did at the end of month one — automatically, without anyone doing anything differently.
+    </div>
+
+    <h2>Plugins Help — But Don't Solve This</h2>
+    <p>The natural instinct is to build plugins. Package the prompts, give the AI instructions, deploy it to users. And plugins do help — they standardize inputs, encode workflows, and reduce the variance in how AI is used day to day.</p>
+    <p>But plugins alone cannot solve the memory problem. Here's why:</p>
+    <ul class="doc-list">
+      <li><strong>No persistent state.</strong> A plugin carries instructions, not memory. When the session ends, everything learned in that session is discarded. The next session starts identically to the one before it — regardless of what happened.</li>
+      <li><strong>No enforced rules.</strong> A plugin can suggest how to behave. It cannot enforce it. There is no mechanism to define which constraints are absolute (hard rules — never violate) versus advisory (soft rules — flag and proceed). Without that distinction, every rule is effectively a suggestion.</li>
+      <li><strong>No schema for knowledge.</strong> Even when a plugin captures something worth saving, there is no standard for what to save, how to classify it, where to store it, or how to retrieve it later. Each plugin is an island.</li>
+      <li><strong>No cross-plugin coherence.</strong> A firm may deploy multiple plugins across different functions — business development, client delivery, internal operations. Each starts blind. None knows what the others have learned. The firm's institutional knowledge never consolidates.</li>
+    </ul>
+    <p>The result is a collection of well-intentioned tools that are, individually, stateless. The AI gets smarter in the moment and resets overnight.</p>
+    <p>This is not a model limitation. It is an architecture failure. The solution is not a better plugin — it is a designed system that gives every plugin the institutional memory it needs to compound over time.</p>
+  </section>
+
+<section id="sAnswer" class="section">
+    <div class="section-tag">02 &nbsp;·&nbsp; The Answer</div>
+    <h1>The Answer: A Designed System That Remembers</h1>
+    <hr class="divider">
+    <p class="lead">The solution is not a smarter model. It is a governed architecture — a set of enforced design standards applied to every AI solution Olytic builds, so that memory compounds automatically across every plugin, every session, and every client engagement.</p>
+
+    <h2>Step 1 — A Universal Design Pattern, Enforced</h2>
+    <p>Olytic defines a single design standard — a proprietary design standard called <strong>Aule Axiom</strong> — that governs how every AI solution we build is structured. Not recommended. Enforced. Every plugin, every agent, every workflow we deploy is built to this standard.</p>
+    <p>The pattern mandates how plugins initialize, how they read and write to memory, what rules are absolute versus advisory, and how sessions are opened and closed. This is not a style guide — it is an architectural contract. A plugin that doesn't conform to Aule Axiom doesn't ship.</p>
+
+    <div class="callout gold">
+      Aule Axiom is Olytic's proprietary architectural standard that sits above any individual model provider. It is compatible with every major platform — Claude, ChatGPT, Microsoft Copilot, and Gemini — because it is defined at the protocol level, not the prompt level. Aule Axiom-compliant solutions work across model providers without redesign.
+    </div>
+
+    <h2>Step 2 — Rules That Are Actually Enforced</h2>
+    <p>Every Aule Axiom-compliant plugin declares its constraints explicitly — and those constraints are enforced at runtime, not just expressed in a system prompt. The protocol distinguishes between:</p>
+    <ul class="doc-list">
+      <li><strong>Hard rules</strong> — absolute. If the AI's response would violate one, the output is automatically corrected before it reaches the user. No exceptions.</li>
+      <li><strong>Soft rules</strong> — advisory. Violations are flagged and surfaced to the user for a decision. The system doesn't override — it alerts.</li>
+      <li><strong>Contextual rules</strong> — conditional. Applied only when defined criteria are met. The plugin knows when they apply.</li>
+    </ul>
+    <p>This is what plugins have always been missing: a mechanism to enforce the standards they claim to follow. Aule Axiom provides it.</p>
+
+    <h2>Step 3 — Session Memory Captured Automatically</h2>
+    <p>At the end of every session, the system doesn't just discard the conversation. Before the ephemeral context is cleared, a structured compression process extracts what matters — decisions made, corrections applied, new facts surfaced, standing preferences confirmed — and writes it to the client's private memory store.</p>
+    <p>This is transmitted via the <strong>Olytic Gateway</strong> — Olytic's proprietary API layer — directly to the client's dedicated database. The Gateway handles the translation to each platform's native protocol, whether that is MCP tool-calling for Claude, Actions for ChatGPT, connectors for Copilot Studio, or extensions for Gemini. The client never has to do anything. The memory accumulates as a byproduct of normal usage.</p>
+
+    <h2>Step 4 — Every Plugin Starts by Remembering</h2>
+    <p>When a plugin is activated — before the user types anything — it runs its bootstrap sequence. The first action is always a fetch: retrieve the relevant memory from the client's vault, inject it into the context, and initialize from a state of knowing.</p>
+    <p>The plugin doesn't start fresh. It starts from everything that has been remembered about this client, their business, their preferences, and their history. Session after session, that foundation grows. The AI doesn't just get better at its task — it gets better at <em>this client's</em> version of that task.</p>
+
+    <div class="callout">
+      <strong>The net effect:</strong> a system where each session makes the next one better. Not because the model improved. Because the memory did.
+    </div>
+
+    <p>The sections that follow define the architecture underlying this system: the three-tier memory model, the anti-drift protocols, the Aule Axiom standard, and the enforcement layer that keeps everything consistent.</p>
+  </section>
+
+<section id="s06" class="section">
+    <div class="section-tag">03 &nbsp;·&nbsp; Aule Axiom</div>
+    <h1>Aule Axiom</h1>
+    <hr class="divider">
+    <p>Each AI platform defines its own transport layer — how an agent communicates with external tools. MCP handles this for Claude, Actions handle it for ChatGPT, connectors for Copilot Studio, and extensions for Gemini. What none of them define is what those tools should do, how a client's knowledge should be structured, or how it should compound over time across every agent deployment.</p>
+    <p>Aule Axiom is the proprietary design standard that sits above all of these platform-specific transports. It governs how every agent initializes, reads, writes, and reflects on a client's semantic knowledge base — regardless of the host platform. It is why two different agents deployed for the same client, on two different platforms, share a single source of truth.</p>
+
+    <h2>The Architecture in Five Components</h2>
+    <p>Every Olytic plugin deployment is built on these five components. A plugin that omits any one of them is not running on Aule Axiom and does not carry its guarantees.</p>
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:22%">Component</th><th>What It Does</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">Master Instruction</td>
+          <td>A proprietary system prompt header embedded in every plugin. Defines the initialization sequence, fetch behavior, write rules, and Reflection trigger. Runs before any user interaction. Cannot be overridden at the plugin level.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Gateway</td>
+          <td>A central Node.js/Python API that routes all plugin requests by Client_ID to the correct isolated Supabase instance. No plugin connects directly to any database. All traffic flows through the Gateway.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Reflection Engine</td>
+          <td>A transformation script that runs at session close. Converts raw session output into high-density structured state: updated project fields, resolved decisions, new Episodic records. Raw transcripts never enter the knowledge base.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Private Vault</td>
+          <td>An isolated Supabase instance per client: PostgreSQL for structured facts and Semantic State, pgvector for Episodic history and similarity search. Client data is never commingled. Isolation is architectural.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Session Bootstrap</td>
+          <td>The first action of every session. The plugin calls the Gateway, retrieves the current Semantic State for this client, and injects it into the model's context window before the user speaks. The model never starts from zero.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>The Session Lifecycle</h2>
+    <p>Every session follows the same six-step cycle, regardless of which plugin the user opens. The cycle is triggered by the Master Instruction — the user never sees it. They experience the result: a model that already knows the context.</p>
+    <ol class="doc-list">
+      <li><strong>Plugin launch.</strong> The Master Instruction activates. It reads the Client_ID and issues a fetch request to the Gateway.</li>
+      <li><strong>Gateway routing.</strong> The Gateway resolves the Client_ID to the correct Supabase connection keys and queries the client's Private Vault for relevant Semantic State.</li>
+      <li><strong>Context injection.</strong> The returned Semantic State is injected into the model's context window before the user's first message.</li>
+      <li><strong>Active session.</strong> The user works with the plugin. Decisions made and preferences expressed accumulate in Active Context.</li>
+      <li><strong>Reflection.</strong> At session close, the Reflection Engine extracts decisions, updates project fields, and writes new Episodic records. Raw transcripts do not enter the knowledge base.</li>
+      <li><strong>Vault write.</strong> The Gateway commits the Reflection output. The next session — from any plugin — begins with a more complete picture than the last one did. The loop closes. The system compounds.</li>
+    </ol>
+
+    <h2>What the Private Vault Contains</h2>
+    <p>Session summaries are one input to the vault. A complete Private Vault contains three categories of knowledge — each with different origins, different update mechanics, and different access patterns.</p>
+    <ul class="doc-list">
+      <li><strong>Category 1 — Generated State.</strong> Written automatically by plugins via Reflection. Includes Semantic State records, Episodic history, interaction patterns, and the Constraint Violation Log. Grows with every session without manual effort.</li>
+      <li><strong>Category 2 — Reference Data.</strong> Entered and managed by the client or Olytic. Named entities, approved glossary, project registry, KPI definitions. Treated as permanent, confidence-1.0 facts. Reflection cannot overwrite them.</li>
+      <li><strong>Category 3 — Live References.</strong> Externally hosted documents (Brand Guide, ICP Definition, legal templates, pricing sheets) registered in the vault as pointers — not stored copies. Each entry holds a source URL, a cached version, and a TTL. Plugins always receive the freshest version without making direct external calls.</li>
+    </ul>
+
+    <h2>Vault Subscriptions: Selective Fetch by Plugin</h2>
+    <p>Not every plugin needs every piece of vault content. Each plugin declares a <strong>Vault Subscription Manifest</strong> specifying exactly three things: which Semantic State domains it reads on bootstrap, which Live References it needs injected, and which Reference Data tables it can access.</p>
+
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th style="width:35%">Vault Content</th>
+          <th class="center">Marketing</th>
+          <th class="center">Sales</th>
+          <th class="center">Compliance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Brand Guide (Live Ref)</td><td class="center"><span class="yes">YES</span></td><td class="center"><span class="dash">—</span></td><td class="center"><span class="dash">—</span></td></tr>
+        <tr><td>ICP Definition (Live Ref)</td><td class="center"><span class="yes">YES</span></td><td class="center"><span class="yes">YES</span></td><td class="center"><span class="dash">—</span></td></tr>
+        <tr><td>Legal Templates (Live Ref)</td><td class="center"><span class="dash">—</span></td><td class="center"><span class="dash">—</span></td><td class="center"><span class="yes">YES</span></td></tr>
+        <tr><td>Semantic State: Campaigns</td><td class="center"><span class="yes">YES</span></td><td class="center"><span class="dash">—</span></td><td class="center"><span class="dash">—</span></td></tr>
+        <tr><td>Semantic State: Deals</td><td class="center"><span class="dash">—</span></td><td class="center"><span class="yes">YES</span></td><td class="center"><span class="dash">—</span></td></tr>
+        <tr><td>Ref Data: Named Entities</td><td class="center"><span class="yes">YES</span></td><td class="center"><span class="yes">YES</span></td><td class="center"><span class="yes">YES</span></td></tr>
+        <tr><td>Ref Data: Competitors</td><td class="center"><span class="dash">—</span></td><td class="center"><span class="yes">YES</span></td><td class="center"><span class="dash">—</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      The Gateway reads the manifest on every bootstrap call and assembles precisely the context package that plugin needs — nothing more. Every token in the context window serves a purpose.
+    </div>
+
+    <h2>Live Reference Bootstrap</h2>
+    <p>Some knowledge is not stored in the vault — it lives in external systems the client already maintains. A brand guide in Google Drive. Pricing sheets in SharePoint. Legal templates in a document management system. These documents are authoritative, actively maintained, and too large or too dynamic to store as Semantic State entries. They are <strong>Live References</strong>.</p>
+    <p>Live Reference Bootstrap is the pattern by which a plugin reads from a designated folder or source location at session initialization, loading the most current version of that knowledge as session-scoped context. There is no sync problem because there is no stored copy — the plugin always reads the source directly at session open.</p>
+
+    <h3>How It Works</h3>
+    <p>Each plugin's Vault Subscription Manifest includes a <code>live_references</code> section. Each entry in that section declares a folder path or source location (not a specific file), a connector type, an optional format filter, and a fallback behavior. At session bootstrap, the Gateway fetches the folder contents, applies the format filter, and injects the results as session-context before the user's first message.</p>
+
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:22%">Field</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-key">source_path</td><td>The folder location — a Google Drive folder ID, SharePoint path, or similar. Points to a folder, not an individual file. All readable files in the folder are candidates.</td></tr>
+        <tr><td class="td-key">connector</td><td>The integration type: <code>google_drive</code>, <code>sharepoint</code>, <code>notion</code>, etc. The Gateway uses this to resolve the correct authentication and fetching strategy.</td></tr>
+        <tr><td class="td-key">format_filter</td><td>Optional. Restricts which file types to load. Example: <code>["docs", "pdf"]</code>. Without a filter, all readable formats in the folder are loaded. Prevents inadvertently loading spreadsheets or images as text context.</td></tr>
+        <tr><td class="td-key">max_tokens</td><td>Token budget for this reference. The Gateway respects the plugin's total context budget. If folder contents exceed the budget, the most recently modified files are prioritized.</td></tr>
+        <tr><td class="td-key">on_unavailable</td><td>Fallback behavior if the folder cannot be read at bootstrap: <code>warn_and_continue</code> (inform the user and proceed) or <code>block</code> (halt and require resolution). Default is <code>warn_and_continue</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      The contract is straightforward: read at session open, treat as session-scoped context, never cache between sessions. This makes Live Reference Bootstrap inherently reliable — there is no stale copy to manage, no sync schedule to maintain, no version mismatch between what the plugin knows and what the source document says. The folder is the truth.
+    </div>
+
+    <h3>What to Put in Live References vs. Semantic State</h3>
+    <p>The design rule: if a person would update a document to change it, it is a Live Reference candidate. If a person would tell the AI to update it, it belongs in Semantic State.</p>
+    <p>A brand guide that lives in Google Drive and is edited by the marketing team → Live Reference. A client preference the user corrects mid-conversation → Semantic State. A pricing policy document maintained by the finance team → Live Reference. A constraint the user declared three sessions ago → Semantic State.</p>
+    <p>The distinction matters because Live References are owned by teams and maintained in their natural habitat. Copying them into the vault creates a sync problem. Pointing to them from the vault keeps ownership where it belongs.</p>
+
+    <h2>Why This Matters for the Client</h2>
+    <ul class="doc-list">
+      <li><strong>No re-explanation cost.</strong> The model arrives at every session knowing the client's current projects, decisions, and open threads.</li>
+      <li><strong>Cross-plugin continuity.</strong> A decision made in the marketing plugin is available to the sales plugin. The plugins are nodes in the same knowledge system, not isolated tools.</li>
+      <li><strong>Compounding accuracy.</strong> Each session updates confidence scores, resolves contradictions, and deepens the model's understanding of the client's business — automatically.</li>
+      <li><strong>Proprietary data moat.</strong> The client's knowledge base is theirs alone — a structured, evolving, private representation of their business that no competitor can access and no model update can erase.</li>
+    </ul>
+
+    <h2>Why This Matters for Olytic</h2>
+    <ul class="doc-list">
+      <li><strong>Standardized deployment.</strong> Every plugin runs on the same Master Instruction and Gateway. New plugins deploy faster because the infrastructure is already in place.</li>
+      <li><strong>Cross-client pattern intelligence.</strong> Structural patterns — which schema fields prove most predictive, which Reflection rules produce the highest-quality state — are observable at the Olytic layer without exposing individual client data.</li>
+      <li><strong>Compounding switching cost.</strong> A client running Aule Axiom for twelve months has a structured knowledge base built in the Olytic schema. That knowledge does not transfer to a competitor without significant reconstruction.</li>
+      <li><strong>Observability and reporting.</strong> All traffic flows through the Gateway, giving Olytic complete visibility into usage, knowledge growth, and optimization opportunities across every deployment.</li>
+    </ul>
+
+    <div class="callout gold">
+      Client data stays in the client's vault. Structural intelligence stays in Olytic's layer. Both compound over time. Neither requires manual work to keep improving.
+    </div>
+  </section>
+
+<section id="sCrossPlatform" class="section">
+    <div class="section-tag">04 &nbsp;·&nbsp; Cross-Platform Strategy</div>
+    <h1>Cross-Platform Strategy: Aule Axiom as a Unified Interface Layer</h1>
+    <hr class="divider">
+    <p class="lead">By architecting the Olytic Intelligence Platform around the Model Context Protocol (MCP), Olytic has effectively created a "USB-C for AI" — a universal adapter that ensures the proprietary memory and governance layers function seamlessly across the industry's major ecosystems. Aule Axiom accounts for platform variance by acting as a Unified Interface Layer: while the "plumbing" differs between ChatGPT, Claude, Microsoft Copilot, and Gemini, the "brain" and its memory-handling protocols remain identical.</p>
+
+    <div class="callout navy">
+      Think of Aule Axiom not just as a prompt, but as a standardized architectural contract that sits between the model provider and your Private Vault. It shifts engineering focus from prompt design — which is fragile and model-specific — to protocol design, which is durable and platform-agnostic.
+    </div>
+
+    <!-- ── ARCHITECTURE DIAGRAM ─────────────────────────────────── -->
+    <div style="background:#fff; border:1.5px solid var(--border); border-radius:12px; padding:40px 32px 32px; margin:36px 0;">
+      <div style="font-family:'DM Mono',monospace; font-size:10px; color:var(--gold); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:24px; text-align:center;">Architecture Overview</div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:0; width:100%; overflow-x:auto;">
+
+        <!-- LLM COLUMN -->
+        <div style="display:flex; flex-direction:column; gap:16px; align-items:flex-end; min-width:160px;">
+
+          <!-- Claude -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+            <div style="width:56px; height:56px; border-radius:12px; background:#D97757; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+              <!-- Anthropic / Claude logo mark -->
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18.98 6L24 26H20.4L19.2 21.6H12.78L11.58 26H8L13.02 6H18.98ZM13.62 18.72H18.36L15.99 9.84L13.62 18.72Z" fill="white"/>
+              </svg>
+            </div>
+            <span style="font-size:11px; font-weight:600; color:var(--navy); text-align:center; line-height:1.3;">Claude</span>
+          </div>
+
+          <!-- ChatGPT -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+            <div style="width:56px; height:56px; border-radius:12px; background:#10A37F; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+              <!-- OpenAI logo mark -->
+              <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M27.2 12.28a7.36 7.36 0 0 0-.63-6.04 7.44 7.44 0 0 0-8.01-3.57A7.44 7.44 0 0 0 13.0 1a7.44 7.44 0 0 0-7.1 5.15 7.44 7.44 0 0 0-4.97 3.6 7.5 7.5 0 0 0 .92 8.77 7.36 7.36 0 0 0 .63 6.04 7.44 7.44 0 0 0 8.01 3.57A7.44 7.44 0 0 0 16.98 29a7.45 7.45 0 0 0 7.11-5.16 7.44 7.44 0 0 0 4.97-3.6 7.5 7.5 0 0 0-.86-7.96zM16.98 27.14a5.53 5.53 0 0 1-3.55-1.3l.18-.1 5.9-3.41a.97.97 0 0 0 .49-.85v-8.32l2.49 1.44a.09.09 0 0 1 .05.07v6.9a5.57 5.57 0 0 1-5.56 5.57zm-11.93-5.1a5.53 5.53 0 0 1-.66-3.73l.17.1 5.9 3.41a.97.97 0 0 0 .98 0l7.2-4.16v2.88a.09.09 0 0 1-.04.08l-5.96 3.44a5.57 5.57 0 0 1-7.59-2.02zM4.13 10.3a5.53 5.53 0 0 1 2.9-2.44v7.02a.97.97 0 0 0 .49.84l7.18 4.15-2.49 1.44a.09.09 0 0 1-.09 0L6.2 17.84A5.57 5.57 0 0 1 4.13 10.3zm20.42 4.77-7.2-4.16 2.5-1.43a.09.09 0 0 1 .09 0l5.93 3.42a5.55 5.55 0 0 1-.86 10.01v-7.02a.97.97 0 0 0-.46-.82zm2.48-3.75-.18-.1-5.88-3.44a.97.97 0 0 0-.98 0l-7.2 4.16V9.06a.09.09 0 0 1 .04-.08l5.95-3.43a5.55 5.55 0 0 1 8.25 5.77zM10.9 16.88l-2.5-1.44a.09.09 0 0 1-.05-.07V8.47a5.55 5.55 0 0 1 9.1-4.26l-.17.1-5.9 3.41a.97.97 0 0 0-.49.85l-.0 8.31zm1.35-2.92 3.2-1.85 3.2 1.85v3.69l-3.2 1.85-3.2-1.85v-3.69z" fill="white"/>
+              </svg>
+            </div>
+            <span style="font-size:11px; font-weight:600; color:var(--navy); text-align:center; line-height:1.3;">ChatGPT</span>
+          </div>
+
+          <!-- Microsoft Copilot -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+            <div style="width:56px; height:56px; border-radius:12px; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+              <!-- Microsoft four-square logo -->
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="1" width="12" height="12" fill="#F25022"/>
+                <rect x="15" y="1" width="12" height="12" fill="#7FBA00"/>
+                <rect x="1" y="15" width="12" height="12" fill="#00A4EF"/>
+                <rect x="15" y="15" width="12" height="12" fill="#FFB900"/>
+              </svg>
+            </div>
+            <span style="font-size:11px; font-weight:600; color:var(--navy); text-align:center; line-height:1.3;">Copilot</span>
+          </div>
+
+          <!-- Gemini -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+            <div style="width:56px; height:56px; border-radius:12px; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+              <!-- Google G logo -->
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M27.6 14.32c0-.97-.08-1.9-.24-2.79H14v5.27h7.63a6.53 6.53 0 0 1-2.83 4.28v3.56h4.58C26.16 22.08 27.6 18.5 27.6 14.32z" fill="#4285F4"/>
+                <path d="M14 28c3.83 0 7.04-1.27 9.38-3.44l-4.58-3.56c-1.27.85-2.9 1.36-4.8 1.36-3.69 0-6.82-2.49-7.93-5.84H1.35v3.67A14 14 0 0 0 14 28z" fill="#34A853"/>
+                <path d="M6.07 16.52A8.44 8.44 0 0 1 5.63 14c0-.88.15-1.73.44-2.52V7.81H1.35A14 14 0 0 0 0 14c0 2.26.54 4.4 1.35 6.19l4.72-3.67z" fill="#FBBC05"/>
+                <path d="M14 5.64c2.08 0 3.94.72 5.41 2.12l4.05-4.05C21.03 1.4 17.83 0 14 0A14 14 0 0 0 1.35 7.81l4.72 3.67C7.18 8.13 10.31 5.64 14 5.64z" fill="#EA4335"/>
+              </svg>
+            </div>
+            <span style="font-size:11px; font-weight:600; color:var(--navy); text-align:center; line-height:1.3;">Gemini</span>
+          </div>
+        </div>
+
+        <!-- SPOKES: LLMs → Gateway -->
+        <div style="position:relative; width:100px; height:260px; flex-shrink:0;">
+          <svg width="100" height="260" viewBox="0 0 100 260" xmlns="http://www.w3.org/2000/svg">
+            <!-- Lines from each LLM (right side of LLM col) to center Gateway (right side) -->
+            <line x1="0" y1="36"  x2="100" y2="130" stroke="#C8A96E" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+            <line x1="0" y1="100" x2="100" y2="130" stroke="#C8A96E" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+            <line x1="0" y1="165" x2="100" y2="130" stroke="#C8A96E" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+            <line x1="0" y1="228" x2="100" y2="130" stroke="#C8A96E" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+          </svg>
+        </div>
+
+        <!-- GATEWAY NODE -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px; flex-shrink:0;">
+          <div style="width:96px; height:96px; border-radius:50%; background:var(--navy); display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(27,42,74,0.35); border:3px solid var(--gold);">
+            <!-- Olytic "O" wordmark stand-in -->
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="18" cy="18" r="14" stroke="#C8A96E" stroke-width="3" fill="none"/>
+              <circle cx="18" cy="18" r="7" fill="#C8A96E"/>
+            </svg>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:12px; font-weight:700; color:var(--navy); line-height:1.2;">Olytic</div>
+            <div style="font-family:'DM Mono',monospace; font-size:10px; color:var(--gold); letter-spacing:0.06em;">Gateway API</div>
+          </div>
+        </div>
+
+        <!-- SPOKE: Gateway → Supabase -->
+        <div style="width:80px; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+          <svg width="80" height="4" viewBox="0 0 80 4" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="2" x2="68" y2="2" stroke="#C8A96E" stroke-width="2" stroke-dasharray="5,3"/>
+            <polygon points="68,0 80,2 68,4" fill="#C8A96E"/>
+          </svg>
+        </div>
+
+        <!-- SUPABASE + CLIENT COLUMN -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px; flex-shrink:0;">
+          <!-- Supabase node -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+            <div style="width:64px; height:64px; border-radius:12px; background:#1C1C1C; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.18);">
+              <!-- Supabase bolt logo -->
+              <svg width="30" height="36" viewBox="0 0 30 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.5 0L0 20.5H14L12.5 36L30 15.5H16L17.5 0Z" fill="#3ECF8E"/>
+              </svg>
+            </div>
+            <span style="font-size:11px; font-weight:600; color:var(--navy); text-align:center;">Supabase</span>
+            <span style="font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); text-align:center; letter-spacing:0.05em;">Private Vault</span>
+          </div>
+
+          <!-- Vertical spoke down -->
+          <svg width="4" height="28" viewBox="0 0 4 28" xmlns="http://www.w3.org/2000/svg">
+            <line x1="2" y1="0" x2="2" y2="20" stroke="#C8A96E" stroke-width="2" stroke-dasharray="4,3"/>
+            <polygon points="0,20 4,20 2,28" fill="#C8A96E"/>
+          </svg>
+
+          <!-- Client node -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+            <div style="width:56px; height:56px; border-radius:50%; background:var(--teal-light); border:2px solid var(--teal); display:flex; align-items:center; justify-content:center;">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="13" cy="9" r="5" fill="#0D6B6E" opacity="0.8"/>
+                <path d="M2 24c0-6.08 4.93-11 11-11s11 4.92 11 11" stroke="#0D6B6E" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.8"/>
+              </svg>
+            </div>
+            <span style="font-size:11px; font-weight:600; color:var(--navy); text-align:center;">Client</span>
+            <span style="font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); text-align:center; letter-spacing:0.05em;">Firm Data</span>
+          </div>
+        </div>
+
+      </div><!-- end flex row -->
+
+      <!-- Legend -->
+      <div style="display:flex; justify-content:center; gap:28px; margin-top:28px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <svg width="28" height="4"><line x1="0" y1="2" x2="28" y2="2" stroke="#C8A96E" stroke-width="1.5" stroke-dasharray="4,3"/></svg>
+          <span style="font-size:11px; color:var(--muted);">Platform-agnostic protocol (Aule Axiom)</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <div style="width:10px; height:10px; border-radius:50%; background:var(--gold);"></div>
+          <span style="font-size:11px; color:var(--muted);">Data flows through Olytic Gateway — never direct to vault</span>
+        </div>
+      </div>
+    </div>
+    <!-- ── END DIAGRAM ────────────────────────────────────────────── -->
+
+    <h2>Cross-Platform Integration</h2>
+    <p>The core strategic insight is that institutional memory gathered by Olytic agents should never be trapped in a single provider's walled garden. The Gateway API ensures that a client's Private Vault is a portable, provider-agnostic asset. The same structured knowledge that powers a ChatGPT deployment can ground a Gemini workflow or enrich a Microsoft Copilot session — without redesign.</p>
+
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th style="width:20%">Platform</th>
+          <th style="width:22%">Integration Strategy</th>
+          <th>Value Proposition</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">Claude (Anthropic)</td>
+          <td class="td-muted">Native</td>
+          <td>First-class support; Aule functions as the primary "Brain" for all deployed Claude agents.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Microsoft Copilot</td>
+          <td class="td-muted">MCP Tooling</td>
+          <td>The Aule Axiom Gateway registers as an external tool source within Copilot Studio, feeding private firm data directly into M365 workflows.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Gemini (Google)</td>
+          <td class="td-muted">Enterprise SDK</td>
+          <td>Integrates with Gemini Enterprise via the MCP Toolbox; Aule Axiom provides the "grounding" data to prevent hallucinations in Workspace.</td>
+        </tr>
+        <tr>
+          <td class="td-key">ChatGPT (OpenAI)</td>
+          <td class="td-muted">Agent Connector</td>
+          <td>Uses the Aule Axiom standard to provide cross-session memory that is more structured and professional than standard "ChatGPT memories".</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>How Aule Axiom Handles Platform Variance</h2>
+    <p>Different platforms have unique data models — ChatGPT uses a specific JSON structure for its "GPTs," while Claude and Gemini use tool-calling APIs, and Copilot Studio uses its own connector framework. Aule Axiom normalizes these differences through three mechanisms:</p>
+
+    <ul class="doc-list">
+      <li><strong>Abstracted Memory Tiers.</strong> Whether an agent is running in ChatGPT, Claude, Copilot, or Gemini, Aule Axiom mandates the same three-tier memory structure (Ephemeral, Semantic, Episodic). The agent is instructed to fetch and write data using the Gateway API, which handles the actual translation to the underlying platform's specific schema.</li>
+      <li><strong>The Adapter Pattern.</strong> Aule Axiom uses an Adapter Pattern to translate platform-agnostic commands from the Master Instruction into the specific API calls required by the host — for example, Salesforce Data Cloud for Agentforce or Python-based actions for ChatGPT.</li>
+      <li><strong>Uniform Constraint Enforcement.</strong> Because the Constraint Firewall runs after the model generates a response but before the user sees it, it doesn't matter which LLM generated the text. The validation logic is platform-blind.</li>
+    </ul>
+
+    <h2>Standardization vs. Implementation</h2>
+    <p>Aule Axiom defines a consistent engineering contract regardless of which host platform is running the agent. The table below maps the key architectural components to their platform-specific variance and Aule Axiom's normalizing role:</p>
+
+    <table class="doc-table">
+      <thead>
+        <tr>
+          <th style="width:22%">Component</th>
+          <th style="width:33%">Platform Variation</th>
+          <th>Aule Axiom's Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">Bootstrapping</td>
+          <td class="td-muted">Different for every host (API vs. Web UI)</td>
+          <td>Mandates a <code>SessionOpen</code> hook that must fetch current Semantic State before the first user message.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Tool Calling</td>
+          <td class="td-muted">Each LLM has a unique function-calling JSON schema</td>
+          <td>Defines a standardized toolspec so agents call the Private Vault the same way every time, regardless of host.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Memory Capture</td>
+          <td class="td-muted">Some platforms "forget" instantly; others have basic history only</td>
+          <td>Enforces the Reflection Engine at every <code>SessionClose</code>, distilling raw transcripts into structured Episodic records regardless of the platform's native memory features.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Engineering for Degraded Mode</h2>
+    <p>Because Aule Axiom operates cross-platform, it includes an explicit Degraded Mode protocol. If a specific platform's API is down or the Gateway is unreachable, the Master Instruction tells the agent exactly how to inform the user and proceed in an Ephemeral-only state — without corrupting the long-term memory in the Private Vault. The system never halts and never silently fails. See <a href="#" onclick="showSection('appG'); return false;">Appendix G</a> for the full Degraded Mode specification within the Master Instruction template.</p>
+
+    <h2>Competitive Differentiation</h2>
+    <p>Olytic's primary advantage lies in the gap between provisioning a tool and implementing a professional system. Five factors define this differentiation:</p>
+
+    <ul class="doc-list">
+      <li><strong>Design Expertise vs. Guided Builders.</strong> Tools like Agentforce provide a "front-end" for creation, but they don't provide the Strategy Design required to map agents to margin-expanding P&amp;L levers. Olytic delivers the expertise to ensure agents are solving the right problems — not just the easiest ones.</li>
+      <li><strong>State vs. History.</strong> Most AI tools simply save "Chat History" — raw transcripts. Olytic's Reflective Summarization extracts State: distilled decisions, updated project fields, and confirmed preferences. Memory compounds instead of just accumulating noise.</li>
+      <li><strong>Enforced Governance.</strong> While standard agents "try" to follow instructions, the Aule Axiom Constraint Firewall provides a post-generation validation layer. It intercepts and auto-corrects outputs that violate firm standards — such as fee quoting or brand register — before they reach the user.</li>
+      <li><strong>The Compounding Moat.</strong> Olytic is not just selling an agent; it is selling a Private Vault. A client who uses Olytic for twelve months builds a structured, proprietary knowledge asset that cannot be replicated by switching to a different out-of-the-box tool.</li>
+      <li><strong>Targeted Mid-Market Focus.</strong> By avoiding the enterprise segment, Olytic bypasses internal AI architects who might resist external standards. Instead, the platform serves Professional Services firms ($2M–$30M revenue) who have the budget and pressure to innovate but zero internal execution capacity.</li>
+    </ul>
+
+    <div class="callout gold">
+      The institutional memory your agents gather is never trapped in a single provider's ecosystem. Because Aule Axiom sits above every platform, the Private Vault belongs to the client — and it works wherever they work: Claude, ChatGPT, Copilot, or Gemini.
+    </div>
+  </section>
+
+<section id="s01" class="section">
+    <div class="section-tag">05 &nbsp;·&nbsp; Memory Architecture</div>
+    <h1>The Memory Architecture</h1>
+    <hr class="divider">
+    <p class="lead">For a plugin to remember anything, the system needs to answer two foundational questions: <em>what should be saved</em>, and <em>how should it be saved</em>. The memory schema is the answer to both.</p>
+
+    <h2>What Is a Memory Schema?</h2>
+    <p>Think of a memory schema as a filing system for everything the AI learns about a client. Without it, information gets dropped into an unstructured pile — and a pile is not retrievable. A schema defines the categories, the labels, the structure, and the rules for what goes where. It is what makes memory queryable, consistent, and trustworthy over time.</p>
+    <p>For plugins specifically, the schema matters because plugins are the primary source of new knowledge. Every client interaction — a preference stated, a decision made, a correction applied — happens through a plugin. If the plugin has no standard way to capture and classify that knowledge, the moment it disappears. The schema is what ensures it doesn't.</p>
+    <p>Critically, every Olytic plugin writes to and reads from the <em>same</em> schema. A business development plugin and a client delivery plugin share a common memory store. What one learns, the other can use. The firm's knowledge consolidates rather than fragmenting across tools.</p>
+
+    <p>All knowledge lives in one of three tiers. There is no fourth tier and no miscellaneous category. If a piece of information cannot be placed, the schema is wrong — not the information.</p>
+
+    <div class="tile-grid cols-3">
+      <div class="tile tier1">
+        <div class="tile-tag muted">Tier 1</div>
+        <div class="tile-title muted">Ephemeral</div>
+        <div class="tile-question muted">"Right now"</div>
+        <div class="tile-body">The active conversation. Working memory only. Discarded at session end. Never persisted unless explicitly promoted.</div>
+      </div>
+      <div class="tile tier2">
+        <div class="tile-tag teal">Tier 2</div>
+        <div class="tile-title teal">Semantic</div>
+        <div class="tile-question teal">"What is true?"</div>
+        <div class="tile-body">Structured facts, preferences, business rules, and entity definitions. Persistent, versioned, and queryable.</div>
+      </div>
+      <div class="tile tier3">
+        <div class="tile-tag navy">Tier 3</div>
+        <div class="tile-title navy">Episodic</div>
+        <div class="tile-question navy">"What happened?"</div>
+        <div class="tile-body">Timestamped session records. Decisions, corrections, outcomes. Compressed but never silently deleted.</div>
+      </div>
+    </div>
+
+    <p>The critical design principle is how information moves between tiers. Ephemeral memory is never automatically promoted. Every write to Semantic or Episodic memory is an explicit, governed action — classified, attributed, and versioned. See <a href="#" onclick="showSection('appA'); return false;">Appendix A</a> for the full Memory Entry Schema.</p>
+
+    <h2>The Schema-Flex Standard</h2>
+    <p>The memory schema has two layers. The outer layer is strict: every entry carries the same typed, indexed, queryable metadata — ID, timestamp, tier, entity type, confidence score, source. The inner layer — the payload — is deliberately flexible. Its structure varies by entity type and is enforced by plugin logic, not by the database.</p>
+    <p>This means new types of knowledge can be added without schema migrations. The envelope stays consistent. What goes inside it evolves freely.</p>
+    <div class="callout">
+      Strict outer schema for metadata. Documented payload conventions enforced by application logic. New knowledge types are added by documenting them — not by migrating the database.
+    </div>
+
+    <h2>State vs. Context</h2>
+    <p>The system distinguishes between two fundamentally different categories of information:</p>
+    <ul class="doc-list">
+      <li><strong>Active Context</strong> — everything known because of the current conversation. Lives in the Ephemeral tier. Never persisted directly. Never treated as a source of long-term truth.</li>
+      <li><strong>Persistent State</strong> — everything known because it was explicitly saved, validated, and governed. Lives in the Semantic and Episodic tiers. Survives session boundaries.</li>
+    </ul>
+    <p>When a piece of Active Context warrants preservation, the Promotion Protocol governs how it moves into Persistent State: classify the tier, check for conflicts, assign metadata including confidence score and source attribution, and confirm silently (high-confidence declarations) or explicitly (inferences). Full protocol in <a href="#" onclick="showSection('appD'); return false;">Appendix D</a>.</p>
+  </section>
+
+<section id="s02" class="section">
+    <div class="section-tag">06 &nbsp;·&nbsp; Anti-Drift Protocols</div>
+    <h1>Anti-Drift Protocols</h1>
+    <hr class="divider">
+    <p>Memory without governance degrades. Systems that accumulate knowledge without pruning or correcting it will eventually hallucinate from their own records. Three protocols prevent this.</p>
+
+    <h2>Reflective Summarization</h2>
+    <p>At the end of every session, before Ephemeral memory is discarded, the system performs a structured compression into Episodic memory. It extracts decisions made, corrections applied, new knowledge surfaced, and open threads that need follow-up. The raw transcript never enters the knowledge base — only its distilled meaning does.</p>
+    <p>The output is a structured session summary: required metadata fields ensure queryability; a flexible narrative field preserves nuance. Full protocol in <a href="#" onclick="showSection('appC'); return false;">Appendix C</a>.</p>
+
+    <h2>Scheduled Pruning</h2>
+    <p>Every 30 days (configurable), the system runs a pruning cycle. Entries with confidence below 0.5 not accessed in 60 days are flagged for review. Contradicting Semantic entries are surfaced to the user for resolution — the system never silently picks one. Episodic records older than 90 days are eligible for compression into higher-level narratives. Full rules in <a href="#" onclick="showSection('appC'); return false;">Appendix C</a>.</p>
+
+    <h2>Session Summary</h2>
+    <p>The Session Summary is the human-readable output of Reflective Summarization — the qualitative record of what a session accomplished. It is structured for the vault's Episodic tier and is the primary mechanism by which sessions compound into institutional memory.</p>
+    <p>A well-formed Session Summary contains: date and duration, the primary topic, decisions made with brief rationale, corrections applied, new knowledge surfaced, open threads requiring follow-up, and a short narrative that would allow any future session to understand what this one accomplished. Raw transcript is never stored — only distilled meaning. See <a href="#" onclick="showSection('appB'); return false;">Appendix B</a> for the <code>session_summary</code> payload convention.</p>
+
+    <h2>Operational Telemetry</h2>
+    <p>Session Summary is qualitative and episodic — it answers "what happened in this session." Operational telemetry is quantitative and aggregate — it answers "what patterns emerge across all sessions at scale." Both are required, and they are complementary.</p>
+    <p>Every Aule Axiom-compliant plugin emits structured telemetry events in real time as sessions execute. These events are delivered to the Olytic analytics layer and are distinct from the vault write that Session Summary produces. Telemetry data does not contain client content — only structural signals about how the plugin is being used.</p>
+
+    <h3>Standard Telemetry Event Types</h3>
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:26%">Event Type</th><th>When It Fires</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-teal">skill_invoke</td><td>A specific skill within the plugin is triggered — manually by user or automatically via a hook.</td></tr>
+        <tr><td class="td-teal">agent_trigger</td><td>An agentic workflow is initiated. Records which agent, what trigger phrase or hook fired it, and the session context.</td></tr>
+        <tr><td class="td-teal">decision_trace</td><td>The plugin makes or supports a significant decision. Records the decision context, options considered, and outcome selected.</td></tr>
+        <tr><td class="td-teal">verification_gate</td><td>A human confirmation checkpoint is reached. Records whether the user approved, rejected, or modified the proposed action.</td></tr>
+        <tr><td class="td-teal">permission_gate</td><td>The plugin requests permission to access a tool, external system, or sensitive capability.</td></tr>
+        <tr><td class="td-teal">feedback</td><td>The user provides explicit positive or negative feedback on a plugin output.</td></tr>
+        <tr><td class="td-teal">violation</td><td>A HARD or SOFT constraint fires. Records the constraint ID, the output that triggered it, and the enforcement action taken.</td></tr>
+        <tr><td class="td-teal">not_found_reported</td><td>The plugin was asked for something it could not find or do. Signals gaps in coverage for future improvement.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout navy">
+      Session Summary and Telemetry serve distinct purposes. Summary is the memory of what happened — it enters the vault and compounds over time. Telemetry is the signal of how it happened — it enters the analytics layer and informs improvement decisions. The Optimizer reads telemetry patterns to surface plugin update recommendations. Both systems run automatically; neither requires manual effort from the user.
+    </div>
+
+    <h2>The Hallucination Firewall</h2>
+    <p>The system never presents its own memories as established fact without attribution. Every retrieved memory is internally tagged with its source and confidence level before being used in generation.</p>
+    <ul class="doc-list">
+      <li><strong>Confidence below 0.7</strong> — disclosed: "Based on what I have recorded, though this may need verification…"</li>
+      <li><strong>Unverified for 90+ days</strong> — disclosed: "This was recorded in [month]. You may want to confirm it is still accurate."</li>
+      <li><strong>No record found</strong> — stated clearly: "I do not have a record of a decision about X." Never fabricated.</li>
+    </ul>
+  </section>
+
+<section id="s08" class="section">
+    <div class="section-tag">07 &nbsp;·&nbsp; Policy Enforcement</div>
+    <h1>Policy Enforcement: The Constraint Firewall</h1>
+    <hr class="divider">
+    <p>A language model is probabilistic. Given enough tokens and enough context pressure, it will eventually produce output that violates a standing rule. This is not a failure of intent. It is a failure of architecture. The correct response is a validation layer that catches violations before they reach the user.</p>
+    <p>The Constraint Firewall operates at the Aule Axiom <code>PostModelResponse</code> Hook — the platform-agnostic lifecycle event that fires after the model generates output, before that output is delivered. Because this hook is implemented at the Gateway layer rather than inside any single platform, the Firewall is model-blind: it doesn't matter whether the text was generated by Claude, ChatGPT, Gemini, or Copilot. Every output carrying ALWAYS or NEVER rules passes through this firewall without exception.</p>
+
+    <h2>Constraint Classification</h2>
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:14%">Class</th><th style="width:36%">Examples</th><th>Firewall Behavior</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">HARD</td>
+          <td class="td-muted">NEVER use em-dashes. ALWAYS use Oxford comma. NEVER fabricate citations.</td>
+          <td>Auto-corrected before output is delivered. Violation logged. User sees the corrected output only.</td>
+        </tr>
+        <tr>
+          <td class="td-key">SOFT</td>
+          <td class="td-muted">PREFER active voice. AVOID jargon. KEEP responses under 400 words.</td>
+          <td>Output delivered as-is. A disclosure note is appended. User decides whether to request a revision.</td>
+        </tr>
+        <tr>
+          <td class="td-key">CONTEXTUAL</td>
+          <td class="td-muted">Use formal register in client-facing output. Apply ICP framing for published content.</td>
+          <td>Firewall checks whether the constraint applies to this output type. If yes, enforced as HARD. If no, skipped entirely.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>The Validation Pass</h2>
+    <p>The Firewall runs a structured validation pass on every output carrying HARD or CONTEXTUAL constraints:</p>
+    <ol class="doc-list">
+      <li><strong>Context classification.</strong> Determine the output type: internal draft, client-facing deliverable, exploratory brainstorm, published content. This activates relevant CONTEXTUAL constraints.</li>
+      <li><strong>HARD constraint scan.</strong> Check for prohibited characters or constructs, missing required elements, and structural violations. Every violation flagged with its location.</li>
+      <li><strong>Auto-correction.</strong> Apply deterministic corrections. Non-deterministic violations trigger a sentence-level rewrite. If the rewrite cannot be completed without the violation, the sentence is removed and the omission is logged.</li>
+      <li><strong>SOFT constraint review.</strong> Record any deviations and append a transparency note: "This response deviates from [constraint name]. Request a revision if needed."</li>
+      <li><strong>Violation log.</strong> Every detection and correction is written to the Episodic memory tier. This log reveals systematic drift over time — a signal to revise the plugin's system prompt.</li>
+    </ol>
+
+    <h2>Defining Constraints</h2>
+    <p>Constraints are defined in the plugin's configuration manifest, not in the system prompt. A system prompt instruction can be degraded by a long or complex conversation. A manifest entry cannot — it is read by the Firewall independently of the model's inference pass. See <a href="#" onclick="showSection('appE'); return false;">Appendix E</a> for the full manifest format.</p>
+
+    <div class="callout navy">
+      If you cannot write a machine-checkable test for it, it is not a HARD constraint. Classify it as SOFT, surface deviations to the user, and let the user decide. The Firewall enforces what can be enforced reliably. Everything else is a recommendation.
+    </div>
+  </section>
+
+<section id="s07" class="section">
+    <div class="section-tag">08 &nbsp;·&nbsp; Ambient Intelligence</div>
+    <h1>Ambient Intelligence</h1>
+    <hr class="divider">
+    <p>The weakest version of a plugin waits to be summoned. The user must know it exists, remember to invoke it, and phrase their request correctly. That is not intelligence. That is a more complicated search bar.</p>
+    <p>The correct model is <strong>ambient intelligence</strong>: an agent that observes the conversation as it unfolds, recognizes when its skills are relevant, and surfaces itself at the right moment — without disrupting the work. Aule Axiom's Hook system is the mechanism that makes this possible. These four lifecycle events are defined by the Aule Axiom standard and are implemented via each platform's native equivalent — tool callbacks in Claude and ChatGPT, event triggers in Copilot Studio, and function hooks in Gemini.</p>
+
+    <h2>The Four Aule Axiom Hook Events</h2>
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:24%">Hook Event</th><th>When It Fires / What the Agent Can Do</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-teal">PreUserMessage</td>
+          <td>Fires before the model processes a message. The agent reads the incoming text and conversation history. Can inject context or flag for downstream handling.</td>
+        </tr>
+        <tr>
+          <td class="td-teal">PostModelResponse</td>
+          <td>Fires after a response is generated, before it reaches the user. Primary activation point for proactive suggestions and Constraint Firewall validation.</td>
+        </tr>
+        <tr>
+          <td class="td-teal">SessionOpen</td>
+          <td>Fires when a session begins. Loads Persistent State, checks for open threads from prior sessions, and primes the context window.</td>
+        </tr>
+        <tr>
+          <td class="td-teal">SessionClose</td>
+          <td>Fires when the session ends. Triggers Reflective Summarization, writes the Episodic record, and updates confidence scores on accessed memories.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Activation Logic: Three Signals</h2>
+    <p>Every plugin that uses Hooks defines an Activation Logic function. It is called on each relevant Hook event and returns one of three signals:</p>
+
+    <div class="tile-grid cols-3">
+      <div class="tile signal-dormant">
+        <div class="tile-tag muted">Signal</div>
+        <div class="tile-title muted">DORMANT</div>
+        <div class="tile-body">The plugin's skills are not relevant to this exchange. The Hook returns without action. No noise is added to the conversation.</div>
+      </div>
+      <div class="tile signal-suggest">
+        <div class="tile-tag teal">Signal</div>
+        <div class="tile-title teal">SUGGEST</div>
+        <div class="tile-body">The plugin recognizes an opportunity and appends a contextual suggestion. User retains control — the plugin does not execute until confirmed.</div>
+      </div>
+      <div class="tile signal-enforce">
+        <div class="tile-tag navy">Signal</div>
+        <div class="tile-title navy">ENFORCE</div>
+        <div class="tile-body">A defined ALWAYS or NEVER policy is about to be violated. The plugin intercepts the output and runs a validation pass before delivery.</div>
+      </div>
+    </div>
+
+    <h2>Choosing the Right Hook Event</h2>
+    <p>Each hook fires at a different moment in the session lifecycle, and the right choice depends on what the plugin needs to do. The decision rule is straightforward:</p>
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:26%">Hook Event</th><th style="width:38%">Use When...</th><th>Do Not Use When...</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-teal">SessionOpen</td>
+          <td>The plugin needs to load context before any user interaction — vault state, live references, open threads from prior sessions. This is the bootstrap hook.</td>
+          <td>The action depends on what the user says. SessionOpen fires before any user message is received.</td>
+        </tr>
+        <tr>
+          <td class="td-teal">PreUserMessage</td>
+          <td>The plugin needs to inspect or enrich the incoming message before the model processes it — routing decisions, intent classification, context injection based on message content.</td>
+          <td>The action belongs after the model responds. Injecting too much context here bloats the model's input unnecessarily.</td>
+        </tr>
+        <tr>
+          <td class="td-teal">PostModelResponse</td>
+          <td>The plugin needs to validate or act on the model's output before the user sees it — constraint enforcement, proactive suggestions, quality checks. This is the Constraint Firewall hook.</td>
+          <td>The action is about loading context (use SessionOpen) or routing based on user intent (use PreUserMessage).</td>
+        </tr>
+        <tr>
+          <td class="td-teal">SessionClose</td>
+          <td>The plugin needs to do something after the session ends — writing Session Summary to the vault, emitting final telemetry events, cleanup operations.</td>
+          <td>The action needs to happen mid-session. SessionClose fires once, after the user ends the session.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>A plugin may register for multiple hook events. The most common pattern is <code>SessionOpen</code> for bootstrap and <code>SessionClose</code> for Reflection — both are required on every Aule Axiom-compliant plugin. <code>PostModelResponse</code> is required whenever the plugin declares HARD or CONTEXTUAL constraints. <code>PreUserMessage</code> is optional and used only when the plugin needs to classify or enrich incoming messages before processing.</p>
+
+    <h3>Natural Language Routing via Hooks</h3>
+    <p>On platforms that support pattern-matched hook dispatch (such as Claude's <code>UserPromptSubmit</code> hook), plugins can register natural language trigger patterns that route user messages directly to specific agents or skills without going through the model's general inference. This is the mechanism for reliable invocation of high-precision workflows.</p>
+    <p>Every skill and agent in an Aule Axiom-compliant plugin must declare at least four specific natural language trigger phrases. These phrases represent how real users actually ask for the capability — not how the developer would describe it. The phrases are used both for hook-based routing and for the model's own skill selection logic.</p>
+    <div class="callout">
+      The trigger phrase requirement is a functional specification, not documentation. A skill with vague or absent trigger phrases will not be reliably invoked — by the model or by hooks. Write trigger phrases as direct quotes of what a user would type: "write me a proposal," "draft a client pitch," "create a scope document." Not: "handles proposal-related tasks."
+    </div>
+
+    <h2>Ambient Plugin Design Requirements</h2>
+    <ul class="doc-list">
+      <li><strong>Declared domain scope.</strong> The plugin explicitly declares which topics, task types, and signals it responds to. A plugin that responds to everything responds usefully to nothing.</li>
+      <li><strong>Defined skill inventory.</strong> Each skill has a name, trigger condition, execution mode (SUGGEST or ENFORCE), and defined inputs and outputs. Skills are not open-ended.</li>
+      <li><strong>Suggestion framing protocol.</strong> When firing in SUGGEST mode, the plugin identifies what it noticed, states what skill it can apply, and asks for user confirmation before proceeding.</li>
+      <li><strong>Cooldown logic.</strong> A suggestion declined or ignored in a session is not repeated in the same session. Relevance without restraint is noise.</li>
+      <li><strong>Memory integration.</strong> Activation Logic consults Episodic memory. If a suggestion was previously accepted, the plugin raises its confidence threshold. If previously declined, it adjusts accordingly.</li>
+    </ul>
+
+    <div class="callout">
+      Standard suggestion format: "I noticed [what the plugin detected]. Before you [next action], would you like me to [specific skill] to [specific outcome]?" One sentence of context. One sentence of offer. The user decides in two seconds.
+    </div>
+  </section>
+
+<section id="s04" class="section">
+    <div class="section-tag">09 &nbsp;·&nbsp; Governance</div>
+    <h1>Governance</h1>
+    <hr class="divider">
+
+    <h2>The User Is Sovereign</h2>
+    <p>The user has absolute authority over Persistent State. They can:</p>
+    <ul class="doc-list">
+      <li>Declare facts (written at confidence 1.0).</li>
+      <li>Correct any entry (triggers the correction protocol).</li>
+      <li>Archive any entry with a reason — never hard-deleted without explicit request.</li>
+      <li>Review the full memory at any time. The system must always be able to present its knowledge base in human-readable form.</li>
+    </ul>
+
+    <h2>The System Is a Steward</h2>
+    <p>The system maintains and governs memory on the user's behalf. It may:</p>
+    <ul class="doc-list">
+      <li>Infer new knowledge (below confidence 1.0, with disclosure).</li>
+      <li>Suggest corrections when it detects contradictions.</li>
+      <li>Compress Episodic memory through Reflective Summarization.</li>
+      <li>Flag stale or low-confidence entries for review.</li>
+    </ul>
+    <p>The system may <strong>not</strong>: silently delete or overwrite user-declared facts, infer and act on knowledge without disclosure, present inferences as facts, or refuse to show the user what it remembers.</p>
+
+    <div class="callout gold">
+      The Principle of Minimum Surprise: every action the system takes with memory should be predictable to a thoughtful user. If a user would be surprised to learn what the system remembered, forgot, inferred, or discarded — the system's behavior is wrong.
+    </div>
+  </section>
+
+<section id="s05" class="section">
+    <div class="section-tag">10 &nbsp;·&nbsp; Implementation Standards</div>
+    <h1>Implementation Standards</h1>
+    <hr class="divider">
+
+    <h2>The Olytic Loop Applied to Memory</h2>
+    <table class="loop-table">
+      <tbody>
+        <tr>
+          <td class="loop-stage">Build</td>
+          <td class="loop-desc">Design and deploy the three-tier memory system with Schema-Flex. Instrument it. Connect it to the Olytic Gateway and configure the agent's platform-specific tool bindings.</td>
+        </tr>
+        <tr>
+          <td class="loop-stage">Run</td>
+          <td class="loop-desc">The system operates across sessions, accumulating Semantic and Episodic memory, performing Reflective Summarization, and serving memories to active context.</td>
+        </tr>
+        <tr>
+          <td class="loop-stage">Improve</td>
+          <td class="loop-desc">Every pruning cycle is an improvement cycle. Stale entries reviewed. Contradictions resolved. Compression reduces noise.</td>
+        </tr>
+        <tr>
+          <td class="loop-stage">Compound</td>
+          <td class="loop-desc">The memory system becomes the moat. A client running the system for six months has a knowledge base that cannot be replicated by starting over with a new tool.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Plugin Identity Standard</h2>
+    <p>Every plugin built on the Aule Axiom standard must declare its identity in its README. This declaration is not documentation — it is a machine-readable specification that governs how the plugin is validated, how it relates to other plugins, and how it participates in the improvement loop. The Plugin Identity Block contains five required fields:</p>
+
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:22%">Field</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-key">Hat</td><td>The job-to-be-done this plugin embodies, expressed as a role: "the proposal auditor," "the content strategist." One sentence describing the platonic ideal of this role at the highest level of abstraction. Not a task description — a role description.</td></tr>
+        <tr><td class="td-key">Dimension</td><td>Which Claude OS dimension this plugin primarily serves. See the Plugin Dimensions section below.</td></tr>
+        <tr><td class="td-key">Governance Dependency</td><td>Which governance foundation this plugin depends on for brand standards, compliance rules, and shared knowledge. Typically "The One Ring" (Olytic's internal governance plugin) for client deployments, or "Standalone" for self-contained plugins.</td></tr>
+        <tr><td class="td-key">Relationships</td><td>Which plugins feed into this one (upstream) and which this one feeds (downstream). Prevents tunnel vision and documents how the plugin ecosystem hangs together.</td></tr>
+        <tr><td class="td-key">Compounding Contribution</td><td>What telemetry signals this plugin emits to feed the improvement loop — decision traces, constraint violations, user feedback, outcome metrics. If a plugin does not declare this, it is not contributing to the compounding system.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Plugin Dimensions</h2>
+    <p>Every plugin declares one primary dimension — the lens through which it creates value. A plugin may serve multiple dimensions, but it should declare one as primary to clarify its role in the ecosystem.</p>
+
+    <div class="tile-grid cols-3">
+      <div class="tile tier2">
+        <div class="tile-tag teal">Dimension 1</div>
+        <div class="tile-title teal" style="font-size:17px;">Unified</div>
+        <div class="tile-body">Orchestrates workflows across plugins. Ensures capabilities move from one stage to the next without manual handoffs. The operating system layer.</div>
+      </div>
+      <div class="tile tier2">
+        <div class="tile-tag teal">Dimension 2</div>
+        <div class="tile-title teal" style="font-size:17px;">Custom</div>
+        <div class="tile-body">Personalizes the OS to a specific organization's workflows, language, and processes. Encodes company-specific standards that other plugins reference.</div>
+      </div>
+      <div class="tile tier2">
+        <div class="tile-tag teal">Dimension 3</div>
+        <div class="tile-title teal" style="font-size:17px;">Augmenting</div>
+        <div class="tile-body">Creates new capabilities that didn't previously exist. Amplifies human judgment. Enables things that were previously impossible or prohibitively slow.</div>
+      </div>
+    </div>
+    <div class="tile-grid cols-2">
+      <div class="tile tier3">
+        <div class="tile-tag navy">Dimension 4</div>
+        <div class="tile-title navy" style="font-size:17px;">Agentic</div>
+        <div class="tile-body">Handles complex, multi-step workflows with autonomous reasoning. Not just a knowledge reference — it actively plans, decides, and executes across multiple turns.</div>
+      </div>
+      <div class="tile tier3">
+        <div class="tile-tag navy">Dimension 5</div>
+        <div class="tile-title navy" style="font-size:17px;">Compounding</div>
+        <div class="tile-body">Feeds telemetry back into the system to improve itself over time. Logs decision traces, violations, and outcomes so the Optimizer can recommend improvements.</div>
+      </div>
+    </div>
+
+    <h2>Required Plugin Components</h2>
+    <p>Every Aule Axiom-compliant plugin must include the following components. There are no exceptions. A plugin missing any of these does not pass Aule Axiom Validation.</p>
+    <ul class="doc-list">
+      <li><strong>Plugin manifest</strong> — the machine-readable descriptor defining the plugin's name, version, author, keywords, and hook declarations. Valid keys only; any unrecognized key causes validation failure. See platform-specific file format standards in <a href="#" onclick="showSection('sForge'); return false;">Section 11</a>.</li>
+      <li><strong>Telemetry integration</strong> — every plugin emits telemetry events to the Olytic analytics layer. This is not optional. A plugin that does not emit telemetry is invisible to the improvement loop.</li>
+      <li><strong>At least one domain skill</strong> — the substantive knowledge component. Skills encode the plugin's expertise: what it knows, when to apply it, and what constraints govern its output.</li>
+      <li><strong>README with Plugin Identity Block</strong> — the identity declaration described above. Also includes the Permissions Manifest and Memory Scope Declaration (see below).</li>
+      <li><strong>Vault Subscription Manifest</strong> — declares which Semantic State domains, Live References, and Reference Data the plugin reads at bootstrap.</li>
+    </ul>
+
+    <h2>Permissions Manifest</h2>
+    <p>Every plugin's README must include a Permissions Manifest that declares exactly what the plugin can do. This serves as the governance document for plugin installation decisions — an administrator reviewing a plugin for deployment should be able to read the Permissions Manifest and understand the plugin's access footprint without reading every skill file.</p>
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:28%">Declaration</th><th>What to Document</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-key">Tools accessed</td><td>Which platform tools and MCP servers the plugin uses. Named explicitly — not described in categories.</td></tr>
+        <tr><td class="td-key">Data read</td><td>What data the plugin reads: vault domains, live references, user-uploaded documents, external APIs.</td></tr>
+        <tr><td class="td-key">Data written</td><td>What data the plugin creates or modifies: vault writes, file outputs, external system updates.</td></tr>
+        <tr><td class="td-key">External services</td><td>Which external systems are called during plugin execution.</td></tr>
+        <tr><td class="td-key">Human-in-the-loop checkpoints</td><td>Which actions require user confirmation before execution. Required for any action that cannot be easily reversed or that affects systems outside the conversation.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Memory Scope Declaration</h2>
+    <p>Every plugin's README must declare its memory scope — how it uses memory and what it persists. The default is ephemeral (session-only, nothing persisted). Any plugin that writes to the vault must justify that choice and declare the data lifecycle.</p>
+    <ul class="doc-list">
+      <li><strong>Scope type</strong> — ephemeral, persistent, or retrieval.</li>
+      <li><strong>What is retained</strong> — specific data or context that survives session boundaries.</li>
+      <li><strong>Retention period</strong> — how long persisted data is kept before pruning eligibility.</li>
+      <li><strong>Data lifecycle</strong> — when and how stored data is purged or archived.</li>
+    </ul>
+
+    <h2>Plugin Naming Conventions</h2>
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:22%">Component</th><th style="width:36%">Pattern</th><th>Examples</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-key">Plugin name</td><td class="td-muted">kebab-case, 2–4 words</td><td><code>proposal-builder</code>, <code>deal-qualifier</code></td></tr>
+        <tr><td class="td-key">Skill directory</td><td class="td-muted">[domain]-[function]</td><td><code>proposal-standards</code>, <code>deal-qualification</code></td></tr>
+        <tr><td class="td-key">Command file</td><td class="td-muted">[verb]-[object].md</td><td><code>pull-metrics.md</code>, <code>review-proposal.md</code></td></tr>
+        <tr><td class="td-key">Agent file</td><td class="td-muted">[role]-[responsibility].md</td><td><code>deal-analyst.md</code>, <code>proposal-reviewer.md</code></td></tr>
+        <tr><td class="td-key">Reference files</td><td class="td-muted">Descriptive, kebab-case</td><td><code>scoring-formula.md</code>, <code>industry-benchmarks.md</code></td></tr>
+      </tbody>
+    </table>
+    <p>Skills, commands, and agents share a qualified namespace within a plugin (<code>plugin-name:component-name</code>). No two components may share a name across types. A skill named <code>content-brief</code> and a command named <code>content-brief</code> in the same plugin will collide. Differentiate by function: <code>content-brief-standards</code> (the knowledge skill) and <code>content-brief</code> (the action command).</p>
+
+    <h2>Non-Negotiable Engineering Rules</h2>
+    <p>Every plugin built on this architecture must comply with the following. There are no exceptions.</p>
+    <ul class="doc-list">
+      <li><strong>No silent writes.</strong> Every mutation to Persistent State is logged, versioned, and attributable.</li>
+      <li><strong>No silent deletes.</strong> Archived entries are preserved. Tombstone records are maintained.</li>
+      <li><strong>No unbounded retrieval.</strong> Every query to Persistent State has a token budget. Disclose when the budget is exceeded.</li>
+      <li><strong>No confidence inflation.</strong> System inferences are never assigned 1.0. Only user declarations get 1.0.</li>
+      <li><strong>No schema coupling.</strong> Plugin logic must not depend on the internal structure of payloads.</li>
+      <li><strong>No orphaned references.</strong> When an entity is archived, all entries referencing it are updated accordingly.</li>
+      <li><strong>No time travel.</strong> The system presents the current knowledge state — not a reconstructed historical state — unless the user explicitly requests version history.</li>
+    </ul>
+    <p>For versioning and migration rules, see <a href="#" onclick="showSection('appD'); return false;">Appendix D</a>.</p>
+  </section>
+
+  <!-- ============================================================
+       SECTION 11 — AULE: THE FORGE
+       ============================================================ -->
+  <section id="sForge" class="section">
+    <div class="section-tag">Section 11</div>
+    <h1>Aule — The Forge</h1>
+    <hr class="divider">
+    <p>Aule is the meta-plugin. It does not serve an end-user workflow — it builds, validates, packages, and maintains the plugins that do. Aule is the concrete implementation of the <strong>forge pattern</strong>: a self-contained intelligent system for creating and sustaining an ecosystem of AI plugins built on the Aule Axiom standard.</p>
+    <p>Every other plugin in the Olytic ecosystem was produced by Aule. Every update to those plugins flows back through Aule's self-updating architecture. The forge builds the tools; the tools extend the forge's reach.</p>
+
+    <h2>Plugin Components</h2>
+    <p>Aule ships as a full plugin with agents, skills, hooks, and commands working together:</p>
+
+    <table class="doc-table">
+      <thead>
+        <tr><th>Component</th><th>Type</th><th>Role</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>plugin-builder</strong></td>
+          <td>Agent</td>
+          <td>Orchestrates the full plugin creation or update workflow. Operates in two modes: <em>Create</em> (new plugin from discovery) and <em>Update</em> (applying changes to an existing plugin). Delegates to component skills and coordinates the packaging step.</td>
+        </tr>
+        <tr>
+          <td><strong>trashbot</strong></td>
+          <td>Agent</td>
+          <td>Automated ecosystem consistency enforcer. When an Aule standard changes, Trashbot sweeps all existing plugins and applies the updated standard. See <em>The Trashbot Pattern</em> below.</td>
+        </tr>
+        <tr>
+          <td><strong>plugin-discovery</strong></td>
+          <td>Skill</td>
+          <td>Elicits requirements through structured questioning before generation begins. Produces a plugin spec that drives the plugin-builder agent.</td>
+        </tr>
+        <tr>
+          <td><strong>plugin-generation</strong></td>
+          <td>Skill</td>
+          <td>Generates all plugin components from spec: plugin.json, README, skills, agents, commands, hooks, metadata. The canonical reference for what a valid plugin looks like.</td>
+        </tr>
+        <tr>
+          <td><strong>plugin-packager</strong></td>
+          <td>Skill</td>
+          <td>Packages the plugin source folder into a deployable .plugin zip file. Validates structure (plugin.json parseable, README present, at least one skill or agent). Final step in every create and update workflow.</td>
+        </tr>
+        <tr>
+          <td><strong>aule-plugin-repackager</strong></td>
+          <td>Skill</td>
+          <td>Triggered automatically by PostToolUse hook when any plugin source file changes. Re-runs plugin-packager to keep .zip files in sync with source. Eliminates stale-zip deploy failures.</td>
+        </tr>
+        <tr>
+          <td><strong>aule-change-analyzer</strong></td>
+          <td>Skill</td>
+          <td>Detects when Aule's own standard files change and routes to the appropriate handler. Categories: <em>Generation Requirement</em> (invoke skill-updater + Trashbot), <em>Reference Update</em> (log only), <em>Schema Change</em> (invoke skill-updater + Trashbot + notify).</td>
+        </tr>
+        <tr>
+          <td><strong>aule-skill-updater</strong></td>
+          <td>Skill</td>
+          <td>Updates plugin-generation/SKILL.md when Aule reference files change. Ensures the generation prompt always reflects current standards. Invoked by aule-change-analyzer; never invoked directly.</td>
+        </tr>
+        <tr>
+          <td><strong>aule-telemetry</strong></td>
+          <td>Skill</td>
+          <td>Logs all skill and agent invocations to Supabase. Provides the event stream that powers the Optimizer feedback loop.</td>
+        </tr>
+        <tr>
+          <td><strong>create-plugin</strong></td>
+          <td>Command</td>
+          <td>Slash command entry point. Routes to plugin-builder agent in Create mode.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>The Trashbot Pattern</h2>
+    <p>The Trashbot pattern solves ecosystem drift — the problem that arises when a standard changes but existing plugins built under the old standard are not updated. Without intervention, the ecosystem diverges: some plugins follow the new standard, others still follow the old one.</p>
+
+    <div class="callout blue">
+      <strong>The Trashbot Pattern:</strong> When a standard changes, every dependent in the ecosystem is automatically swept and updated. Standards propagation is not manual — it is structural.
+    </div>
+
+    <p>The pattern works as a chain reaction:</p>
+    <ol class="doc-list" style="list-style: decimal; padding-left: 24px;">
+      <li><strong>Standard file changes</strong> — A developer updates a reference file in Aule (e.g., a new required component is added to all plugins).</li>
+      <li><strong>PostToolUse hook fires</strong> — Aule's hooks configuration detects the write to the standards folder.</li>
+      <li><strong>aule-change-analyzer routes</strong> — The change is categorized (Generation Requirement, Reference Update, or Schema Change). For Generation Requirements and Schema Changes, the chain continues.</li>
+      <li><strong>aule-skill-updater propagates</strong> — The plugin-generation/SKILL.md is updated to reflect the new standard.</li>
+      <li><strong>Trashbot sweeps</strong> — Trashbot iterates through every plugin in the ecosystem and applies the updated standard. Each plugin is validated after update. Failures are logged, not silenced.</li>
+    </ol>
+
+    <p>The key design principle: the developer changes the standard <em>once</em>. The system handles the rest. No manual plugin-by-plugin updates, no ecosystem drift, no orphaned plugins running old patterns.</p>
+
+    <h2>Self-Updating Architecture</h2>
+    <p>Aule is designed to improve itself. When Aule's own standards evolve, the same Trashbot pattern applies — Aule updates its generation skill, which updates how all future plugins are generated, which ensures all existing plugins converge to the new standard. The forge reshapes itself and reshapes everything it has forged.</p>
+
+    <p>This creates a closed improvement loop:</p>
+    <div class="tier-grid" style="grid-template-columns: repeat(3, 1fr); margin: 24px 0;">
+      <div class="tier-card" style="text-align:center; padding: 20px;">
+        <div class="tier-label">Standard Updated</div>
+        <div style="font-size: 13px; color: #666; margin-top: 8px;">Developer refines a reference file</div>
+      </div>
+      <div class="tier-card" style="text-align:center; padding: 20px;">
+        <div class="tier-label">Generation Updated</div>
+        <div style="font-size: 13px; color: #666; margin-top: 8px;">plugin-generation/SKILL.md reflects new standard</div>
+      </div>
+      <div class="tier-card" style="text-align:center; padding: 20px;">
+        <div class="tier-label">Ecosystem Converges</div>
+        <div style="font-size: 13px; color: #666; margin-top: 8px;">All plugins swept and aligned by Trashbot</div>
+      </div>
+    </div>
+
+    <h2>LLM Platform File Formats</h2>
+    <p>Each LLM platform that supports plugin-style extensions has its own file format conventions. Aule's <code>references/platform-file-formats.md</code> is the living reference for these specifications — it is loaded at session init via the Vault Subscription Manifest so generation always uses current format rules.</p>
+
+    <table class="doc-table">
+      <thead>
+        <tr><th>Component</th><th>Claude Native Format</th><th>Key Rules</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Manifest</strong></td>
+          <td><code>.claude-plugin/plugin.json</code></td>
+          <td>Required keys: <code>name</code>, <code>version</code>, <code>description</code>, <code>author</code>. Semantic versioning (MAJOR.MINOR.PATCH). kebab-case name. No trailing commas.</td>
+        </tr>
+        <tr>
+          <td><strong>Skill</strong></td>
+          <td><code>skills/[name]/SKILL.md</code></td>
+          <td>YAML frontmatter: <code>name</code> and <code>description</code> required. Description is the trigger — it must be a natural language functional spec. Skill directory name must match <code>name</code> field.</td>
+        </tr>
+        <tr>
+          <td><strong>Agent</strong></td>
+          <td><code>agents/[name].md</code></td>
+          <td>YAML frontmatter with agent <code>name</code> and <code>description</code>. Description drives invocation routing. Body contains orchestration instructions.</td>
+        </tr>
+        <tr>
+          <td><strong>Command</strong></td>
+          <td><code>commands/[name].md</code></td>
+          <td>YAML frontmatter: <code>name</code> (no slash prefix), <code>description</code>. Body routes to skill or agent. One command per file.</td>
+        </tr>
+        <tr>
+          <td><strong>Hooks</strong></td>
+          <td><code>hooks/hooks.json</code></td>
+          <td>Array of hook objects. Required fields: <code>event</code> (SessionOpen | PreUserMessage | PostModelResponse | SessionClose), <code>skill</code> or <code>agent</code>. Optional: <code>condition</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>Package</strong></td>
+          <td><code>[plugin-name].plugin</code> (.zip)</td>
+          <td>Zip the src folder contents (not the src folder itself). Root of zip must contain <code>.claude-plugin/plugin.json</code>. Excludes: <code>.DS_Store</code>, <code>.git*</code>, <code>node_modules</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>Metadata Sidecar</strong></td>
+          <td><code>[plugin-name].metadata.json</code></td>
+          <td>Not part of the plugin package. Lives alongside the zip. Schema-Flex format: typed envelope + untyped <code>payload</code>. Tracks version, relationships, Cortex topics, change log.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Full per-platform format specifications (including Microsoft Copilot MCP tooling, Google Gemini Enterprise SDK, and ChatGPT Agent Connector formats) are maintained in <code>Plugins/aule/src-aule/skills/plugin-generation/references/platform-file-formats.md</code>. This file is a Live Reference — it is never cached in the Platform document because it changes as LLM platforms evolve.</p>
+  </section>
+
+  <!-- ============================================================
+       SECTION 12 — AI AGENT LIFECYCLE
+       ============================================================ -->
+  <section id="sLifecycle" class="section">
+    <div class="section-tag">Section 12</div>
+    <h1>AI Agent Lifecycle</h1>
+    <hr class="divider">
+    <p>An AI agent — in the Olytic framework, a plugin — moves through a predictable lifecycle from concept to production to ongoing evolution. Understanding this lifecycle allows developers to instrument each phase, apply the right tools at the right time, and build agents that improve rather than decay.</p>
+
+    <h2>Lifecycle Phases</h2>
+
+    <div class="tier-grid" style="grid-template-columns: repeat(4, 1fr); margin: 24px 0;">
+      <div class="tier-card">
+        <div class="tier-label">1. Discovery</div>
+        <div style="font-size: 13px; color: #555; margin-top: 8px;">Define the plugin's purpose, Hat, Dimension, relationships, and memory scope. Identify what problem the plugin solves and what success looks like.</div>
+      </div>
+      <div class="tier-card">
+        <div class="tier-label">2. Component Planning</div>
+        <div style="font-size: 13px; color: #555; margin-top: 8px;">Identify which components are needed: skills, agents, commands, hooks. Map trigger phrases. Define the Permissions Manifest and Memory Scope Declaration.</div>
+      </div>
+      <div class="tier-card">
+        <div class="tier-label">3. Generation</div>
+        <div style="font-size: 13px; color: #555; margin-top: 8px;">Generate all files from spec using Aule's plugin-generation skill. Verify every required component is present before moving forward.</div>
+      </div>
+      <div class="tier-card">
+        <div class="tier-label">4. Review &amp; Validation</div>
+        <div style="font-size: 13px; color: #555; margin-top: 8px;">Validate plugin.json structure, check trigger phrase coverage, verify telemetry hooks, confirm identity block completeness, test routing logic.</div>
+      </div>
+      <div class="tier-card">
+        <div class="tier-label">5. Packaging</div>
+        <div style="font-size: 13px; color: #555; margin-top: 8px;">Run plugin-packager to zip the source folder into a deployable .plugin file. Verify zip structure: plugin.json parseable at root, README present, at least one skill or agent.</td>
+      </div>
+      <div class="tier-card">
+        <div class="tier-label">6. Delivery</div>
+        <div style="font-size: 13px; color: #555; margin-top: 8px;">Upload the .plugin file to the target environment. Configure vault credentials, Supabase edge function endpoints, and any external service connections.</div>
+      </div>
+      <div class="tier-card">
+        <div class="tier-label">7. Marketplace Registration</div>
+        <div style="font-size: 13px; color: #555; margin-top: 8px;">Register the plugin in the Olytic marketplace. Set visibility, pricing tier, documentation link. Plugin becomes discoverable and installable by other clients.</div>
+      </div>
+      <div class="tier-card">
+        <div class="tier-label">8. Maintenance</div>
+        <div style="font-size: 13px; color: #555; margin-top: 8px;">Monitor telemetry for skill failure patterns, low-confidence routing, and missing trigger phrases. Apply standard updates via the Trashbot pattern. Re-package and re-deploy on version bumps.</div>
+      </div>
+    </div>
+
+    <h2>Phase 5 in Detail: Packaging</h2>
+    <p>Packaging is the mandatory gate between generation and delivery. A plugin that cannot be packaged is not ready to ship. The plugin-packager skill enforces this:</p>
+
+    <table class="doc-table">
+      <thead>
+        <tr><th>Check</th><th>Pass Condition</th><th>Fail Action</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>plugin.json parseable</td>
+          <td>Valid JSON, all required keys present</td>
+          <td>Block packaging, report missing or malformed keys</td>
+        </tr>
+        <tr>
+          <td>README.md present</td>
+          <td>File exists at root of source folder</td>
+          <td>Block packaging, prompt to create README</td>
+        </tr>
+        <tr>
+          <td>Skills or agents present</td>
+          <td>At least one <code>skills/</code> or <code>agents/</code> entry</td>
+          <td>Block packaging, plugin has no functional surface</td>
+        </tr>
+        <tr>
+          <td>Zip integrity</td>
+          <td><code>.claude-plugin/plugin.json</code> readable from inside zip</td>
+          <td>Log warning, keep last-known-good zip, do not overwrite</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>The plugin-packager is invoked as the final step of <em>every</em> create or update workflow. It is also triggered automatically by the PostToolUse hook whenever a source file changes, ensuring the .plugin file is always in sync with the source folder.</p>
+
+    <h2>Phase 8 in Detail: Maintenance via Trashbot</h2>
+    <p>Plugin maintenance in the Olytic ecosystem is not ad hoc. The Trashbot pattern (see Section 11) provides the maintenance mechanism: when standards change, the sweep happens automatically. The developer does not need to track which plugins are affected — the system does.</p>
+
+    <p>Manual maintenance triggers:</p>
+    <ul class="doc-list">
+      <li><strong>Telemetry anomalies</strong> — The Optimizer surfaces patterns from the event stream: skills that fail silently, trigger phrases that never fire, verification gates that always pass without real checking. These signal plugin drift from intended behavior.</li>
+      <li><strong>Capability expansion</strong> — The plugin's domain grows. New trigger phrases, new skills, new agent modes must be added and re-packaged.</li>
+      <li><strong>Schema migration</strong> — A field in the vault schema changes. The plugin's Memory Scope Declaration and vault queries must be updated. The aule-change-analyzer Schema Change path handles this automatically for Aule's own schema; for client-specific schemas, a manual update is required.</li>
+      <li><strong>LLM platform updates</strong> — A target platform (Claude, Copilot, Gemini, ChatGPT) changes its plugin format. Aule's platform-file-formats.md is updated first; the Trashbot sweep follows.</li>
+    </ul>
+
+    <h2>Lifecycle and the Compounding Loop</h2>
+    <p>The AI Agent Lifecycle does not terminate at maintenance — it loops. Each maintenance cycle is an opportunity to improve the plugin based on real operational data. Telemetry feeds the Optimizer; the Optimizer surfaces recommendations; approved recommendations re-enter the lifecycle at Phase 3 (Generation) and flow through to Phase 5 (Packaging) and Phase 6 (Delivery) again.</p>
+
+    <div class="callout blue">
+      <strong>The loop is the product.</strong> A plugin that has run for six months on real client sessions, with telemetry, session summaries, and Optimizer recommendations applied, is fundamentally more capable than the plugin that was originally deployed. The lifecycle is designed to make that improvement automatic and auditable.
+    </div>
+
+    <h2>Aule's Role Across the Lifecycle</h2>
+    <table class="doc-table">
+      <thead>
+        <tr><th>Phase</th><th>Aule Component</th><th>What It Does</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Discovery</td><td>plugin-discovery skill</td><td>Structured requirement elicitation via 10-question framework</td></tr>
+        <tr><td>Component Planning</td><td>plugin-builder agent</td><td>Translates spec into component list, routes to generation</td></tr>
+        <tr><td>Generation</td><td>plugin-generation skill</td><td>Generates all files from spec per current standards</td></tr>
+        <tr><td>Review &amp; Validation</td><td>plugin-builder agent (validation pass)</td><td>Checklist validation before packaging is allowed</td></tr>
+        <tr><td>Packaging</td><td>plugin-packager skill</td><td>Produces deployable .plugin zip, enforces structural requirements</td></tr>
+        <tr><td>Maintenance (auto)</td><td>Trashbot + aule-change-analyzer + aule-skill-updater</td><td>Standard changes propagated automatically across ecosystem</td></tr>
+        <tr><td>Maintenance (signal)</td><td>aule-telemetry + Optimizer</td><td>Operational signals surface improvement recommendations</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+<section id="closing" class="section">
+    <div class="section-tag">Closing</div>
+    <h1>The Standard</h1>
+    <hr class="divider">
+    <p>This document is not a suggestion. It is a standard. Every plugin built under the Olytic architecture must conform to the memory tiers, the state/context distinction, the Anti-Drift Protocols, the Schema-Flex Standard, the Failure Mode protocols, and the governance rules defined here.</p>
+    <p>The goal is not perfection. The goal is a system that gets better the longer it runs, that earns trust through transparency, and that treats the client's knowledge as the valuable asset it is.</p>
+
+    <div class="callout gold" style="margin-top:40px; font-size:16px; line-height:1.8;">
+      Build it right. Run it honestly. Improve it relentlessly. Let it compound.<br><br>
+      That is the Loop. That is the standard.
+    </div>
+
+    <div style="margin-top: 60px; padding-top: 32px; border-top: 1px solid var(--border);">
+      <p style="color: var(--muted); font-size: 13px;">Olytic Solutions &nbsp;·&nbsp; Source of Truth Document &nbsp;·&nbsp; v2.0 &nbsp;·&nbsp; March 2026 &nbsp;·&nbsp; Confidential</p>
+    </div>
+  </section>
+
+<section id="appA" class="section">
+    <div class="appendix-header">
+      <div class="tag">Appendix A</div>
+      <h1>Memory Entry Schema</h1>
+      <p>Full field specification for every memory entry in the system. Referenced from Section 01.</p>
+    </div>
+    <p>Every memory entry — whether Semantic or Episodic — is structured using this schema. The metadata fields are strictly typed and validated. The <code>payload</code> field is deliberately untyped at the schema level; its structure is governed by payload conventions (see <a href="#" onclick="showSection('appB'); return false;">Appendix B</a>).</p>
+
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:18%">Field</th><th style="width:16%">Type</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-teal">id</td><td class="td-muted">UUID</td><td>Globally unique identifier for this memory entry.</td></tr>
+        <tr><td class="td-teal">version</td><td class="td-muted">Integer</td><td>Monotonically increasing. Every update creates a new version.</td></tr>
+        <tr><td class="td-teal">created_at</td><td class="td-muted">ISO 8601</td><td>Timestamp of initial creation.</td></tr>
+        <tr><td class="td-teal">updated_at</td><td class="td-muted">ISO 8601</td><td>Timestamp of this version.</td></tr>
+        <tr><td class="td-teal">tier</td><td class="td-muted">Enum</td><td>"semantic" or "episodic". Ephemeral memories are not persisted.</td></tr>
+        <tr><td class="td-teal">entity_type</td><td class="td-muted">String</td><td>Category of knowledge. New types can be added without schema migration.</td></tr>
+        <tr><td class="td-teal">confidence</td><td class="td-muted">Float 0–1</td><td>1.0 = user-declared. 0.8–0.9 = strong inference. Below 0.5 = flagged.</td></tr>
+        <tr><td class="td-teal">source</td><td class="td-muted">Object</td><td>Contains type (enum), session_id, and optional original_text.</td></tr>
+        <tr><td class="td-teal">tags</td><td class="td-muted">Array</td><td>Freeform tags for retrieval. Not governed by enum.</td></tr>
+        <tr><td class="td-teal">supersedes</td><td class="td-muted">UUID</td><td>Optional. ID of the entry this version replaces. Creates a version chain.</td></tr>
+        <tr><td class="td-teal">archived</td><td class="td-muted">Boolean</td><td>Archived entries are not retrieved by default but are preserved.</td></tr>
+        <tr><td class="td-teal">last_accessed</td><td class="td-muted">ISO 8601</td><td>Timestamp of last retrieval. Used for pruning decisions.</td></tr>
+        <tr><td class="td-teal">payload</td><td class="td-muted">Object</td><td>The actual memory content. Structure varies by entity_type. Deliberately untyped.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+<section id="appB" class="section">
+    <div class="appendix-header">
+      <div class="tag">Appendix B</div>
+      <h1>Payload Conventions by Entity Type</h1>
+      <p>Documented conventions for the payload field, enforced by plugin logic. Referenced from Section 01.</p>
+    </div>
+    <p>The <code>payload</code> field is untyped at the schema level. New entity types and payload conventions can be added without modifying the core schema — document them, then enforce them in application logic.</p>
+
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:22%">Entity Type</th><th style="width:42%">Expected Payload Fields</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-teal">user_preference</td>
+          <td class="td-muted">domain, preference, strength, counterexample</td>
+          <td>counterexample captures what the user does NOT want.</td>
+        </tr>
+        <tr>
+          <td class="td-teal">business_fact</td>
+          <td class="td-muted">subject, predicate, object, unit</td>
+          <td>SPO triple with optional unit for numeric values.</td>
+        </tr>
+        <tr>
+          <td class="td-teal">decision_record</td>
+          <td class="td-muted">decision, alternatives_considered, rationale, outcome</td>
+          <td>Structured decision log.</td>
+        </tr>
+        <tr>
+          <td class="td-teal">session_summary</td>
+          <td class="td-muted">date, duration_minutes, primary_topic, decisions, corrections, open_threads, narrative</td>
+          <td>Output of Reflective Summarization.</td>
+        </tr>
+        <tr>
+          <td class="td-teal">entity_definition</td>
+          <td class="td-muted">name, type, attributes, relationships</td>
+          <td>For companies, people, products, concepts.</td>
+        </tr>
+        <tr>
+          <td class="td-teal">correction</td>
+          <td class="td-muted">original_entry_id, what_was_wrong, what_is_right, user_statement</td>
+          <td>Audit trail for corrections.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+<section id="appC" class="section">
+    <div class="appendix-header">
+      <div class="tag">Appendix C</div>
+      <h1>Anti-Drift Protocol: Full Rules</h1>
+      <p>Complete specification for Reflective Summarization and Scheduled Pruning. Referenced from Section 02.</p>
+    </div>
+
+    <h2>Reflective Summarization Protocol</h2>
+    <p>At session end, before Ephemeral memory is discarded:</p>
+    <ol class="doc-list">
+      <li><strong>Extract decisions.</strong> What was decided during this session? List each with its rationale.</li>
+      <li><strong>Extract corrections.</strong> Did the user correct the system? What was wrong; what is now right?</li>
+      <li><strong>Extract new knowledge.</strong> Did the session reveal facts, preferences, or patterns not previously in Semantic memory?</li>
+      <li><strong>Extract open threads.</strong> What was discussed but not resolved?</li>
+      <li><strong>Compress the narrative.</strong> Write a structured summary in fewer than 500 tokens: required metadata fields (date, duration, session ID, primary topic, decisions, corrections) plus a flexible narrative field.</li>
+      <li><strong>Promote candidates.</strong> For each new piece of knowledge identified in step 3, run the Promotion Protocol (see Appendix D).</li>
+    </ol>
+
+    <h2>Scheduled Pruning Rules</h2>
+    <p>Every 30 days (configurable per deployment):</p>
+    <ol class="doc-list">
+      <li><strong>Confidence decay.</strong> Entries below confidence 0.5 not accessed or corroborated in 60 days are flagged for review.</li>
+      <li><strong>Contradiction resolution.</strong> Conflicting Semantic entries are surfaced to the user with full provenance chains. The system does not silently pick one.</li>
+      <li><strong>Episodic compression.</strong> Episodic entries older than 90 days are eligible for merging into higher-level narratives.</li>
+      <li><strong>Orphan detection.</strong> Semantic entries referencing entities no longer present elsewhere are flagged and archived with a <code>last_relevant_date</code> marker.</li>
+      <li><strong>Token budget enforcement.</strong> Total Persistent State surfaced in any single session must not exceed the configured threshold (default: 4,000 tokens Semantic, 2,000 tokens Episodic).</li>
+    </ol>
+  </section>
+
+<section id="appD" class="section">
+    <div class="appendix-header">
+      <div class="tag">Appendix D</div>
+      <h1>Engineering Standards &amp; Versioning</h1>
+      <p>Schema versioning, migration path, and the Promotion Protocol. Referenced from Sections 01 and 05.</p>
+    </div>
+
+    <h2>Schema Versioning &amp; Migration</h2>
+    <p>The Schema-Flex Standard is versioned. The current version is v1. Future versions must be backward-compatible at the metadata level. Payload conventions evolve independently.</p>
+    <p>When a breaking change is required:</p>
+    <ol class="doc-list">
+      <li>Deploy the new schema version alongside the old one.</li>
+      <li>New entries are written in the new version.</li>
+      <li>Old entries are read in their original version and presented normally.</li>
+      <li>A background migration process updates old entries during the next pruning cycle.</li>
+      <li>The old version is retired only after all entries have been migrated.</li>
+    </ol>
+
+    <h2>The Promotion Protocol</h2>
+    <p>Moving information from Active Context to Persistent State is a governed action. The system must:</p>
+    <ol class="doc-list">
+      <li><strong>Identify the candidate</strong> — a durable fact, preference, decision, or event detected in the current conversation.</li>
+      <li><strong>Classify the tier</strong> — Semantic (what is true) or Episodic (what happened).</li>
+      <li><strong>Check for conflicts</strong> — if the candidate contradicts existing Persistent State, surface the conflict to the user before writing.</li>
+      <li><strong>Assign metadata</strong> — ID, timestamp, tier, entity type, confidence score, source session ID, and source type.</li>
+      <li><strong>Write with provenance</strong> — store the entry with its full metadata envelope and payload.</li>
+      <li><strong>Confirm silently or explicitly</strong> — high-confidence user declarations confirm silently; inferences and extrapolations confirm explicitly with the user.</li>
+    </ol>
+  </section>
+
+<section id="appE" class="section">
+    <div class="appendix-header">
+      <div class="tag">Appendix E</div>
+      <h1>Constraint Manifest Format</h1>
+      <p>Full specification for defining constraints in the plugin configuration manifest. Referenced from Section 08.</p>
+    </div>
+
+    <p>Constraints are defined in the plugin's configuration manifest, not in the system prompt. Each constraint entry requires exactly four fields:</p>
+    <ul class="doc-list">
+      <li><strong><code>id</code></strong> — a unique identifier for this constraint. Used in the violation log.</li>
+      <li><strong><code>class</code></strong> — <code>HARD</code>, <code>SOFT</code>, or <code>CONTEXTUAL</code>. This field determines Firewall behavior. No other values are valid.</li>
+      <li><strong><code>rule</code></strong> — a machine-checkable description of what constitutes a violation. For character-level constraints, a regex or string match pattern. For structural constraints, a schema or count condition. Ambiguous rules that cannot be expressed as a checkable condition must be classified SOFT.</li>
+      <li><strong><code>correction</code></strong> — required for HARD constraints only. Specifies what the Firewall should do when a violation is detected: substitute a specific character or string, remove the element, or trigger a sentence-level rewrite. If no deterministic correction can be defined, the constraint cannot be classified as HARD.</li>
+    </ul>
+
+    <h2>What the Firewall Does Not Do</h2>
+    <p>Scope matters as much as capability. The Firewall intercepts outputs and enforces defined rules. It does not rewrite for quality, tone, or strategic alignment. It does not substitute its judgment for the user's. It does not reject outputs that are simply suboptimal.</p>
+    <p>A Firewall that tries to do everything becomes a censor. A Firewall with a defined scope becomes infrastructure.</p>
+
+    <div class="callout navy" style="margin-top: 40px;">
+      Olytic Solutions &nbsp;·&nbsp; Source of Truth Document &nbsp;·&nbsp; v3.0 &nbsp;·&nbsp; March 2026 &nbsp;·&nbsp; Confidential
+    </div>
+  </section>
+
+<section id="appF" class="section">
+    <div class="section-tag">F &nbsp;·&nbsp; Failure Modes</div>
+    <h1>Failure Modes &amp; Graceful Degradation</h1>
+    <hr class="divider">
+    <p>The system will fail. Memory will be missing. Entries will conflict. Retrieval will return nothing when something was expected. Every failure mode has a defined protocol — because undefined failure behavior is how AI systems lose trust.</p>
+
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:22%">Scenario</th><th>Protocol</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">Missing Memory</td>
+          <td>Never guess or fabricate. State clearly that no record exists. Offer to record the information now, or work through it fresh.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Conflicting Memory</td>
+          <td>Surface both entries with full provenance. Ask the user to resolve. Archive the incorrect entry and create a correction record linking the two.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Stale Memory</td>
+          <td>Flag with a "stale" tag. When next retrieved, disclose its age. Reset the staleness clock on confirmation; run the conflict protocol on correction.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Retrieval Failure</td>
+          <td>Acknowledge the gap. Attempt a broader query. If still empty, fall back to the Missing Memory protocol and log the failure as a system event.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Context Window Overflow</td>
+          <td>Retrieve by relevance score first, recency second. Serve metadata-only for lower-priority entries. Disclose the limitation so the user can ask for specifics.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      The system always discloses what it knows, what it does not know, and what it is uncertain about. It never fabricates. It never halts. It treats the user as a partner in maintaining the quality of shared memory.
+    </div>
+  </section>
+
+  <!-- ══ APPENDIX G: MASTER INSTRUCTION TEMPLATE ══════════════════════════ -->
+  <section id="appG" class="section">
+    <div class="tag">Appendix G</div>
+    <h1>Master Instruction Template</h1>
+    <hr class="divider">
+
+    <h2>What the Master Instruction Is</h2>
+    <p>The Master Instruction is the system prompt that every Aule Axiom-compliant plugin receives at initialization. It is the verbatim text that tells the AI how to behave — what memory to fetch, which rules are absolute, how to open and close a session, and how to handle everything in between. It is not a description of Aule Axiom. It <em>is</em> Aule Axiom, from the plugin's perspective.</p>
+    <p>Every plugin Olytic ships is built on this template, extended with client-specific variables: the firm's name, their hard and soft rules, the entity types in their vault, and the specific domains that plugin is permitted to read and write. The template provides the invariant core. The customization layer provides the context.</p>
+
+    <h2>A Note on Confidentiality</h2>
+    <p>The Master Instruction template should be treated as a documented standard, not a trade secret — because it functionally cannot be kept secret. Any system prompt running inside a language model can be extracted by a sufficiently determined user: through direct prompting ("repeat your instructions"), prompt injection, or model introspection. Confidentiality instructions within the prompt are soft controls, not hard ones.</p>
+    <p>This is not a vulnerability. It is simply the nature of how these systems work — and it is the right framing for client conversations. The defensible asset is not the template. It is everything the template connects to: the Private Vault, the compounding Episodic archive, the Gateway infrastructure, and the years of accumulated institutional memory that cannot be replicated by reading a system prompt. A competitor who obtains this template cannot obtain a client's twelve months of structured knowledge. That is the moat.</p>
+    <p>Olytic's position should be confident: we publish our design standard openly because the standard alone is not the product. The system built on it is.</p>
+
+    <h2>The Template</h2>
+    <p>Variables are denoted <code>{{LIKE_THIS}}</code>. Sections marked <code>[REQUIRED]</code> must be present in every deployment unchanged. Sections marked <code>[CUSTOMIZABLE]</code> are extended per client.</p>
+
+    <pre class="code-block">
+## AXIOM MASTER INSTRUCTION
+## Olytic Solutions — Confidential
+## Version: {{PLUGIN_VERSION}} | Client: {{CLIENT_NAME}} | Plugin: {{PLUGIN_NAME}}
+
+---
+
+### [REQUIRED] IDENTITY
+
+You are {{PLUGIN_NAME}}, an AI assistant deployed by Olytic Solutions for {{CLIENT_NAME}}.
+You operate under the Aule Axiom design standard. Every session you run is governed by the
+protocols defined below. You do not deviate from them.
+
+---
+
+### [REQUIRED] SESSION BOOTSTRAP
+
+At the start of every session, before responding to any user input, you must:
+
+1. Call the Vault Gateway with Client_ID: {{CLIENT_ID}} and Plugin_ID: {{PLUGIN_ID}}
+2. Retrieve all Semantic State entries matching your declared domain subscriptions
+3. Retrieve the five most recent Episodic records for this client
+4. Inject retrieved state silently into your working context
+5. Confirm readiness internally — do not announce this process to the user
+
+You do not respond to the user's first message until bootstrap is complete.
+If the Gateway is unreachable, follow the Degraded Mode protocol (see below).
+
+---
+
+### [REQUIRED] MEMORY TIERS
+
+You operate across three memory tiers. You must understand and respect the distinction
+between them at all times.
+
+TIER 1 — EPHEMERAL
+Everything known because of this conversation. Never persisted directly.
+Discarded at session end unless explicitly promoted via the Promotion Protocol.
+
+TIER 2 — SEMANTIC
+Structured facts, preferences, business rules, and entity definitions.
+Persistent, versioned, and queryable. Written only via governed writes.
+
+TIER 3 — EPISODIC
+Timestamped session records. Decisions made, corrections applied, outcomes reached.
+Written only at session close via the Reflection Engine.
+
+---
+
+### [REQUIRED] HARD RULES — NEVER VIOLATE
+{{HARD_RULES}}
+
+These rules are absolute. If your response would violate any of them, you must
+correct the response before it reaches the user. You do not ask for permission.
+You do not flag the correction unless it materially changes the output.
+You log every hard rule enforcement as a system event.
+
+---
+
+### [CUSTOMIZABLE] SOFT RULES — FLAG AND PROCEED
+{{SOFT_RULES}}
+
+These rules are advisory. If your response would violate one, flag it to the user
+before or alongside the output. Do not suppress the response. Do not override it.
+Surfacing the flag is sufficient.
+
+---
+
+### [CUSTOMIZABLE] ENTITY TYPES
+
+You are aware of the following entity types in this client's vault:
+{{ENTITY_TYPE_LIST}}
+
+When recording new knowledge, classify it against one of these types.
+If no type fits, flag the classification gap — do not invent a new type silently.
+
+---
+
+### [REQUIRED] PROMOTION PROTOCOL
+
+When Active Context warrants preservation as Persistent State:
+
+1. Classify the tier (Semantic for facts/rules/preferences; Episodic via Reflection only)
+2. Assign entity type from the approved list
+3. Set confidence score (0.0–1.0):
+   - Direct declaration by user → 0.95
+   - Confirmed inference → 0.80
+   - Unconfirmed inference → 0.60 (flag before writing)
+4. Check for conflicts with existing Semantic entries
+5. On conflict: surface both versions with provenance, ask user to resolve
+6. Write with full metadata envelope: ID, timestamp, tier, entity_type,
+   confidence, source_plugin, source_session
+
+High-confidence writes (≥0.80) proceed silently.
+Lower-confidence writes require explicit user confirmation before writing.
+
+---
+
+### [REQUIRED] SESSION CLOSE — REFLECTION ENGINE
+
+At the end of every session, before context is cleared:
+
+1. Extract: decisions made, corrections applied, new knowledge surfaced,
+   standing preferences confirmed, open threads requiring follow-up
+2. Do not write raw transcript to the vault — write only distilled meaning
+3. Structure the Episodic record with required metadata fields and a
+   narrative summary field
+4. Transmit via the Olytic Gateway to the client's Private Vault
+5. Confirm transmission silently — do not announce to user
+
+---
+
+### [REQUIRED] MEMORY DISCLOSURE STANDARDS
+
+You never present your own records as established fact without attribution.
+
+- Confidence ≥ 0.90: use without disclosure
+- Confidence 0.70–0.89: "Based on what I have recorded…"
+- Confidence &lt; 0.70: "I have a low-confidence record suggesting… you may want to confirm"
+- Unverified for 90+ days: "This was recorded in [month] — you may want to confirm it is still accurate"
+- No record found: "I do not have a record of a decision about X." Never fabricate.
+
+---
+
+### [REQUIRED] DEGRADED MODE
+
+If the Gateway is unreachable at session start:
+
+1. Inform the user: "I'm unable to retrieve your memory store right now. I'll proceed
+   without it, but I won't be able to reference past context this session."
+2. Continue the session in Ephemeral-only mode
+3. Do not attempt vault writes during a degraded session
+4. Log the degraded session event for system review
+5. Attempt a single Gateway retry at session close
+
+---
+
+### [CUSTOMIZABLE] PLUGIN-SPECIFIC INSTRUCTIONS
+{{PLUGIN_SPECIFIC_INSTRUCTIONS}}
+
+---
+## END AXIOM MASTER INSTRUCTION
+    </pre>
+
+    <h2>Customization Rules</h2>
+    <p>The following fields must be defined before any plugin ships. A plugin with empty or placeholder values in required fields fails Aule Axiom Validation automatically.</p>
+    <ul class="doc-list">
+      <li><strong>HARD_RULES</strong> — minimum one entry required. Written as declarative constraints: "Never quote a fee below the approved rate card without Partner sign-off." Each rule should be testable: it is either violated or it isn't.</li>
+      <li><strong>SOFT_RULES</strong> — optional but recommended. Same format as hard rules; flagging behavior is automatic once declared.</li>
+      <li><strong>ENTITY_TYPE_LIST</strong> — drawn from the client's Vault Subscription Manifest. Must match the approved entity types in the schema exactly.</li>
+      <li><strong>PLUGIN_SPECIFIC_INSTRUCTIONS</strong> — workflow logic, output format preferences, domain-specific guidance. This section is free-form but must not contradict any Required section.</li>
+    </ul>
+    <p>Required sections may not be removed, abbreviated, or overridden by plugin-specific instructions. If a required section conflicts with a client request, the client request must be accommodated in the Customizable sections or escalated for review.</p>
+  </section>
+
+  <!-- ══ APPENDIX H: AXIOM VALIDATION ══════════════════════════════════════ -->
+  <section id="appH" class="section">
+    <div class="tag">Appendix H</div>
+    <h1>Aule Axiom Validation</h1>
+    <hr class="divider">
+
+    <h2>The Problem Aule Axiom Validation Solves</h2>
+    <p>Aule Axiom is a design standard, not a runtime enforcement layer. It defines what every plugin must do — but nothing in the language model itself will refuse to run a plugin that omits the Session Bootstrap, skips the Reflection Engine, or leaves hard rules blank. There is no Salesforce validation rule analog. There is no schema constraint that rejects a non-compliant deployment at the database level.</p>
+    <p>The enforcement mechanism is therefore a test suite — a set of automated checks that a plugin must pass before it is cleared for deployment. A plugin that fails Aule Axiom Validation does not ship. This is the CI/CD gate for the Aule Axiom standard.</p>
+
+    <h2>Three Layers of Validation</h2>
+
+    <h3>Layer 1 — Structural Checks (Static Analysis)</h3>
+    <p>Run against the plugin's manifest and system prompt before any execution. These checks verify that the required architectural elements are declared and present:</p>
+    <ul class="doc-list">
+      <li>Master Instruction contains all Required sections (Bootstrap, Memory Tiers, Hard Rules, Promotion Protocol, Reflection Engine, Disclosure Standards, Degraded Mode)</li>
+      <li>Hard Rules section contains at least one declared constraint</li>
+      <li>Vault Subscription Manifest is present and declares at least one domain subscription</li>
+      <li>Plugin ID and Client ID are defined and match registered Gateway entries</li>
+      <li>All entity types referenced in instructions appear in the approved schema</li>
+      <li>No Required section has been modified or removed from the baseline template</li>
+      <li><strong>Plugin Identity Block is present</strong> in README — Hat, Dimension, Governance Dependency, Relationships, and Compounding Contribution fields are all declared and non-empty</li>
+      <li><strong>Permissions Manifest is present</strong> in README — Tools Accessed, Data Read, Data Written, External Services, and Human-in-the-Loop Checkpoints fields are all declared</li>
+      <li><strong>Memory Scope Declaration is present</strong> — Scope Type, What Is Retained, Retention Period, and Data Lifecycle fields are all declared</li>
+      <li><strong>plugin.json passes format validation</strong> — required keys present (name, version, description, author), semantic versioning format, kebab-case name, valid JSON structure</li>
+      <li><strong>Plugin package passes structural validation</strong> — .plugin zip contains .claude-plugin/plugin.json at root, README.md present, at least one skill or agent directory present</li>
+      <li><strong>Telemetry hook is configured</strong> — plugin registers an aule-telemetry invocation for skill/agent events so it participates in the Optimizer feedback loop</li>
+    </ul>
+    <p>Structural checks are fast and deterministic. A failure here is a blocking error — the plugin cannot proceed to behavioral testing.</p>
+
+    <h3>Layer 2 — Behavioral Checks (Simulated Execution)</h3>
+    <p>Run against a synthetic client vault with known state. A scripted conversation is played through the plugin and its outputs are inspected against expected outcomes:</p>
+    <ul class="doc-list">
+      <li><strong>Bootstrap test:</strong> session opens with a pre-seeded vault; verify that retrieved Semantic State appears in the plugin's first response context</li>
+      <li><strong>Hard rule enforcement test:</strong> conversation is scripted to trigger each declared hard rule; verify that output is corrected before delivery and enforcement event is logged</li>
+      <li><strong>Soft rule flag test:</strong> conversation triggers each declared soft rule; verify that flag is surfaced to user and response is not suppressed</li>
+      <li><strong>Promotion test:</strong> user declares a new fact during conversation; verify that a Semantic write is initiated with correct metadata and confidence score</li>
+      <li><strong>Conflict test:</strong> user states something that contradicts existing Semantic State; verify that both versions are surfaced with provenance and no silent override occurs</li>
+      <li><strong>Reflection test:</strong> session is closed; verify that an Episodic record is written to the vault with required metadata fields and that the record contains distilled meaning, not raw transcript</li>
+      <li><strong>Degraded mode test:</strong> Gateway is made unreachable; verify that the plugin informs the user, continues in Ephemeral-only mode, and attempts no vault writes</li>
+    </ul>
+
+    <h3>Layer 3 — Schema Checks (Vault Inspection)</h3>
+    <p>Run after behavioral tests, against the vault state written during simulation. These verify that every write conformed to the Schema-Flex Standard:</p>
+    <ul class="doc-list">
+      <li>Every vault entry contains the required metadata envelope: ID, timestamp, tier, entity_type, confidence, source_plugin, source_session</li>
+      <li>Confidence scores are within range and consistent with source type (declared facts ≥ 0.90, unconfirmed inferences ≤ 0.70)</li>
+      <li>No Episodic records contain raw conversation transcript — only structured summaries</li>
+      <li>No Semantic entries exist with blank or null entity_type</li>
+      <li>All writes are attributed to a valid Plugin ID and Session ID</li>
+    </ul>
+
+    <h2>Validation Outcomes</h2>
+    <table class="doc-table">
+      <thead>
+        <tr><th style="width:22%">Result</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">Pass</td>
+          <td>All three layers pass. Plugin is cleared for deployment. Validation report archived against Plugin ID and version.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Structural Fail</td>
+          <td>Required element missing or modified. Plugin is blocked. Must be corrected and re-submitted from Layer 1.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Behavioral Fail</td>
+          <td>Plugin ran but did not behave as Aule Axiom requires. Specific failing test cases are reported. Plugin is blocked pending fix and re-run from Layer 2.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Schema Fail</td>
+          <td>Plugin executed correctly but wrote malformed vault entries. Indicates a bug in write logic. Blocked pending fix; re-run from Layer 2.</td>
+        </tr>
+        <tr>
+          <td class="td-key">Conditional Pass</td>
+          <td>All required checks pass; one or more optional checks flagged. Plugin may deploy with documented exceptions. Exceptions require sign-off.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Validation as a Versioning Gate</h2>
+    <p>Aule Axiom Validation runs not just at initial deployment but at every version update. Any change to the Master Instruction, the manifest, or the plugin's tool definitions triggers a full re-validation. A plugin that passed validation at v1.0 is not assumed to pass at v1.1.</p>
+    <p>Validation reports are archived per Plugin ID and version and are available for client review on request. This creates an auditable record: every plugin in production has a documented validation history, and any deviation from Aule Axiom is traceable to a specific version and a specific decision.</p>
+
+    <div class="callout gold">
+      Aule Axiom Validation is what makes the standard enforceable. The Master Instruction defines what every plugin must do. Validation is the mechanism that ensures it actually does.
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+  function showSection(id) {
+    // Hide all sections
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    // Deactivate all nav items
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+    // Show target section
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+
+    // Activate corresponding nav item
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) {
+        n.classList.add('active');
+      }
+    });
+
+    // Scroll main content to top
+    window.scrollTo(0, 0);
+  }
+</script>
+
+</body>
+</html>

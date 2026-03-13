@@ -1,35 +1,31 @@
 # Olytic Plugin Folder Structure
 
-The olytic-plugins repository uses a **clean, two-level plugin hierarchy** with flat Cortex for easy file management.
+The olytic-plugins repository uses a **clean, two-level plugin hierarchy**.
 
 ## Repository Root Structure
 
 ```
 olytic-plugins/
-├── Cortex/                          # Knowledge management system (FLAT)
-│   ├── 2026-03-01-insight.md       # Drag and drop .md files here
-│   ├── 2026-03-02-another.md
-│   ├── _archived/                  # Auto-managed after processing
-│   └── _cortex-state.json
-├── plugins-workspace/               # ALL PLUGINS LIVE HERE
+├── Plugins/                         # ALL PLUGINS LIVE HERE
 │   ├── aule/
 │   ├── gaudi/
 │   ├── magneto/
 │   └── the-one-ring/
-├── telemetry-blueprint/
-├── README.md
-├── catalog.json
-├── validate-plugins.sh
-└── CORTEX-SYSTEM.md
+├── contracts/
+│   ├── compiler/                    # plugin-compiler.py + plugin_spec.py
+│   ├── protocols/                   # org-wide behavioral standards
+│   └── schemas/                     # org-wide JSON schemas
+├── workspace.json                   # workspace manifest
+└── catalog.json
 ```
 
 ## Individual Plugin Organization
 
-Each plugin in `plugins-workspace/` follows this structure:
+Each plugin in `Plugins/` follows this structure:
 
 ```
-plugins-workspace/
-└── [plugin-name]/                           # Parent folder (workspace)
+Plugins/
+└── [plugin-name]/                           # Parent folder
     ├── src-[plugin-name]/                   # Actual plugin source code
     │   ├── .claude-plugin/
     │   │   └── plugin.json
@@ -37,6 +33,8 @@ plugins-workspace/
     │   ├── README.md
     │   ├── skills/
     │   │   ├── [plugin-name]-telemetry/
+    │   │   │   └── SKILL.md
+    │   │   ├── [plugin-name]-session-summarizer/
     │   │   │   └── SKILL.md
     │   │   ├── [domain-skill-1]/
     │   │   │   ├── SKILL.md
@@ -46,162 +44,96 @@ plugins-workspace/
     │   │       └── SKILL.md
     │   ├── agents/                          # Optional
     │   ├── commands/                        # Optional
-    │   └── hooks/                           # Optional
-    ├── [plugin-name].metadata.json          # Sidecar metadata (parent level)
-    └── [plugin-name].zip                    # Packaged plugin (parent level)
+    │   └── hooks/                           # Required if hooks declared
+    │       └── hooks.json
+    └── [plugin-name].plugin                 # Packaged archive (parent level)
 ```
 
 ## Folder Naming Convention
 
-**Crystal Clear:**
 - **Parent folder:** `[plugin-id]` (e.g., `aule`, `the-one-ring`)
-  - This is the "workspace" or "namespace" for the plugin
-  - Contains metadata, zip, and the source folder
+  - Acts as the namespace for the plugin
+  - Contains only: the source folder and the `.plugin` archive
 - **Source folder:** `src-[plugin-id]` (e.g., `src-aule`, `src-gaudi`)
-  - This is the actual plugin source code
-  - Contains all the plugin files: .claude-plugin/, skills/, agents/, commands/, etc.
-- **Metadata file:** `[plugin-id].metadata.json` (in parent folder)
-- **Zip file:** `[plugin-id].zip` (in parent folder)
+  - The actual plugin source code
+  - Contains all plugin files: `.claude-plugin/`, `skills/`, `agents/`, `commands/`, `hooks/`, `README.md`
+- **Plugin archive:** `[plugin-id].plugin` — zip built by compiler, lives in parent folder
 
 ## Examples
 
-### Aule Structure
+### Aule
 ```
-plugins-workspace/aule/
-├── src-aule/               # The actual Aule plugin source code
-├── aule.metadata.json      # Aule's metadata (in parent)
-└── aule.zip                # Aule's package (in parent)
-```
-
-### Gaudi Structure
-```
-plugins-workspace/gaudi/
-├── src-gaudi/              # The actual Gaudi plugin source code
-├── gaudi.metadata.json
-└── gaudi.zip
+Plugins/aule/
+├── src-aule/               # All Aule source files
+└── aule.plugin             # Packaged archive
 ```
 
-### The One Ring Structure
+### Gaudi
 ```
-plugins-workspace/the-one-ring/
-├── src-the-one-ring/       # The actual One Ring plugin source code
-├── the-one-ring.metadata.json
-└── the-one-ring.zip
+Plugins/gaudi/
+├── src-gaudi/
+└── gaudi.plugin
+```
+
+### The One Ring
+```
+Plugins/the-one-ring/
+├── src-the-one-ring/
+└── the-one-ring.plugin
 ```
 
 ## Key Rules
 
 1. **Parent folder only contains:**
-   - The `src-[plugin-name]/` subfolder (actual plugin source)
-   - The `.metadata.json` sidecar file
-   - The `.zip` packaged file
+   - The `src-[plugin-name]/` subfolder
+   - The `[plugin-name].plugin` archive
    - Nothing else
 
-2. **Metadata file is NEVER inside src-[plugin-name]/**
-   - ✅ Correct: `plugins-workspace/aule/aule.metadata.json`
-   - ❌ Wrong: `plugins-workspace/aule/src-aule/aule.metadata.json`
+2. **`.plugin` file is NEVER inside `src-[plugin-name]/`**
+   - ✅ Correct: `Plugins/aule/aule.plugin`
+   - ❌ Wrong: `Plugins/aule/src-aule/aule.plugin`
 
-3. **Zip file is NEVER inside src-[plugin-name]/**
-   - ✅ Correct: `plugins-workspace/aule/aule.zip`
-   - ❌ Wrong: `plugins-workspace/aule/src-aule/aule.zip`
+3. **Source folder is ALWAYS named `src-[plugin-id]`**
+   - ✅ Correct: `Plugins/aule/src-aule/`
+   - ✅ Correct: `Plugins/gaudi/src-gaudi/`
+   - ❌ Wrong: `Plugins/aule/src/`
+   - ❌ Wrong: `Plugins/aule/aule/`
 
-4. **Source folder is ALWAYS named `src-[plugin-id]`**
-   - ✅ Correct: `plugins-workspace/aule/src-aule/`
-   - ✅ Correct: `plugins-workspace/gaudi/src-gaudi/`
-   - ❌ Wrong: `plugins-workspace/aule/src/`
-   - ❌ Wrong: `plugins-workspace/aule/aule/`
-
-## Cortex Folder (Flat Structure)
-
-**No subfolders.** Just drag and drop `.md` files directly:
-
-```
-Cortex/
-├── 2026-03-01-plugin-metadata-strategy.md
-├── 2026-03-02-user-feedback-synthesis.md
-├── 2026-03-03-aule-best-practices.md
-├── _archived/                    # Auto-managed by processor
-│   └── 2026-03-01-plugin-metadata-strategy.md
-└── _cortex-state.json
-```
-
-**Why flat?**
-- Easy drag-and-drop from your file manager
-- No need to think about categorization
-- Processor handles deduplication and mapping
-- Archived files automatically organized by date
+4. **Telemetry and session-summarizer skills are required in every plugin**
+   - `[plugin-name]-telemetry/SKILL.md`
+   - `[plugin-name]-session-summarizer/SKILL.md`
+   - Both are auto-generated by the compiler — do not write manually
 
 ## When Generating a New Plugin
 
-1. Create parent folder: `plugins-workspace/[plugin-name]/`
-2. Create source subfolder inside: `plugins-workspace/[plugin-name]/src-[plugin-name]/`
-3. Write all plugin files into `src-[plugin-name]/` folder
-4. Create metadata file in parent: `plugins-workspace/[plugin-name]/[plugin-name].metadata.json`
-5. Package from inside `src-[plugin-name]/` folder
-6. Move zip to parent: `plugins-workspace/[plugin-name]/[plugin-name].zip`
+The compiler handles all file creation. Aule's role is:
+
+1. Run discovery → produce PluginSpec JSON
+2. Call `python3 src-aule/tools/plugin-compiler.py --dry-run [spec].json` — review plan
+3. Call `python3 src-aule/tools/plugin-compiler.py [spec].json` — compiler creates:
+   - `Plugins/[plugin-name]/src-[plugin-name]/` with all files
+   - `Plugins/[plugin-name]/[plugin-name].plugin` archive
+
+Do not create plugin directories or files manually. Always go through the compiler.
 
 ## Path References in Skills
 
-When referencing plugins in skill documentation:
-
-**Discovery/Generation Skills:**
-- Check for existing: `plugins-workspace/[plugin-name]/src-[plugin-name]/`
-- Write to: `plugins-workspace/[plugin-name]/src-[plugin-name]/`
-
-**Marketplace Management:**
-- Source path: `./plugins-workspace/[plugin-name]`
-- The marketplace validator finds src-*, metadata, and zip at the parent level
-
-**Cortex Processor:**
-- Metadata location: `plugins-workspace/[plugin-name]/[plugin-name].metadata.json`
-- Updates: `lastCortexUpdate` timestamp and `cortexTopics` array
+When checking for existing plugins:
+- Parent folder: `Plugins/[plugin-name]/`
+- Source folder: `Plugins/[plugin-name]/src-[plugin-name]/`
+- Plugin archive: `Plugins/[plugin-name]/[plugin-name].plugin`
 
 ## Validation Checklist
 
 Before considering a plugin "ready," verify:
 
-- [ ] Parent folder exists: `plugins-workspace/[plugin-name]/`
-- [ ] Source folder exists: `plugins-workspace/[plugin-name]/src-[plugin-name]/`
-- [ ] `.claude-plugin/plugin.json` exists in `src-[plugin-name]/` folder
-- [ ] Metadata file exists in parent folder (NOT in src-[plugin-name]/)
-- [ ] Metadata file is valid JSON and matches schema
-- [ ] Zip file exists in parent folder (NOT in src-[plugin-name]/)
-- [ ] Zip contains correct structure (no wrapper subfolder)
-- [ ] All skills have SKILL.md files
-- [ ] [plugin-name]-telemetry skill included
-- [ ] README.md exists with Claude OS Identity section
+- [ ] Parent folder exists: `Plugins/[plugin-name]/`
+- [ ] Source folder exists: `Plugins/[plugin-name]/src-[plugin-name]/`
+- [ ] `.claude-plugin/plugin.json` exists in `src-[plugin-name]/`
+- [ ] `[plugin-name].plugin` exists in parent folder (NOT in `src-[plugin-name]/`)
+- [ ] All skills have `SKILL.md` files
+- [ ] `[plugin-name]-telemetry` skill present
+- [ ] `[plugin-name]-session-summarizer` skill present
+- [ ] `README.md` exists with Claude OS Identity section
 - [ ] No duplicate component names across skills/commands/agents
-
-## Marketplace Integration
-
-The Olytic marketplace references plugins using this structure:
-
-```json
-{
-  "name": "aule",
-  "source": "./plugins-workspace/aule",
-  "description": "...",
-  "version": "0.1.0",
-  "keywords": [...],
-  "category": "meta"
-}
-```
-
-The `source` path points to the parent folder. The marketplace validator finds:
-- Plugin files in `source/src-[plugin-name]/`
-- Metadata in `source/[plugin-name].metadata.json`
-- Packaged zip in `source/[plugin-name].zip`
-
-## Visual Comparison
-
-**Before (Confusing):**
-```
-plugins-workspace/aule/aule/...    # Which is which?
-```
-
-**After (Crystal Clear):**
-```
-plugins-workspace/aule/src-aule/...     # Parent folder, then src-aule
-```
-
-Much easier to understand and scan visually!
+- [ ] No `[TODO ...]` placeholders remaining

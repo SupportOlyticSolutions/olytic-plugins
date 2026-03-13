@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aule — Plugin Architecture</title>
+<style>
+:root {
+  --navy:        #1B2A4A;
+  --navy-mid:    #243960;
+  --navy-light:  #EEF1F7;
+  --gold:        #C8A96E;
+  --gold-light:  #FAF5EC;
+  --teal:        #0D6B6E;
+  --teal-light:  #E8F4F4;
+  --surface:     #F4F5F3;
+  --body:        #344054;
+  --muted:       #667085;
+  --border:      #E4E7EC;
+  --white:       #FFFFFF;
+
+  --c-manifest:    #1B2A4A;
+  --c-agent:       #0D6B6E;
+  --c-skill:       #6B3FA0;
+  --c-command:     #B86A1A;
+  --c-connector:   #0D4F8C;
+  --c-scheduled:   #7B3FA0;
+  --c-policy:      #A74D1F;
+  --c-event:       #D94A42;
+  --c-data-model:  #2D7A6E;
+  --c-ref-global:  #C8A96E;
+  --c-ref-local:   #1E6B38;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--surface);
+  color: var(--body);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.page-header {
+  background: var(--navy);
+  border-bottom: 2px solid var(--gold);
+  padding: 14px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.page-header .brand { color: var(--gold); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+.page-header h1     { color: #fff; font-size: 17px; font-weight: 600; margin-top: 2px; }
+.page-header .sub   { color: rgba(255,255,255,0.4); font-size: 11px; margin-top: 1px; }
+.header-right       { display: flex; align-items: center; gap: 10px; }
+.expand-all-btn {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.75); font-size: 11px; font-weight: 600;
+  padding: 5px 12px; border-radius: 6px; cursor: pointer; letter-spacing: 0.03em;
+  transition: background 0.15s;
+}
+.expand-all-btn:hover { background: rgba(255,255,255,0.18); }
+
+/* ── App shell ── */
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.sidebar-section { padding: 16px 16px 8px; }
+.sidebar-label {
+  font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.12em;
+  font-weight: 700; color: var(--muted); padding: 0 4px; margin-bottom: 6px;
+}
+.filter-btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 7px 10px;
+  background: none; border: none; border-radius: 7px;
+  font-size: 12px; font-weight: 500; color: var(--body);
+  cursor: pointer; text-align: left;
+  transition: background 0.12s;
+  margin-bottom: 1px;
+}
+.filter-btn:hover { background: var(--surface); }
+.filter-btn.active { background: var(--navy-light); color: var(--navy); font-weight: 700; }
+.filter-dot {
+  width: 9px; height: 9px; border-radius: 2.5px; flex-shrink: 0;
+}
+.filter-count {
+  margin-left: auto; font-size: 10px; color: var(--muted);
+  background: var(--surface); border-radius: 8px; padding: 1px 6px;
+}
+.filter-btn.active .filter-count { background: #d6dff0; color: var(--navy); }
+
+.sidebar-divider { height: 1px; background: var(--border); margin: 8px 16px; }
+
+.sidebar-section-sub { padding: 8px 16px; }
+.legend-row {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 10.5px; color: var(--muted);
+  padding: 4px 4px;
+}
+.leg-line-svg { flex-shrink: 0; }
+
+/* ── Main content ── */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px 48px;
+}
+
+/* ── Search bar ── */
+.search-bar-wrap {
+  margin-bottom: 20px;
+}
+.search-input {
+  width: 100%; max-width: 420px;
+  padding: 8px 14px 8px 36px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px; color: var(--body);
+  background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search-input:focus { border-color: var(--navy); }
+
+/* ── Group header ── */
+.group-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px; margin-top: 28px;
+}
+.group-header:first-of-type { margin-top: 0; }
+.group-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.group-count { font-size: 10px; color: var(--muted); background: var(--border); border-radius: 8px; padding: 1px 7px; }
+
+/* ── Card grid ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+/* ── Record card ── */
+.record-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  transition: box-shadow 0.15s;
+  cursor: pointer;
+}
+.record-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.1); }
+.record-card.expanded { box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+
+.record-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px;
+}
+.record-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.record-icon svg { width: 15px; height: 15px; fill: #fff; }
+.record-title-wrap { flex: 1; min-width: 0; }
+.record-title {
+  font-size: 13px; font-weight: 700; color: var(--navy);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.record-type {
+  font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.08em;
+  font-weight: 700; margin-top: 1px;
+}
+.record-chevron {
+  flex-shrink: 0; color: var(--muted); opacity: .5;
+  transition: transform 0.2s ease;
+}
+.record-card.expanded .record-chevron { transform: rotate(180deg); opacity: .8; }
+
+/* collapsible body */
+.record-body { display: none; border-top: 1.5px solid var(--border); }
+.record-card.expanded .record-body { display: block; }
+
+/* desc */
+.record-desc {
+  font-size: 11.5px; line-height: 1.65; color: var(--muted);
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Field sections (Salesforce-style) ── */
+.field-section {
+  padding: 8px 14px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.field-section:last-child { border-bottom: none; }
+.field-section-title {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em;
+  font-weight: 700; color: var(--muted); margin-bottom: 6px;
+}
+.field-row {
+  display: flex; gap: 8px; font-size: 11px;
+  padding: 3px 0; border-bottom: 1px solid #F2F4F7;
+  align-items: flex-start;
+}
+.field-row:last-child { border-bottom: none; }
+.field-key { font-weight: 700; color: var(--navy); min-width: 90px; flex-shrink: 0; }
+.field-val { color: var(--body); flex: 1; }
+
+/* related list */
+.related-list { padding: 8px 14px 10px; border-bottom: 1px solid var(--border); }
+.related-list:last-child { border-bottom: none; }
+.related-list-title {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em;
+  font-weight: 700; color: var(--muted); margin-bottom: 6px;
+}
+.related-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 4px 0; border-bottom: 1px solid #F2F4F7;
+  font-size: 11px;
+}
+.related-item:last-child { border-bottom: none; }
+.rel-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+.rel-name { color: var(--navy); font-weight: 600; flex: 1; }
+.rel-label { color: var(--muted); font-size: 10px; margin-left: auto; }
+.hook-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #fce8ef; color: #A02050; border-radius: 4px;
+  font-size: 9.5px; font-weight: 700; padding: 2px 6px;
+  margin-right: 4px; margin-bottom: 3px;
+}
+.hook-chip-wrap { padding: 4px 0 2px; }
+
+/* new badge */
+.new-badge {
+  display: inline-block; background: var(--gold); color: var(--navy);
+  font-size: 8px; font-weight: 800; letter-spacing: 0.06em;
+  padding: 1px 5px; border-radius: 3px; text-transform: uppercase;
+  vertical-align: middle; margin-left: 4px;
+}
+
+/* type accents */
+.record-card.t-manifest  .record-header { background: #eef1f7; }
+.record-card.t-manifest  .record-type   { color: var(--c-manifest); }
+.record-card.t-manifest  .record-icon   { background: var(--c-manifest); }
+
+.record-card.t-agent     .record-header { background: #e8f4f4; }
+.record-card.t-agent     .record-type   { color: var(--c-agent); }
+.record-card.t-agent     .record-icon   { background: var(--c-agent); }
+
+.record-card.t-skill     .record-header { background: #f3eeff; }
+.record-card.t-skill     .record-type   { color: var(--c-skill); }
+.record-card.t-skill     .record-icon   { background: var(--c-skill); }
+
+.record-card.t-command   .record-header { background: #fdf3e7; }
+.record-card.t-command   .record-type   { color: var(--c-command); }
+.record-card.t-command   .record-icon   { background: var(--c-command); }
+
+.record-card.t-ref-global .record-header { background: #fdf8ee; }
+.record-card.t-ref-global .record-type   { color: var(--c-ref-global); }
+.record-card.t-ref-global .record-icon   { background: var(--c-ref-global); }
+
+.record-card.t-ref-local  .record-header { background: #e8f5ee; }
+.record-card.t-ref-local  .record-type   { color: var(--c-ref-local); }
+.record-card.t-ref-local  .record-icon   { background: var(--c-ref-local); }
+.record-card.t-policy     .record-header { background: #f5e8dc; }
+.record-card.t-policy     .record-type   { color: var(--c-policy); }
+.record-card.t-policy     .record-icon   { background: var(--c-policy); }
+.record-card.t-event      .record-header { background: #fce4e3; }
+.record-card.t-event      .record-type   { color: var(--c-event); }
+.record-card.t-event      .record-icon   { background: var(--c-event); }
+.record-card.t-data-model .record-header { background: #e4f2f0; }
+.record-card.t-data-model .record-type   { color: var(--c-data-model); }
+.record-card.t-data-model .record-icon   { background: var(--c-data-model); }
+
+.record-card.t-connector  .record-header { background: #e6f0fa; }
+.record-card.t-connector  .record-type   { color: var(--c-connector); }
+.record-card.t-connector  .record-icon   { background: var(--c-connector); }
+
+.record-card.t-scheduled  .record-header { background: #f3eeff; }
+.record-card.t-scheduled  .record-type   { color: var(--c-scheduled); }
+.record-card.t-scheduled  .record-icon   { background: var(--c-scheduled); }
+
+/* hidden */
+.record-card.hidden { display: none; }
+.group-block.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div>
+    <div class="brand">Olytic Solutions &nbsp;·&nbsp; Aule Plugin Architecture</div>
+    <h1>Component Directory</h1>
+    <div class="sub">Two-tier reference model &nbsp;·&nbsp; v4.3</div>
+  </div>
+  <div class="header-right">
+    <button class="expand-all-btn" id="expandAllBtn">Expand All</button>
+  </div>
+</div>
+
+<div class="app-body">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Filter by type</div>
+    <button class="filter-btn active" data-filter="all">
+      <span class="filter-dot" style="background:#667085"></span>
+      All Components
+      <span class="filter-count" id="count-all"></span>
+    </button>
+    <button class="filter-btn" data-filter="manifest">
+      <span class="filter-dot" style="background:var(--c-manifest)"></span>
+      Manifest
+      <span class="filter-count" id="count-manifest"></span>
+    </button>
+    <button class="filter-btn" data-filter="agent">
+      <span class="filter-dot" style="background:var(--c-agent)"></span>
+      Agents
+      <span class="filter-count" id="count-agent"></span>
+    </button>
+    <button class="filter-btn" data-filter="skill">
+      <span class="filter-dot" style="background:var(--c-skill)"></span>
+      Skills
+      <span class="filter-count" id="count-skill"></span>
+    </button>
+    <button class="filter-btn" data-filter="command">
+      <span class="filter-dot" style="background:var(--c-command)"></span>
+      Commands
+      <span class="filter-count" id="count-command"></span>
+    </button>
+    <button class="filter-btn" data-filter="ref">
+      <span class="filter-dot" style="background:var(--c-ref-global)"></span>
+      References
+      <span class="filter-count" id="count-ref"></span>
+    </button>
+    <button class="filter-btn" data-filter="connector">
+      <span class="filter-dot" style="background:var(--c-connector)"></span>
+      Connectors
+      <span class="filter-count" id="count-connector"></span>
+    </button>
+    <button class="filter-btn" data-filter="scheduled">
+      <span class="filter-dot" style="background:var(--c-scheduled)"></span>
+      Scheduled Tasks
+      <span class="filter-count" id="count-scheduled"></span>
+    </button>
+    <button class="filter-btn" data-filter="policy">
+      <span class="filter-dot" style="background:var(--c-policy)"></span>
+      Protocols
+      <span class="filter-count" id="count-policy"></span>
+    </button>
+    <button class="filter-btn" data-filter="event">
+      <span class="filter-dot" style="background:var(--c-event)"></span>
+      Events
+      <span class="filter-count" id="count-event"></span>
+    </button>
+    <button class="filter-btn" data-filter="data-model">
+      <span class="filter-dot" style="background:var(--c-data-model)"></span>
+      Schemas
+      <span class="filter-count" id="count-data-model"></span>
+    </button>
+  </div>
+
+</nav>
+
+<!-- MAIN -->
+<main class="main" id="mainContent">
+  <div class="search-bar-wrap">
+    <input class="search-input" id="searchInput" type="text" placeholder="Search components…">
+  </div>
+  <!-- groups injected by JS -->
+</main>
+
+</div><!-- /app-body -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA MODEL
+// ═══════════════════════════════════════════════════════════════
+
+const NODES = [
+  // ── MANIFEST ─────────────────────────────────────────────────
+  {
+    id: 'plugin-json', type: 'manifest', label: 'plugin.json',
+    icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z"/>',
+    desc: 'Per-plugin identity & metadata. The install contract — declares name, version, author, connector dependencies, and bootstrap ref paths. Validated by plugin-packager before every deploy.',
+    fields: [
+      { k:'name',           v:'kebab-case, unique' },
+      { k:'version',        v:'semver' },
+      { k:'description',    v:'one-line purpose' },
+      { k:'author',         v:'Olytic Solutions' },
+      { k:'connectors',     v:'declared external service dependencies (e.g. olytic-gateway)' },
+      { k:'bootstrap refs', v:'declared in Vault Subscription Manifest → loaded at SessionOpen' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'workspace-json', type: 'manifest', label: 'workspace.json',
+    icon: '<path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>',
+    desc: 'Global cross-plugin registry for the entire Olytic workspace. Declares all installed plugins, their versions, shared connector dependencies, and bootstrap reference paths. The authoritative source Trashbot and aule-verifier iterate over when sweeping or auditing the ecosystem.',
+    fields: [
+      { k:'plugins',        v:'array of { name, version, path, status }' },
+      { k:'connectors',     v:'shared connector declarations (e.g. olytic-gateway endpoint)' },
+      { k:'bootstrap_refs', v:'canonical paths to plugin-level reference files' },
+      { k:'standards_version', v:'semver — tracks which Aule standard each plugin was last verified against' },
+    ],
+    hooks: [],
+  },
+
+  // ── AGENTS ───────────────────────────────────────────────────
+  {
+    id: 'agent-plugin-builder', type: 'agent', label: 'plugin-builder',
+    icon: '<path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>',
+    desc: 'Orchestrates end-to-end plugin creation and update. Manages state across all lifecycle phases: discovery → generation → review → packaging. Modes: Create and Update.',
+    fields: [
+      { k:'modes',       v:'Create · Update' },
+      { k:'delegates to',v:'plugin-discovery, plugin-generation, plugin-packager' },
+    ],
+    hooks: ['SessionClose — emits lifecycle telemetry on completion'],
+  },
+  {
+    id: 'agent-trashbot', type: 'agent', label: 'trashbot',
+    icon: '<path d="M9 3v1H4v2h1v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1V4h-5V3H9zm0 5h2v9H9V8zm4 0h2v9h-2V8z"/>',
+    desc: 'Ecosystem consistency enforcer. When any Aule standard changes, sweeps every plugin listed in workspace.json and applies the update. Runs silently — no per-plugin approval needed. Can also be handed a remediation list from aule-verifier.',
+    fields: [
+      { k:'trigger',    v:'Invoked by aule-change-analyzer, aule-verifier (remediate mode), or manually' },
+      { k:'iterates',   v:'workspace.json plugin registry' },
+      { k:'reads',      v:'component-templates, olytic-folder-structure' },
+    ],
+    hooks: [],
+  },
+
+  // ── SKILLS ───────────────────────────────────────────────────
+  {
+    id: 'skill-discovery', type: 'skill', label: 'plugin-discovery',
+    icon: '<path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>',
+    desc: 'Structured 10-question discovery conversation. Gathers all requirements before generation begins. Produces a complete plugin spec that drives plugin-builder.',
+    fields: [
+      { k:'output',      v:'Plugin spec (JSON) passed to plugin-builder' },
+      { k:'skill reads', v:'hooks-reference' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'skill-generation', type: 'skill', label: 'plugin-generation',
+    icon: '<path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>',
+    desc: 'Translation layer only — converts discovery output into a validated PluginSpec JSON object and hands off to plugin-compiler. Does not write plugin files. Reads schemas to inform field mapping.',
+    fields: [
+      { k:'output',      v:'PluginSpec JSON → plugin-compiler' },
+      { k:'skill reads', v:'anti-drift-protocols, hooks-reference, platform-file-formats, olytic-folder-structure, telemetry-template' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'skill-packager', type: 'skill', label: 'aule-plugin-repackager',
+    icon: '<path d="M20 6h-2.18c.07-.43.18-.86.18-1a3 3 0 0 0-6 0c0 .14.11.57.18 1H10a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm-7-1a1 1 0 0 1 2 0c0 .14-.15.63-.24 1h-1.52c-.09-.37-.24-.86-.24-1zm7 15H10V8h10v12z"/>',
+    desc: 'Re-zips an existing plugin source directory into a .plugin file after surgical edits. Used in Update Mode when the compiler has not re-emitted. Auto-triggers via PostToolUse when any plugin source file changes.',
+    fields: [
+      { k:'input',       v:'Existing src-[plugin-name]/ directory' },
+      { k:'output',      v:'Updated .plugin zip archive' },
+      { k:'invocation',  v:'Explicit (Update Mode delivery) or automatic (PostToolUse hook)' },
+    ],
+    hooks: ['PostToolUse — fires on Write/Edit to any plugin source path; auto-repackages'],
+  },
+  {
+    id: 'skill-change-analyzer', type: 'skill', label: 'aule-change-analyzer',
+    icon: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>',
+    desc: 'Detects changes to Aule standard files and schema files, and routes to the right handler. Three categories: Generation Requirement → invoke skill-updater + Trashbot; Reference Update → log only; Schema Change → skill-updater + Trashbot + notify. Schema changes trigger the full propagation chain so all plugins adapt on their next session without direct modification.',
+    fields: [
+      { k:'categories',  v:'Generation Requirement · Reference Update · Schema Change' },
+      { k:'watched paths', v:'Any Aule standard file path AND contracts/schemas/*.json' },
+      { k:'schema change action', v:'skill-updater updates plugin-generation → Trashbot sweeps all plugins → plugins read new schema at next runtime invocation' },
+    ],
+    hooks: ['PostToolUse — fires on Write/Edit to any Aule standard file path or contracts/schemas/*.json'],
+  },
+  {
+    id: 'skill-updater', type: 'skill', label: 'aule-skill-updater',
+    icon: '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>',
+    desc: 'Updates plugin-generation/SKILL.md when reference files change. Invoked by aule-change-analyzer only — never called directly by users.',
+    fields: [
+      { k:'writes to',   v:'plugin-generation/SKILL.md' },
+      { k:'skill reads', v:'component-templates' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'skill-telemetry', type: 'skill', label: 'aule-telemetry',
+    icon: '<path d="M22 12l-4-4v3H3v2h15v3l4-4z"/>',
+    desc: 'Real-time invocation logging. Logs all skill and agent invocations to the Olytic Gateway API as they happen. Auto-loaded — never invoked directly by users. Powers the Optimizer feedback loop and operational analytics. Reads schema-telemetry-event at runtime on every invocation — schema changes propagate automatically on next session.',
+    fields: [
+      { k:'emits',       v:'8 standard event types per invocation' },
+      { k:'connector',   v:'olytic-gateway' },
+      { k:'reads at',    v:'Runtime (PostModelResponse) — not deploy time' },
+      { k:'schema',      v:'schema-telemetry-event (contracts/schemas/)' },
+    ],
+    hooks: ['PostModelResponse — fires after every model turn to log invocation events'],
+  },
+  {
+    id: 'skill-session-summarizer', type: 'skill', label: 'aule-session-summarizer',
+    icon: '<path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>',
+    desc: 'Episodic memory emission. Structures the session summary and writes it to the persistent vault at SessionClose. Records primary topic, key decisions, corrections, new knowledge, open threads, and narrative. Reads schema-session-summary at runtime on every SessionClose — schema changes propagate automatically on next session. Wraps the payload in a schema-vault-entry envelope before sending to gateway.',
+    fields: [
+      { k:'writes to',   v:'persistent vault (episodic) via olytic-gateway' },
+      { k:'connector',   v:'olytic-gateway' },
+      { k:'reads at',    v:'Runtime (SessionClose) — not deploy time' },
+      { k:'content schema', v:'schema-session-summary (contracts/schemas/)' },
+      { k:'envelope schema', v:'schema-vault-entry (contracts/schemas/)' },
+    ],
+    hooks: ['SessionClose — emits final session summary to vault'],
+  },
+  {
+    id: 'skill-verifier', type: 'skill', label: 'aule-verifier',
+    icon: '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>',
+    desc: 'Compliance scanner. Reads every plugin in workspace.json and checks each against plugin-standards.md: required components present, Identity Block valid, schema compliance, hook declarations, telemetry skill present, connector declarations match. Emits a structured compliance report. Never writes — detect only. Optionally hands off failing plugins to Trashbot for remediation.',
+    fields: [
+      { k:'iterates',    v:'workspace.json plugin registry' },
+      { k:'checks against', v:'plugin-standards.md' },
+      { k:'output',      v:'Compliance report: pass / drift / fail per plugin' },
+      { k:'modes',       v:'Report only · Report + remediate (hands off to Trashbot)' },
+      { k:'self-applies',v:'Yes — Aule itself is verified as a plugin' },
+    ],
+    hooks: ['SessionOpen — runs daily verification on schedule; surfaces drift summary if any failures'],
+  },
+
+  // ── COMMANDS ─────────────────────────────────────────────────
+  {
+    id: 'cmd-create', type: 'command', label: 'create-plugin',
+    icon: '<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>',
+    desc: 'Slash command entry point for new plugin creation. Routes to plugin-builder in Create mode. Stays thin — all logic lives downstream.',
+    fields: [
+      { k:'routes to', v:'plugin-builder (Create mode)' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'cmd-update', type: 'command', label: 'update-plugin',
+    icon: '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>',
+    desc: 'Audits and updates an existing plugin to current Aule standards. Accepts a plugin name or "all" to sweep the entire workspace.',
+    fields: [
+      { k:'routes to', v:'plugin-builder (Update mode)' },
+      { k:'accepts',   v:'plugin-name | "all"' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'cmd-sync', type: 'command', label: 'sync-standards',
+    icon: '<path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>',
+    desc: 'Manual trigger for aule-change-analyzer when a reference file is updated outside of a hook-detected write. Edge-case safety valve.',
+    fields: [
+      { k:'routes to', v:'aule-change-analyzer' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'cmd-verify', type: 'command', label: 'verify-plugins',
+    icon: '<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>',
+    desc: 'Manual trigger for aule-verifier. Runs a full compliance scan across all plugins in workspace.json and returns a report. Accepts an optional --fix flag to pass failing plugins to Trashbot for remediation.',
+    fields: [
+      { k:'routes to', v:'aule-verifier' },
+      { k:'flags',     v:'--fix (optional) → hands failures to Trashbot' },
+      { k:'accepts',   v:'plugin-name (single) | omit (all plugins)' },
+    ],
+    hooks: [],
+  },
+
+  // ── REFS — BOOTSTRAP ─────────────────────────────────────────
+  {
+    id: 'ref-core-standards', type: 'ref-global', label: 'aule-core-standards.md',
+    icon: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
+    desc: 'Consolidated operational standard. Hats Framework, naming conventions, writing standards, integrity controls, composability — plus reasoning precision protocols and context footprint rules. How Aule identifies itself and thinks.',
+    fields: [
+      { k:'merges',    v:'olytic-patterns.md + agentic-best-practices.md' },
+      { k:'load scope',v:'All skills + agents (loaded at SessionOpen)' },
+      { k:'edit cycle',v:'Stable — brand/identity layer' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'ref-plugin-standards', type: 'ref-global', label: 'plugin-standards.md',
+    icon: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
+    desc: 'Plugin Identity Block, Dimensions, Required Components, Permissions Manifest schema, Memory Scope Declaration, Vault Subscription Manifest, Naming Conventions. Machine-readable extract from Platform §03 & §10.',
+    fields: [
+      { k:'load scope',v:'All skills + agents (loaded at SessionOpen)' },
+      { k:'edit cycle',v:'Changes when schema or component types change' },
+      { k:'source of truth', v:'Platform doc §03, §10' },
+    ],
+    hooks: [],
+  },
+
+  // ── COMPILER ────────────────────────────────────────────────
+  {
+    id: 'compiler', type: 'tool', label: 'plugin-compiler.py',
+    icon: '<path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>',
+    desc: 'Deterministic file generator. Takes a validated PluginSpec JSON and writes every plugin file to disk. No LLM involvement — pure compilation. Supports --dry-run (preview) and --validate-dir (post-edit verification via Pydantic).',
+    fields: [
+      { k:'location',    v:'src-aule/tools/plugin-compiler.py' },
+      { k:'input',       v:'PluginSpec JSON (from plugin-generation skill)' },
+      { k:'output',      v:'Complete plugin directory + .plugin archive' },
+      { k:'modes',       v:'compile · --dry-run · --validate-dir' },
+      { k:'version',     v:'1.1.0' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'plugin-spec', type: 'tool', label: 'plugin_spec.py',
+    icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z"/>',
+    desc: 'Pydantic data model for PluginSpec — the authoritative schema for what a valid plugin specification contains. Validates spec JSON before compilation. The LLM-facing source of truth for required fields.',
+    fields: [
+      { k:'location',    v:'src-aule/tools/plugin_spec.py' },
+      { k:'validates',   v:'PluginSpec JSON from plugin-generation skill' },
+      { k:'enforces',    v:'required fields, value constraints, auto-injection of olytic-gateway' },
+    ],
+    hooks: [],
+  },
+
+  // ── REFS — SKILL-SPECIFIC ────────────────────────────────────
+  {
+    id: 'ref-folder', type: 'ref-local', label: 'olytic-folder-structure.md',
+    icon: '<path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>',
+    desc: 'Repository layout, plugin folder conventions, zip naming rules. Needed by any skill that navigates or writes to the workspace filesystem.',
+    fields: [
+      { k:'load scope', v:'On invocation of: plugin-generation, plugin-packager, trashbot' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'ref-anti-drift', type: 'ref-local', label: 'anti-drift-protocols.md',
+    icon: '<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>',
+    desc: 'Official Reflective Summarization script (8-step), Scheduled Pruning rules, SessionClose hook pattern. Generation-time reference — read by plugin-generation to inject the correct SessionClose block into new plugins.',
+    fields: [
+      { k:'load scope', v:'On invocation of: plugin-generation' },
+      { k:'note',       v:'Session Summary payload schema split into session-summary-template.md' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'ref-hooks', type: 'ref-local', label: 'hooks-reference.md',
+    icon: '<path d="M13 10V3L4 14h7v7l9-11h-7z"/>',
+    desc: 'Four hook events with use/don\'t-use guidance, Natural Language Routing pattern, trigger phrase rules, hook registration format.',
+    fields: [
+      { k:'load scope', v:'On invocation of: plugin-generation, plugin-discovery, aule-change-analyzer' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'ref-formats', type: 'ref-local', label: 'platform-file-formats.md',
+    icon: '<path d="M20 6h-2.18c.07-.43.18-.86.18-1a3 3 0 0 0-6 0c0 .14.11.57.18 1H10a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2z"/>',
+    desc: 'Per-platform format specs: Claude native, Copilot MCP, Gemini Enterprise SDK, ChatGPT Agent Connector. Live reference — never cached, always fresh.',
+    fields: [
+      { k:'load scope', v:'On invocation of: plugin-generation, plugin-packager' },
+    ],
+    hooks: [],
+  },
+
+  // ── PROTOCOLS ────────────────────────────────────────────────
+  {
+    id: 'protocol-core-standards', type: 'policy', label: 'aule-core-standards.md',
+    icon: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>',
+    desc: 'Canonical organizational protocol. Defines validation rules, governance policies, and structural requirements that every plugin must adhere to. Stored at workspace root (contracts/protocols/). Read by aule-verifier during compliance scans and by Trashbot during remediation.',
+    fields: [
+      { k:'location',    v:'contracts/protocols/aule-core-standards.md' },
+      { k:'defines',     v:'Plugin identity structure, hook declarations, reference requirements' },
+      { k:'validated by',v:'aule-verifier (compliance scanning)' },
+      { k:'enforced by', v:'Trashbot (remediation)' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'protocol-plugin-standards', type: 'policy', label: 'plugin-standards.md',
+    icon: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>',
+    desc: 'Per-plugin organizational protocol. Declares constraints on vault structure, reference requirements, hook event bindings, and connector dependencies. Stored at workspace root (contracts/protocols/). Each plugin loads this from workspace.json during SessionOpen.',
+    fields: [
+      { k:'location',    v:'contracts/protocols/plugin-standards.md' },
+      { k:'scope',       v:'Plugin-specific validation rules' },
+      { k:'read at',     v:'SessionOpen (bootstrap phase)' },
+      { k:'enforced by', v:'Plugin bootstrap validation + aule-verifier' },
+    ],
+    hooks: [],
+  },
+
+  // ── EVENTS ───────────────────────────────────────────────────
+  {
+    id: 'event-plugin-created', type: 'event', label: 'plugin-created',
+    icon: '<path d="M18 13h-5v5h-2v-5H6v-2h5V6h2v5h5v2z"/>',
+    desc: 'Emitted when plugin-builder successfully completes a Create workflow. Signals that a new plugin has been registered in workspace.json and is ready for verification.',
+    fields: [
+      { k:'emitted by',  v:'plugin-builder (SessionClose hook)' },
+      { k:'consumed by', v:'aule-telemetry, daily-plugin-verification' },
+      { k:'payload',     v:'{ plugin_name, version, timestamp, builder_session_id }' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'event-verification-failed', type: 'event', label: 'plugin-verification-failed',
+    icon: '<path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>',
+    desc: 'Emitted by aule-verifier when compliance scan detects drift. Signals structural or policy violations that require remediation. Can trigger Trashbot with --fix if configured.',
+    fields: [
+      { k:'emitted by',  v:'aule-verifier (daily-plugin-verification)' },
+      { k:'consumed by', v:'aule-telemetry, aule-change-analyzer (optional Trashbot handoff)' },
+      { k:'payload',     v:'{ plugin_name, violations[], severity, remediation_steps }' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'event-vault-updated', type: 'event', label: 'vault-entry-updated',
+    icon: '<path d="M17 12h-5v5h-2v-5H5v-2h5V5h2v5h5v2z"/>',
+    desc: 'Emitted whenever a vault (persistent, episodic, or semantic) receives a new entry or update. Used by plugins to react to workspace state changes without polling.',
+    fields: [
+      { k:'emitted by',  v:'olytic-gateway (on POST/PUT to /vaults)' },
+      { k:'consumed by', v:'Plugins with registered subscriptions' },
+      { k:'payload',     v:'{ vault_type, entry_id, mutation_type, timestamp }' },
+    ],
+    hooks: [],
+  },
+
+  // ── SCHEMAS ──────────────────────────────────────────────────
+  {
+    id: 'schema-plugin-identity', type: 'data-model', label: 'plugin-identity-schema.json',
+    icon: '<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>',
+    desc: 'Canonical plugin identity schema. Defines all required and optional fields in the Plugin Identity Block (hat, dimension, governance dependency, relationships, compounding contribution). Stored at workspace root (contracts/schemas/). Used by plugin-generation and aule-verifier for validation.',
+    fields: [
+      { k:'location',    v:'contracts/schemas/plugin-identity-schema.json' },
+      { k:'defines',     v:'hat, dimension, governance_dependency, relationships[], compounding_contribution' },
+      { k:'used by',     v:'plugin-generation, plugin-packager, aule-verifier' },
+      { k:'validation',  v:'JSON Schema with required/optional constraints' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'schema-vault-entry', type: 'data-model', label: 'vault-entry-schema.json',
+    icon: '<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>',
+    desc: 'Canonical vault entry schema. Defines the shape of all data written to or read from any vault (persistent, episodic, semantic). Stored at workspace root (contracts/schemas/). Enables type safety and validation across plugins without shared code.',
+    fields: [
+      { k:'location',    v:'contracts/schemas/vault-entry-schema.json' },
+      { k:'defines',     v:'Entry type, required fields, field validation rules, TTL if episodic' },
+      { k:'used by',     v:'olytic-gateway (validation on write), plugins (on read/transform)' },
+      { k:'versioning',  v:'Each vault type can have independent schema versions' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'schema-hook-event', type: 'data-model', label: 'hook-event-schema.json',
+    icon: '<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>',
+    desc: 'Canonical hook event schema. Defines the payload structure for SessionOpen, PreUserMessage, PostModelResponse, SessionClose, and custom async events. Stored at workspace root (contracts/schemas/). Ensures all plugins can safely subscribe and handle events.',
+    fields: [
+      { k:'location',    v:'contracts/schemas/hook-event-schema.json' },
+      { k:'defines',     v:'Event type, payload fields, timing constraints, guarantee levels' },
+      { k:'events',      v:'SessionOpen, PreUserMessage, PostModelResponse, SessionClose, custom async' },
+      { k:'used by',     v:'Plugin bootstrap, event routing in hook dispatch' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'schema-memory-access', type: 'data-model', label: 'memory-access-schema.json',
+    icon: '<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>',
+    desc: 'Canonical memory access declaration schema. Defines which vaults (persistent, episodic, semantic) a plugin reads from or writes to, which fields it accesses, read/write frequency, and access patterns. Enables least-privilege vault access and helps aule-verifier detect unauthorized or obsolete memory access declarations.',
+    fields: [
+      { k:'location',    v:'contracts/schemas/memory-access-schema.json' },
+      { k:'declares',    v:'vault_type, access_mode (read|write), fields[], frequency, use_case' },
+      { k:'vault types', v:'persistent (long-term), episodic (session-scoped), semantic (vector embeddings)' },
+      { k:'used by',     v:'plugin-generation (inject into plugins), aule-verifier (validate access patterns), olytic-gateway (enforce access control)' },
+      { k:'enforcement', v:'aule-verifier checks declared vs actual access; flags undeclared reads as drift' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'schema-telemetry-event', type: 'data-model', label: 'telemetry-event-schema.json',
+    icon: '<path d="M22 12l-4-4v3H3v2h15v3l4-4z"/>',
+    desc: 'Canonical telemetry event schema. Defines the exact shape of all 8 event types emitted by aule-telemetry to the gateway (skill_invoke, decision_trace, feedback, violation, not_found_reported, verification_gate, permission_gate, agent_trigger). Read at runtime on every PostModelResponse — not baked in. Changing this file automatically changes what all telemetry-emitting plugins send on their next session.',
+    fields: [
+      { k:'location',    v:'contracts/schemas/telemetry-event-schema.json' },
+      { k:'event types', v:'skill_invoke, decision_trace, feedback, violation, not_found_reported, verification_gate, permission_gate, agent_trigger' },
+      { k:'read timing', v:'Runtime — read at invocation, not deploy time' },
+      { k:'used by',     v:'aule-telemetry (structures payload), plugin-generation (injects into generated telemetry skills), aule-verifier (validates conformance)' },
+    ],
+    hooks: [],
+  },
+  {
+    id: 'schema-session-summary', type: 'data-model', label: 'session-summary-schema.json',
+    icon: '<path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>',
+    desc: 'Canonical session summary schema. Defines the payload content written to the episodic vault at SessionClose: primary_topic, key_decisions, corrections, new_knowledge, open_threads, narrative. Peer to schema-vault-entry — the summary is the content, vault-entry is the envelope. Read at runtime on every SessionClose.',
+    fields: [
+      { k:'location',    v:'contracts/schemas/session-summary-schema.json' },
+      { k:'defines',     v:'primary_topic, key_decisions[], corrections[], new_knowledge[], open_threads[], narrative (100–300 words)' },
+      { k:'relationship',v:'Content payload — wrapped in schema-vault-entry envelope before writing to vault' },
+      { k:'read timing', v:'Runtime — read at invocation, not deploy time' },
+      { k:'used by',     v:'aule-session-summarizer (structures content), plugin-generation (injects into generated session skills), connector-gateway (validates payload on write)' },
+    ],
+    hooks: [],
+  },
+
+  // ── CONNECTORS ───────────────────────────────────────────────
+  {
+    id: 'connector-gateway', type: 'connector', label: 'olytic-gateway',
+    icon: '<path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>',
+    desc: 'Proprietary Olytic Gateway API — the single external integration point for all Aule-built plugins. Handles telemetry ingestion, vault reads/writes, session summaries, and analytics. Plugins never connect directly to underlying services (Supabase, etc.) — all traffic routes through the Gateway, which manages auth, routing, and schema versioning. When Aule generates plugins for other LLM platforms (ChatGPT, Copilot, Gemini), the Gateway connection mechanism is platform-specific but the API contract is identical.',
+    fields: [
+      { k:'type',          v:'REST API (Olytic-proprietary)' },
+      { k:'auth',          v:'API key declared in plugin.json connectors block' },
+      { k:'used for',      v:'Telemetry writes · Vault reads/writes · Session summaries · Compliance reports' },
+      { k:'LLM note',      v:'Claude: MCP server · ChatGPT: Agent Connector · Copilot: MCP · Gemini: Enterprise SDK — same API contract, platform-specific transport' },
+      { k:'consumers',     v:'aule-telemetry, aule-verifier (report emit), all generated plugins' },
+    ],
+    hooks: [],
+  },
+
+  // ── SCHEDULED TASKS ──────────────────────────────────────────
+  {
+    id: 'scheduled-verifier', type: 'scheduled', label: 'daily-plugin-verification',
+    icon: '<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/>',
+    desc: 'Scheduled daily run of aule-verifier across all plugins in workspace.json. Fires at SessionOpen if 24 hours have elapsed since last run. Surfaces a drift summary inline if any plugins fail compliance — does not auto-remediate unless --fix was pre-configured. Keeps the ecosystem honest between manual change cycles.',
+    fields: [
+      { k:'schedule',    v:'Daily · fires at SessionOpen if 24h elapsed' },
+      { k:'routes to',   v:'aule-verifier (report-only mode by default)' },
+      { k:'on failure',  v:'Surfaces drift summary in session · optionally invokes Trashbot if --fix configured' },
+      { k:'last run',    v:'Tracked in workspace.json → last_verified timestamp' },
+    ],
+    hooks: [],
+  },
+];
+
+// ── Relationship graph ──────────────────────────────────────────
+// { from, to, kind: 'invokes'|'bootstrap'|'reads', label }
+const EDGES = [
+  // manifest & validation hierarchy
+  { from:'compiler',              to:'plugin-json',           kind:'invokes',    label:'generates' },
+  { from:'plugin-spec',           to:'compiler',              kind:'invokes',    label:'validates spec for' },
+  { from:'workspace-json',        to:'plugin-json',           kind:'validates',  label:'source of truth' },
+  { from:'plugin-json',           to:'workspace-json',        kind:'declares-dependency-on', label:'subset of' },
+
+  // bootstrap loads (SessionOpen)
+  { from:'plugin-json',           to:'ref-core-standards',    kind:'bootstrap',  label:'bootstrap load' },
+  { from:'plugin-json',           to:'ref-plugin-standards',  kind:'bootstrap',  label:'bootstrap load' },
+
+  // commands → agents
+  { from:'cmd-create',            to:'agent-plugin-builder',  kind:'invokes',    label:'routes to' },
+  { from:'cmd-update',            to:'agent-plugin-builder',  kind:'invokes',    label:'routes to' },
+  { from:'cmd-sync',              to:'skill-change-analyzer', kind:'invokes',    label:'triggers' },
+
+  // agents → skills → compiler
+  { from:'agent-plugin-builder',  to:'skill-discovery',       kind:'invokes',    label:'delegates' },
+  { from:'agent-plugin-builder',  to:'skill-generation',      kind:'invokes',    label:'delegates' },
+  { from:'agent-plugin-builder',  to:'compiler',              kind:'invokes',    label:'runs' },
+  { from:'agent-plugin-builder',  to:'skill-packager',        kind:'invokes',    label:'delegates (Update Mode)' },
+  { from:'skill-generation',      to:'compiler',              kind:'invokes',    label:'hands spec to' },
+  { from:'agent-trashbot',        to:'skill-generation',      kind:'invokes',    label:'applies via' },
+
+  // hook-driven invocations (PostToolUse)
+  { from:'skill-change-analyzer', to:'skill-updater',         kind:'invokes',    label:'invokes' },
+  { from:'skill-change-analyzer', to:'agent-trashbot',        kind:'invokes',    label:'invokes' },
+  { from:'skill-updater',         to:'skill-generation',      kind:'invokes',    label:'updates' },
+
+  // NOTE: Reference file reads (ref-*) are codebase artifacts, not executable dependencies.
+  // If skills need these, they load them directly. These relationships are documented separately.
+
+  // workspace.json relationships
+  { from:'agent-trashbot',        to:'workspace-json',         kind:'reads',      label:'iterates' },
+  { from:'skill-verifier',        to:'workspace-json',         kind:'reads',      label:'iterates' },
+  { from:'compiler',              to:'workspace-json',         kind:'reads',      label:'writes output relative to' },
+
+  // verifier relationships
+  { from:'cmd-verify',            to:'skill-verifier',         kind:'invokes',    label:'triggers' },
+  { from:'skill-verifier',        to:'ref-plugin-standards',   kind:'reads',      label:'' },
+  { from:'skill-verifier',        to:'agent-trashbot',         kind:'invokes',    label:'hands off to (--fix)' },
+  { from:'scheduled-verifier',    to:'skill-verifier',         kind:'invokes',    label:'runs daily' },
+
+  // connector relationships
+  { from:'skill-telemetry',       to:'connector-gateway',      kind:'invokes',    label:'sends to' },
+  { from:'skill-session-summarizer', to:'connector-gateway',   kind:'invokes',    label:'writes to' },
+  { from:'skill-verifier',        to:'connector-gateway',      kind:'invokes',    label:'emits report to' },
+  { from:'plugin-json',           to:'connector-gateway',      kind:'invokes',    label:'declares dependency' },
+
+  // protocol relationships
+  { from:'skill-verifier',        to:'protocol-core-standards', kind:'reads',     label:'' },
+  { from:'skill-verifier',        to:'protocol-plugin-standards',kind:'reads',    label:'' },
+  { from:'agent-trashbot',        to:'protocol-core-standards', kind:'reads',     label:'' },
+  { from:'agent-trashbot',        to:'protocol-plugin-standards',kind:'reads',    label:'' },
+  { from:'compiler',              to:'protocol-core-standards', kind:'reads',     label:'validates against' },
+  { from:'workspace-json',        to:'protocol-plugin-standards',kind:'contains', label:'references per plugin' },
+
+  // event relationships
+  { from:'agent-plugin-builder',  to:'event-plugin-created',   kind:'emits',      label:'on SessionClose' },
+  { from:'event-plugin-created',  to:'skill-telemetry',        kind:'consumed-by', label:'' },
+  { from:'event-plugin-created',  to:'scheduled-verifier',     kind:'consumed-by', label:'' },
+  { from:'skill-verifier',        to:'event-verification-failed',kind:'emits',    label:'on drift' },
+  { from:'event-verification-failed',to:'skill-telemetry',     kind:'consumed-by', label:'' },
+  { from:'event-verification-failed',to:'agent-trashbot',      kind:'consumed-by', label:'(optional --fix)' },
+  { from:'connector-gateway',     to:'event-vault-updated',    kind:'emits',      label:'on mutation' },
+  { from:'event-vault-updated',   to:'agent-plugin-builder',   kind:'consumed-by', label:'(subscribed plugins)' },
+
+  // schema relationships
+  { from:'skill-generation',         to:'schema-plugin-identity',    kind:'reads',     label:'guides field mapping' },
+  { from:'compiler',                 to:'schema-plugin-identity',    kind:'reads',     label:'validates on compile' },
+  { from:'skill-verifier',           to:'schema-plugin-identity',    kind:'reads',     label:'validates' },
+  { from:'skill-generation',         to:'schema-vault-entry',        kind:'reads',     label:'injects into generated plugins' },
+  { from:'skill-session-summarizer', to:'schema-vault-entry',        kind:'reads',     label:'runtime — wraps payload in envelope' },
+  { from:'connector-gateway',        to:'schema-vault-entry',        kind:'reads',     label:'validates on write' },
+  { from:'skill-generation',         to:'schema-hook-event',         kind:'reads',     label:'injects into generated plugins' },
+  { from:'skill-discovery',          to:'schema-hook-event',         kind:'reads',     label:'' },
+  { from:'skill-generation',         to:'schema-memory-access',      kind:'reads',     label:'injects into generated plugins' },
+  { from:'skill-verifier',           to:'schema-memory-access',      kind:'reads',     label:'validates access' },
+  { from:'connector-gateway',        to:'schema-memory-access',      kind:'reads',     label:'enforces ACL' },
+  // telemetry + session summary schemas — runtime reads (schema changes propagate automatically)
+  { from:'skill-telemetry',          to:'schema-telemetry-event',    kind:'reads',     label:'runtime — structures payload' },
+  { from:'skill-generation',         to:'schema-telemetry-event',    kind:'reads',     label:'injects into generated telemetry skills' },
+  { from:'skill-verifier',           to:'schema-telemetry-event',    kind:'reads',     label:'validates conformance' },
+  { from:'skill-session-summarizer', to:'schema-session-summary',    kind:'reads',     label:'runtime — structures content' },
+  { from:'skill-generation',         to:'schema-session-summary',    kind:'reads',     label:'injects into generated session skills' },
+  { from:'connector-gateway',        to:'schema-session-summary',    kind:'reads',     label:'validates payload on write' },
+];
+
+// ── Build lookup maps ───────────────────────────────────────────
+const NODE_MAP = {};
+NODES.forEach(n => NODE_MAP[n.id] = n);
+
+// outgoing[id] = [{edge, node}]
+// incoming[id] = [{edge, node}]
+const outgoing = {}, incoming = {};
+NODES.forEach(n => { outgoing[n.id] = []; incoming[n.id] = []; });
+EDGES.forEach(e => {
+  if (outgoing[e.from]) outgoing[e.from].push({ edge:e, node:NODE_MAP[e.to]   });
+  if (incoming[e.to])   incoming[e.to  ].push({ edge:e, node:NODE_MAP[e.from] });
+});
+
+// ── Type metadata ───────────────────────────────────────────────
+const TYPE_META = {
+  manifest:    { label:'Manifest',              color:'#1B2A4A', filterKey:'manifest'  },
+  agent:       { label:'Agent',                 color:'#0D6B6E', filterKey:'agent'     },
+  skill:       { label:'Skill',                 color:'#6B3FA0', filterKey:'skill'     },
+  command:     { label:'Command',               color:'#B86A1A', filterKey:'command'   },
+  connector:   { label:'Connector',             color:'#0D4F8C', filterKey:'connector' },
+  scheduled:   { label:'Scheduled Task',        color:'#7B3FA0', filterKey:'scheduled' },
+  policy:      { label:'Policy',                color:'#A74D1F', filterKey:'policy'    },
+  event:       { label:'Event',                 color:'#D94A42', filterKey:'event'     },
+  'data-model':{ label:'Data Model',            color:'#2D7A6E', filterKey:'data-model'},
+  'ref-global':{ label:'Ref · Bootstrap',       color:'#C8A96E', filterKey:'ref'       },
+  'ref-local': { label:'Ref · Skill-specific',  color:'#1E6B38', filterKey:'ref'       },
+  'tool':      { label:'Compiler / Tool',        color:'#4A4A8A', filterKey:'tool'      },
+};
+
+const GROUP_ORDER = ['manifest','agent','skill','command','connector','scheduled','policy','event','data-model','ref-global','ref-local','tool'];
+const GROUP_LABELS = {
+  manifest:    'Manifest & Config',
+  agent:       'Agents',
+  skill:       'Skills',
+  command:     'Commands',
+  connector:   'Connectors',
+  scheduled:   'Scheduled Tasks',
+  policy:      'Protocols',
+  event:       'Events',
+  'data-model':'Schemas',
+  'ref-global':'References — Plugin Bootstrap',
+  'ref-local': 'References — Skill-specific',
+  'tool':      'Compiler & Tools',
+};
+
+// ── Render ──────────────────────────────────────────────────────
+function relColor(kind) {
+  if (kind === 'bootstrap') return '#C8A96E';
+  if (kind === 'reads')     return '#1E6B38';
+  if (kind === 'validates') return '#D94A42';
+  if (kind === 'declares-dependency-on') return '#0D4F8C';
+  return '#344054';
+}
+function relLabel(edge, isOutgoing) {
+  if (edge.label) return edge.label;
+  if (edge.kind === 'bootstrap') return 'bootstrap load';
+  if (edge.kind === 'reads')     return isOutgoing ? 'reads' : 'read by';
+  if (edge.kind === 'validates') return isOutgoing ? 'validates' : 'validated by';
+  if (edge.kind === 'declares-dependency-on') return 'requires subset of';
+  return isOutgoing ? 'invokes' : 'invoked by';
+}
+
+function buildCard(node) {
+  const tm  = TYPE_META[node.type];
+  const out = outgoing[node.id];
+  const inc = incoming[node.id];
+
+
+  // hooks section
+  let hooksHTML = '';
+  if (node.hooks && node.hooks.length > 0) {
+    const chips = node.hooks.map(h => `<div class="hook-chip">⚡ ${h}</div>`).join('');
+    hooksHTML = `
+      <div class="field-section">
+        <div class="field-section-title">Hooks</div>
+        <div class="hook-chip-wrap">${chips}</div>
+      </div>`;
+  }
+
+  // fields section
+  let fieldsHTML = '';
+  if (node.fields && node.fields.length > 0) {
+    const rows = node.fields.map(f =>
+      `<div class="field-row"><span class="field-key">${f.k}</span><span class="field-val">${f.v}</span></div>`
+    ).join('');
+    fieldsHTML = `
+      <div class="field-section">
+        <div class="field-section-title">Fields</div>
+        ${rows}
+      </div>`;
+  }
+
+  // outgoing related list
+  let outHTML = '';
+  if (out.length > 0) {
+    const items = out.map(({ edge, node: n }) => {
+      if (!n) return '';
+      const ntm = TYPE_META[n.type] || {};
+      return `<div class="related-item">
+        <span class="rel-dot" style="background:${ntm.color||'#667085'}"></span>
+        <span class="rel-name">${n.label}</span>
+        <span class="rel-label" style="color:${relColor(edge.kind)}">${relLabel(edge, true)}</span>
+      </div>`;
+    }).join('');
+    outHTML = `<div class="related-list">
+      <div class="related-list-title">Points To</div>
+      ${items}
+    </div>`;
+  }
+
+  // incoming related list
+  let incHTML = '';
+  if (inc.length > 0) {
+    const items = inc.map(({ edge, node: n }) => {
+      if (!n) return '';
+      const ntm = TYPE_META[n.type] || {};
+      return `<div class="related-item">
+        <span class="rel-dot" style="background:${ntm.color||'#667085'}"></span>
+        <span class="rel-name">${n.label}</span>
+        <span class="rel-label" style="color:${relColor(edge.kind)}">${relLabel(edge, false)}</span>
+      </div>`;
+    }).join('');
+    incHTML = `<div class="related-list">
+      <div class="related-list-title">Referenced By</div>
+      ${items}
+    </div>`;
+  }
+
+  return `
+  <div class="record-card t-${node.type} expanded" id="card-${node.id}" data-type="${node.type}" data-filterkey="${tm.filterKey}">
+    <div class="record-header">
+      <div class="record-icon"><svg viewBox="0 0 24 24">${node.icon}</svg></div>
+      <div class="record-title-wrap">
+        <div class="record-title">${node.label}</div>
+        <div class="record-type">${tm.label}</div>
+      </div>
+      <svg class="record-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="record-body">
+      <div class="record-desc">${node.desc}</div>
+      ${hooksHTML}
+      ${fieldsHTML}
+      ${outHTML}
+      ${incHTML}
+    </div>
+  </div>`;
+}
+
+function renderAll() {
+  const main = document.getElementById('mainContent');
+  // preserve search bar
+  const searchWrap = main.querySelector('.search-bar-wrap');
+  main.innerHTML = '';
+  main.appendChild(searchWrap);
+
+  GROUP_ORDER.forEach(type => {
+    const nodes = NODES.filter(n => n.type === type);
+    if (!nodes.length) return;
+    const tm = TYPE_META[type];
+    const block = document.createElement('div');
+    block.className = 'group-block';
+    block.dataset.groupType = type;
+    block.dataset.filterKey = tm.filterKey;
+    block.innerHTML = `
+      <div class="group-header">
+        <span class="group-dot" style="background:${tm.color}"></span>
+        <span class="group-title">${GROUP_LABELS[type]}</span>
+        <span class="group-count">${nodes.length}</span>
+      </div>
+      <div class="card-grid">${nodes.map(buildCard).join('')}</div>`;
+    main.appendChild(block);
+  });
+
+  // re-attach click handlers
+  document.querySelectorAll('.record-card').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('expanded'));
+  });
+
+  updateCounts();
+}
+
+// ── Filtering ────────────────────────────────────────────────────
+let activeFilter = 'all';
+
+function applyFilter(filterKey) {
+  activeFilter = filterKey;
+  document.querySelectorAll('.record-card').forEach(card => {
+    const match = filterKey === 'all' || card.dataset.filterkey === filterKey;
+    card.classList.toggle('hidden', !match);
+  });
+  document.querySelectorAll('.group-block').forEach(block => {
+    const visible = filterKey === 'all' || block.dataset.filterKey === filterKey;
+    block.classList.toggle('hidden', !visible);
+  });
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filterKey);
+  });
+}
+
+function updateCounts() {
+  const counts = {};
+  NODES.forEach(n => {
+    const fk = TYPE_META[n.type].filterKey;
+    counts[fk] = (counts[fk] || 0) + 1;
+  });
+  document.getElementById('count-all').textContent = NODES.length;
+  ['manifest','agent','skill','command','ref','connector','scheduled','policy','event','data-model'].forEach(k => {
+    const el = document.getElementById('count-' + k);
+    if (el) el.textContent = counts[k] || 0;
+  });
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyFilter(btn.dataset.filter));
+});
+
+// ── Search ───────────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('.record-card').forEach(card => {
+    if (activeFilter !== 'all' && card.dataset.filterkey !== activeFilter) {
+      card.classList.add('hidden'); return;
+    }
+    const text = card.textContent.toLowerCase();
+    card.classList.toggle('hidden', q.length > 0 && !text.includes(q));
+  });
+  document.querySelectorAll('.group-block').forEach(block => {
+    const anyVisible = [...block.querySelectorAll('.record-card')].some(c => !c.classList.contains('hidden'));
+    block.classList.toggle('hidden', !anyVisible);
+  });
+});
+
+// ── Expand All toggle ────────────────────────────────────────────
+let allExpanded = true;
+document.getElementById('expandAllBtn').textContent = 'Collapse All';
+document.getElementById('expandAllBtn').addEventListener('click', () => {
+  allExpanded = !allExpanded;
+  document.querySelectorAll('.record-card').forEach(card => {
+    card.classList.toggle('expanded', allExpanded);
+  });
+  document.getElementById('expandAllBtn').textContent = allExpanded ? 'Collapse All' : 'Expand All';
+});
+
+// ── Init ─────────────────────────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>

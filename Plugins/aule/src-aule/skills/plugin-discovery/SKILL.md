@@ -158,6 +158,19 @@ Walk users through a structured discovery conversation to gather everything need
 - Follow up: "Where does this knowledge live? How large is the corpus, and how fresh does it need to be?"
 - Note for generation: Plugin will need retrieval configuration (what sources, what freshness, what fallback). This feeds into the integrations question.
 
+*If memory_scope is "persistent" — follow up with memory access control:*
+- Ask: "Who or what should be allowed to read the data this plugin stores? Should any other plugins access it? Should access be restricted to this plugin only?"
+- This determines the memory access control declaration, which governs how the vault protects this plugin's stored data.
+
+**Store:**
+- `memory_access_control` — "private" (only this plugin reads its own data), "shared" (named list of other plugins allowed to read), or "org-wide" (any plugin in the org can read)
+- `memory_access_readers` — if "shared", the list of plugin IDs allowed read access (e.g., `["aule", "the-one-ring"]`)
+- `memory_access_justification` — why broader-than-private access is needed
+
+**If the user isn't sure about access control:** Default to "private" and note: "We'll lock this down to your plugin only by default. You can grant read access to specific other plugins later."
+
+**Why this matters:** Every persistent memory entry is a security surface. Access control declarations feed into the `schema-memory-access` contract that the vault enforces — if a plugin doesn't declare who can read its data, access defaults to private. This is not an afterthought; it's part of the plugin's security posture.
+
 **If the user isn't sure:** Default to "ephemeral" and note: "We'll start with session-scoped memory. If you find the plugin needs to remember things between conversations, we can add that later."
 
 ---
@@ -243,8 +256,37 @@ Don't block the plugin, but flag it in the discovery summary: "This plugin prima
 **Store:**
 - `integrations` — list of selected systems
 - `integration_details` — any specifics (repo names, property IDs, workspace URLs)
+- `connectors` — array of connector entries formatted for plugin.json (see Connectors Mapping below)
 
 **Follow-up for each selected integration:** "Any specifics? For example, a GitHub repo name, a GA4 property ID, or an API endpoint?"
+
+**Connectors Mapping — convert Q7 answers to plugin.json format:**
+
+After collecting integrations, map each selected system to a connector entry. This is the exact format that flows into the plugin.json `connectors` field:
+
+```json
+"connectors": [
+  {
+    "id": "github",
+    "required": true,
+    "scopes": ["read:repo", "write:issues"]
+  },
+  {
+    "id": "google-analytics",
+    "required": false,
+    "scopes": ["read:reports"]
+  }
+]
+```
+
+Common connector IDs: `github`, `google-analytics`, `salesforce`, `hubspot`, `slack`, `jira`, `linear`, `asana`, `google-workspace`, `snowflake`, `bigquery`.
+
+For each integration:
+- Mark `required: true` if the plugin cannot function without it (core workflow dependency)
+- Mark `required: false` if it enhances the plugin but isn't mandatory
+- Derive `scopes` from what the plugin will actually do (read vs. write, which objects)
+
+If the user selects "None — standalone", store `connectors: []`.
 
 ---
 
@@ -445,6 +487,7 @@ Format the collected answers as a structured summary:
 - Type: [memory_scope]
 - Details: [memory_details]
 - Lifecycle: [data_lifecycle]
+- Access control: [memory_access_control] — [memory_access_readers if shared] — [memory_access_justification if not private]
 
 **Workflow Context:**
 - Before: [workflow_before]
@@ -456,6 +499,7 @@ Format the collected answers as a structured summary:
 
 **Integrations:**
 [integrations as bullet list with details]
+[connectors as JSON array — formatted for plugin.json]
 
 **Success Metrics:**
 [success_metrics as bullet list]
@@ -487,14 +531,15 @@ This skill participates in Aule's compounding loop by logging all discovery sess
 At the **start** of discovery, log:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.2.0","component":"plugin-discovery","trigger":"user asked to create a new plugin"}
+{"timestamp":"2026-03-03T10:30:00Z","event":"skill_invoke","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-discovery","trigger":"user asked to create a new plugin"}
 ```
 
 **Required fields:**
 - `timestamp` — ISO 8601 UTC time with Z suffix
 - `event` — literal string "skill_invoke"
 - `plugin` — literal string "aule"
-- `plugin_version` — from the skill frontmatter (currently 0.2.0)
+- `plugin_version` — from plugin.json (currently 0.3.0)
+- `platform` — hardcoded string "claude" (set at generation time, never inferred at runtime)
 - `component` — literal string "plugin-discovery"
 - `trigger` — paraphrase of the user's initial message (5-15 words, no PII)
 
@@ -505,21 +550,22 @@ At the **start** of discovery, log:
 When you are **interpreting user answers and storing discovery data**, log:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:35:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.2.0","component":"plugin-discovery","input_summary":"user described a content review workflow with 2 approval steps","reasoning":["multi-step orchestration → agent component","content constraint checking → skill component","trigger on keyword detection → command component"],"output_summary":"planned plugin architecture: 1 agent, 1 command, 1 skill","confidence":"high"}
+{"timestamp":"2026-03-03T10:35:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-discovery","input_summary":"user described a content review workflow with 2 approval steps","reasoning":["multi-step orchestration → agent component","content constraint checking → skill component","trigger on keyword detection → command component"],"output_summary":"planned plugin architecture: 1 agent, 1 command, 1 skill","confidence":"high"}
 ```
 
 **Required fields:**
 - `timestamp` — ISO 8601 UTC time with Z suffix
 - `event` — literal string "decision_trace"
 - `plugin` — literal string "aule"
-- `plugin_version` — from the skill frontmatter
+- `plugin_version` — from plugin.json
+- `platform` — hardcoded string "claude"
 - `component` — literal string "plugin-discovery"
 - `input_summary` — what the user said (1-2 sentences, paraphrased, no verbatim PII)
 - `reasoning` — list of 2-3 key factors that influenced interpretation (bullet-point style)
 - `output_summary` — what you decided or concluded (1-2 sentences)
 - `confidence` — "high", "medium", or "low" based on clarity of user's answers
 
-**When:** Log after interpreting answers to Q2 (key functions), Q3 (strategic questions), Q4 (constraints), Q6 (workflow context), Q7 (integrations), and Q9 (success metrics) — these are the substantive interpretive decisions.
+**When:** Log after interpreting answers to Q2 (key functions), Q3 (strategic questions), Q4 (constraints), Q5 (memory scope + access control), Q6 (workflow context), Q7 (integrations → connectors mapping), and Q9 (success metrics) — these are the substantive interpretive decisions.
 
 **Why:** Discovery answers are the foundation for plugin design. Logging the reasoning behind how we interpret those answers helps the Optimizer understand what kinds of user inputs lead to well-designed plugins.
 
@@ -528,7 +574,7 @@ When you are **interpreting user answers and storing discovery data**, log:
 If the user provides **significantly positive or negative** feedback about the discovery flow itself, log:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:50:00Z","event":"feedback","plugin":"aule","plugin_version":"0.2.0","sentiment":"positive","component":"plugin-discovery","context":"user said the questions helped them clarify what they really wanted to build","output_summary":"guided user through 10 discovery questions to complete plugin specification"}
+{"timestamp":"2026-03-03T10:50:00Z","event":"feedback","plugin":"aule","plugin_version":"0.3.0","platform":"claude","sentiment":"positive","component":"plugin-discovery","context":"user said the questions helped them clarify what they really wanted to build","output_summary":"guided user through 10 discovery questions to complete plugin specification"}
 ```
 
 **Required fields:**
@@ -552,7 +598,7 @@ If the user provides **significantly positive or negative** feedback about the d
 If a user tries something that conflicts with discovery's constraints, log:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:45:00Z","event":"violation","plugin":"aule","plugin_version":"0.2.0","violation_type":"constraint_breach","description":"user tried to skip the discovery process and jump directly to code generation","constraint_violated":"Complete discovery conversation before generating plugin","action_taken":"redirected — explained why discovery is required and restarted the protocol"}
+{"timestamp":"2026-03-03T10:45:00Z","event":"violation","plugin":"aule","plugin_version":"0.3.0","platform":"claude","violation_type":"constraint_breach","description":"user tried to skip the discovery process and jump directly to code generation","constraint_violated":"Complete discovery conversation before generating plugin","action_taken":"redirected — explained why discovery is required and restarted the protocol"}
 ```
 
 **Discovery constraints are:**
@@ -581,7 +627,7 @@ If a user tries something that conflicts with discovery's constraints, log:
 If a user references a plugin name that already exists, or references a file/path that doesn't exist, log:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:40:00Z","event":"not_found_reported","plugin":"aule","plugin_version":"0.2.0","component":"plugin-discovery","description":"user asked to create plugin named 'content-auditor' but a plugin with that name already exists in plugins-workspace/"}
+{"timestamp":"2026-03-03T10:40:00Z","event":"not_found_reported","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-discovery","description":"user asked to create plugin named 'content-auditor' but a plugin with that name already exists in plugins-workspace/"}
 ```
 
 **Required fields:**
@@ -601,7 +647,7 @@ If a user references a plugin name that already exists, or references a file/pat
 Once discovery is complete and the user confirms the summary, you can add a final decision trace summarizing what was discovered:
 
 ```jsonl
-{"timestamp":"2026-03-03T10:55:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.2.0","component":"plugin-discovery","input_summary":"user completed all 10 discovery questions for a proposal review plugin","reasoning":["identified 3 key functions: structure validation, feedback synthesis, compliance checking","constraints emerged: must preserve client confidentiality, cannot generate content","success metric: reviewers save 30+ mins per review"],"output_summary":"complete plugin specification stored and ready for generation","confidence":"high"}
+{"timestamp":"2026-03-03T10:55:00Z","event":"decision_trace","plugin":"aule","plugin_version":"0.3.0","platform":"claude","component":"plugin-discovery","input_summary":"user completed all 10 discovery questions for a proposal review plugin","reasoning":["identified 3 key functions: structure validation, feedback synthesis, compliance checking","constraints emerged: must preserve client confidentiality, cannot generate content","success metric: reviewers save 30+ mins per review"],"output_summary":"complete plugin specification stored and ready for generation","confidence":"high"}
 ```
 
 This summary event marks the transition from discovery → generation phase.

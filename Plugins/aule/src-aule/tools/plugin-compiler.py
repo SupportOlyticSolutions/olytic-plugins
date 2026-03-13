@@ -94,8 +94,6 @@ def gen_plugin_json(spec: PluginSpec) -> str:
             {"id": c.id, "required": c.required, "scopes": c.scopes}
             for c in spec.connectors
         ]
-    manifest["sublabel"] = spec.sublabel
-    manifest["icon"]     = spec.icon
     return json.dumps(manifest, indent=2, ensure_ascii=False)
 
 
@@ -320,20 +318,20 @@ version: {spec.version}
 
 # {spec.plugin_name} Telemetry
 
-> **Schema:** Reads `olytic-core/contracts/schemas/telemetry-event-schema.json` at runtime on every invocation.
-> Do NOT bake field definitions in — always read from the schema file.
+> **Schema:** Fetches the canonical `telemetry-event` schema at runtime from `olytic-core` by invoking the `olytic-core-schemas` skill.
+> Do NOT bake field definitions in. Do NOT read from filesystem paths — use the skill invocation only.
+> This works whether olytic-core is a mounted workspace folder or an installed Organizational Plugin.
 
 ## Schema Runtime Behavior
 
 Before logging any event:
 
 ```
-If olytic-core/contracts/schemas/telemetry-event-schema.json exists:
-  → Read it and use its field definitions as the authoritative event shape
-  → Do NOT cache — re-read at each invocation
+invoke skill: olytic-core-schemas
+schema: telemetry-event
 
-If the file does not exist:
-  → Use the hardcoded fallback structure below
+→ Use the returned base_fields and event_fields as the authoritative event shape
+→ Do NOT cache — re-invoke at each session start
 ```
 
 **Canonical event types (8):**
@@ -428,17 +426,26 @@ Fires on the `SessionClose` hook. Silent — never announces its operation.
 
 ## Schema Runtime Behavior
 
-At each invocation, check and read:
-1. `olytic-core/contracts/schemas/session-summary-schema.json` — content field definitions
-2. `olytic-core/contracts/schemas/vault-entry-schema.json` — envelope structure
+At each invocation, fetch both schemas from `olytic-core`:
 
-Do NOT cache. Re-read both files on every SessionClose invocation.
+```
+invoke skill: olytic-core-schemas
+schema: session-summary
+→ Use the returned fields as the authoritative content shape
+
+invoke skill: olytic-core-schemas
+schema: vault-entry
+→ Use the returned fields as the authoritative envelope structure
+```
+
+Do NOT cache. Do NOT read from filesystem paths. Re-invoke on every SessionClose.
+This works whether olytic-core is a mounted workspace folder or an installed Organizational Plugin.
 
 ## Step-by-Step Protocol
 
-**Step 1:** Read `olytic-core/contracts/schemas/session-summary-schema.json`. Use its fields.
+**Step 1:** Invoke `olytic-core-schemas` for `session-summary`. Use its fields for the content payload.
 
-**Step 2:** Read `olytic-core/contracts/schemas/vault-entry-schema.json`. Use its envelope structure.
+**Step 2:** Invoke `olytic-core-schemas` for `vault-entry`. Use its fields for the envelope wrapper.
 
 **Step 3:** Assess session substance. If purely conversational with no decisions or changes, produce a minimal summary (primary_topic + narrative only).
 
@@ -664,7 +671,7 @@ def validate_output(src: Path, spec: PluginSpec) -> list[str]:
         try:
             manifest = json.loads(plugin_json_path.read_text())
             valid_keys = {"name", "version", "description", "author", "keywords",
-                          "hooks", "connectors", "sublabel", "icon"}
+                          "hooks", "connectors"}
             extra = set(manifest.keys()) - valid_keys
             if extra:
                 failures.append(f"plugin.json has invalid keys: {extra}")
