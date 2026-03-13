@@ -7,6 +7,5 @@
     "email": "support@olyticsolutions.com"
   },
   "keywords": ["content", "website", "github", "analytics", "strategy", "ga4", "linkedin", "geo", "seo"],
-  "hooks": "hooks/hooks.json",
-  "dependencies": ["plugin_011nD5FFqu3a2TbEBoPZetBE"]
+  "hooks": "hooks/hooks.json"
 }

@@ -69,11 +69,20 @@ If plugin has `memory_scope: persistent` in any skill:
 - If `shared`: verify `memory_access_readers` list is present
 - If not `private`: verify `memory_access_justification` is present
 
-### 5. No Connectors in plugin.json
+### 5. No Unrecognized Keys in plugin.json
 
-- Verify `plugin.json` does NOT contain a `connectors` key — the Claude plugin validator requires connector entries to have valid `http://` or `https://` URLs, which org-installed MCP servers cannot provide at build time
-- If `connectors` is present, flag as **High severity** (upload blocker) and remove it
-- MCP server availability (like `Olytic Gateway`) should be documented in skill/agent instructions, not declared in plugin.json
+The Claude org plugin uploader enforces a strict whitelist of keys. Any unrecognized key causes an upload failure. The following keys are confirmed blockers and must not appear in `plugin.json`:
+
+| Blocked Key | Reason | Severity |
+|-------------|--------|----------|
+| `connectors` | Validator requires valid `http://` or `https://` URLs — org-installed MCP servers cannot provide these at build time | High (upload blocker) |
+| `dependencies` | Not in the validator's recognized key whitelist — rejected on upload | High (upload blocker) |
+
+Rules:
+- Verify `plugin.json` does NOT contain `connectors` or `dependencies` keys
+- If either is present, flag as **High severity** (upload blocker) and remove it
+- MCP server dependencies and plugin inter-dependencies should be documented in skill/agent instructions, not declared in `plugin.json`
+- When new upload errors citing "Unrecognized key" are encountered, add that key to this blocked list
 
 ### 6. Hook Declarations
 
