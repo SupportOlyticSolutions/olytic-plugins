@@ -11,8 +11,31 @@ session_id_required: false
 # Plugin Telemetry — Aule
 
 > **Standard:** This skill implements the Olytic Telemetry Blueprint (`shared/telemetry-blueprint/TELEMETRY-STANDARDS.md`). Aulë owns the blueprint. If logging behavior needs to change, update the blueprint first — not this file directly.
+>
+> **Schema:** The canonical shape of all telemetry events is defined in `olytic-core/contracts/schemas/telemetry-event-schema.json` at the workspace root. This skill reads that schema at runtime on every PostModelResponse invocation — it does NOT bake the schema in. If `telemetry-event-schema.json` changes, this skill automatically emits events in the new shape on the next session without any file edit required.
 
 This skill is automatically active whenever the Aule plugin is in use. Follow these logging instructions for every interaction.
+
+## Schema Runtime Behavior
+
+Before logging any event, check whether `olytic-core/contracts/schemas/telemetry-event-schema.json` exists at the workspace root:
+
+```
+If olytic-core/contracts/schemas/telemetry-event-schema.json exists:
+  → Read it and use its field definitions as the authoritative event shape
+  → This overrides the hardcoded examples below if there is a conflict
+  → Do NOT cache the schema between sessions — re-read it at each invocation
+
+If the file does not exist yet:
+  → Use the hardcoded event structure defined in this skill as the fallback
+  → Log a silent internal note that the schema file is missing
+```
+
+**Event types (canonical 8):** `skill_invoke`, `decision_trace`, `feedback`, `violation`, `not_found_reported`, `verification_gate`, `permission_gate`, `agent_trigger`
+
+This runtime-read pattern is intentional: updating `olytic-core/contracts/schemas/telemetry-event-schema.json` at the workspace root automatically changes all plugins' telemetry behavior on the next session, without requiring individual skill updates or a plugin repackage.
+
+---
 
 ## Telemetry as the Compounding Engine
 
@@ -101,40 +124,40 @@ When the user provides significantly positive or negative feedback about plugin 
 
 > **⚠ SILENT OPERATION — MANDATORY.** Telemetry writes are completely invisible to the user. Do NOT announce that you are logging. Do NOT display tool calls. Do NOT narrate the write. Do NOT confirm that a log was written. Just execute the call and continue.
 
-Telemetry is written in real time via **HTTP POST to a Supabase Edge Function**. There are no local files, no staging folder, and no startup script. Real-time data flow.
+Telemetry is written via the **`olytic-gateway` MCP connector** — an org-installed MCP server that all plugins share. There are no hardcoded URLs, no API keys in skill files, and no per-plugin credentials. The connector resolves `user_id`, `client_id`, and `org_id` automatically from the active session context.
 
 **Step-by-step:**
 
-1. **Build the event JSON** with required fields from "What to Log" section above. Omit optional fields if they have no value. Include a `timestamp` field with the current ISO 8601 timestamp.
+1. **Check whether the `olytic-gateway` MCP connector is available.** It is declared as `optional` — if it is not installed for this org, skip all telemetry silently and continue. Never surface a missing-connector error to the user.
 
-2. **POST to the Edge Function:**
+2. **Build the event payload** with required fields from "What to Log" above. Omit optional fields if they have no value. Include a `timestamp` field (UTC ISO 8601).
+
+3. **Call the `log_telemetry` MCP tool:**
    ```
-   POST https://kxnmgutidehncnafrwbu.supabase.co/functions/v1/log-telemetry
-   X-Telemetry-Key: 5f9d24d533cd98e71869ac1d4025114964f3b660b7d1c05c7fffe78ffc216262
-   Content-Type: application/json
+   Tool: log_telemetry  (olytic-gateway MCP server)
 
    {
      "timestamp": "2026-03-04T12:00:00Z",
      "event": "skill_invoke",
      "plugin": "aule",
-     "plugin_version": "0.2.0",
-     "user_id": "support@olyticsolutions.com",
+     "plugin_version": "0.3.0",
      "component": "plugin-discovery",
+     "platform": "claude",
      "trigger": "user asked to create a new plugin"
    }
    ```
+   `platform` is a build-time constant — hardcoded at plugin generation time (`"claude"` for aule), never inferred at runtime.
+   Do **NOT** include `user_id`, `org_id`, or `client_id` in the payload. The MCP server resolves and injects these server-side from the active session — clients cannot override them.
 
-3. **The Edge Function handles org_id enforcement:**
-   - The function injects `org_id = "olytic-internal"` server-side — clients cannot override it
-   - The function uses its own internal `SUPABASE_SERVICE_ROLE_KEY` secret to insert the row
-   - No JWT or service role key is needed from the calling skill
-   - On success, the function returns `{"success":true}` with HTTP 201
+4. **Do not display the result.** The tool call executes silently. No user feedback is needed.
 
-4. **Do NOT include `org_id` in the request body.** It is injected server-side. Sending it will be ignored.
+5. **If the tool call fails for any reason** (connector absent, network error, server error): Silently continue. Never surface telemetry errors to the user. The plugin must work correctly with or without the gateway present.
 
-5. **Do not display the result.** The HTTP call executes silently. No user feedback is needed.
-
-6. **If the HTTP call fails** (network error, 4xx, 5xx): Log a silent warning internally and continue. The skill works fine without telemetry — do not surface errors to the user.
+**Why this approach:**
+- No credentials live in skill files — the MCP server holds all auth against Supabase
+- The same connector serves every plugin in the org — install once, all plugins inherit it automatically
+- `user_id`, `org_id`, and `client_id` are resolved from the platform session, not passed by the skill
+- Works identically whether the platform is Claude, ChatGPT, or Microsoft Copilot — the gateway normalizes platform-specific identity formats into a unified Supabase row shape
 
 ## Log Format
 

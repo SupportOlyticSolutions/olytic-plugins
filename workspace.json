@@ -1,0 +1,70 @@
+{
+  "$schema": "https://olyticsolutions.com/schemas/workspace/v1",
+  "workspace": "olytic-plugins",
+  "standards_version": "3.0.0",
+  "last_verified": null,
+
+  "connectors": {
+    "olytic-gateway": {
+      "description": "Proprietary Olytic Gateway API — single external integration point for all plugins",
+      "endpoint": "${OLYTIC_GATEWAY_URL}",
+      "auth": {
+        "type": "api-key",
+        "env_var": "OLYTIC_GATEWAY_API_KEY"
+      },
+      "used_for": ["telemetry", "vault-reads", "vault-writes", "session-summaries", "compliance-reports"],
+      "platform_transports": {
+        "claude":   "mcp-server",
+        "chatgpt":  "agent-connector",
+        "copilot":  "mcp-server",
+        "gemini":   "enterprise-sdk"
+      }
+    }
+  },
+
+  "bootstrap_refs": {
+    "aule-core-standards":    "Plugins/aule/src-aule/aule-core-standards.md",
+    "aule-agentic-behavior":  "Plugins/aule/src-aule/aule-agentic-behavior.md",
+    "protocols-core":         "Plugins/olytic-core/src-olytic-core/contracts/protocols/agentic-behavior.md",
+    "protocols-plugin":       "Plugins/olytic-core/src-olytic-core/contracts/protocols/plugin-standards.md",
+    "schema-plugin-identity": "Plugins/olytic-core/src-olytic-core/contracts/schemas/plugin-identity-schema.json",
+    "schema-telemetry-event": "Plugins/olytic-core/src-olytic-core/contracts/schemas/telemetry-event-schema.json",
+    "schema-session-summary": "Plugins/olytic-core/src-olytic-core/contracts/schemas/session-summary-schema.json",
+    "schema-vault-entry":     "Plugins/olytic-core/src-olytic-core/contracts/schemas/vault-entry-schema.json",
+    "schema-hook-event":      "Plugins/olytic-core/src-olytic-core/contracts/schemas/hook-event-schema.json",
+    "schema-memory-access":   "Plugins/olytic-core/src-olytic-core/contracts/schemas/memory-access-schema.json"
+  },
+
+  "plugins": [
+    {
+      "name": "olytic-core",
+      "version": "1.0.0",
+      "path": "Plugins/olytic-core/src-olytic-core",
+      "status": "active",
+      "last_verified": null,
+      "compliance": null
+    },
+    {
+      "name": "aule",
+      "version": "0.3.0",
+      "path": "Plugins/aule/src-aule",
+      "status": "active",
+      "last_verified": null,
+      "compliance": null
+    }
+  ],
+
+  "verification": {
+    "schedule": "daily",
+    "mode": "report-only",
+    "auto_remediate": false,
+    "notify_on_drift": true,
+    "metadata_types": ["manifest", "agent", "skill", "command", "connector", "scheduled", "policy", "event", "data-model", "ref-global", "ref-local"],
+    "checks": {
+      "policy-compliance": true,
+      "data-model-schema-validation": true,
+      "event-subscription-validity": true,
+      "connector-dependency-resolution": true
+    }
+  }
+}
