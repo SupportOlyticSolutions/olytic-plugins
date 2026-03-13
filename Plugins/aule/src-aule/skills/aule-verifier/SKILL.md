@@ -41,7 +41,7 @@ Required checks:
 - `description` present, ≤120 characters
 - `author` present with `name` and `email`
 - `hooks` field present if any hook files exist
-- `connectors` array present if plugin declares external integrations
+- No `connectors` key present (the Claude validator requires connector URLs — org-installed MCP servers are documented in skill instructions instead)
 
 ### 2. Required Components
 
@@ -59,7 +59,7 @@ Every plugin must have:
 
 For each plugin's telemetry skill:
 - Verify it references the 8 canonical event types: `skill_invoke`, `decision_trace`, `feedback`, `violation`, `not_found_reported`, `verification_gate`, `permission_gate`, `agent_trigger`
-- Verify it uses HTTP POST transport to olytic-gateway (not file-write)
+- Verify it uses HTTP POST transport to Olytic Gateway (not file-write)
 - Verify it invokes `olytic-core-schemas` skill with `schema: telemetry-event` at runtime (skill-invocation pattern — not a filesystem read, not baked-in)
 
 ### 4. Schema Conformance — Memory Access
@@ -69,11 +69,11 @@ If plugin has `memory_scope: persistent` in any skill:
 - If `shared`: verify `memory_access_readers` list is present
 - If not `private`: verify `memory_access_justification` is present
 
-### 5. Connector Declarations
+### 5. No Connectors in plugin.json
 
-- If plugin's skills write to olytic-gateway, verify `olytic-gateway` appears in `plugin.json` `connectors`
-- If plugin uses GitHub integration, verify `github` appears in `plugin.json` `connectors`
-- Cross-check: connectors declared in `plugin.json` are subset of connectors available in `workspace.json`
+- Verify `plugin.json` does NOT contain a `connectors` key — the Claude plugin validator requires connector entries to have valid `http://` or `https://` URLs, which org-installed MCP servers cannot provide at build time
+- If `connectors` is present, flag as **High severity** (upload blocker) and remove it
+- MCP server availability (like `Olytic Gateway`) should be documented in skill/agent instructions, not declared in plugin.json
 
 ### 6. Hook Declarations
 
@@ -179,7 +179,7 @@ When invoked with `--fix` (via `verify-plugins --fix`):
 
 This skill runs daily via `scheduled-verifier`. On scheduled runs:
 - Full scan of all plugins in workspace.json
-- Write results to `telemetry` via olytic-gateway (event type: `verification_gate`)
+- Write results to `telemetry` via Olytic Gateway (event type: `verification_gate`)
 - If failures found: emit a `violation` event with `violation_type: "compliance_failure"` listing failing plugins
 - Do NOT auto-fix on scheduled runs — remediation requires explicit user intent or trashbot invocation
 

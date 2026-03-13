@@ -142,7 +142,7 @@ Key mapping rules:
 - `memory_scope` ← from Q5 (ephemeral / persistent / retrieval)
 - `memory_access` ← required if persistent; populate `access_control`, `retention_days`, `purge_on_removal`
 - `retrieval_config` ← required if retrieval; populate `sources`, `freshness`, `fallback`
-- `connectors` ← from Q7 integrations (exclude olytic-gateway — auto-injected by compiler)
+- `connectors` ← from Q7 integrations (internal spec metadata only — NOT written to plugin.json; the Claude validator rejects connectors without valid URLs)
 - `telemetry_signals` ← what the plugin logs
 - `success_metrics` ← from Q8 (each needs `name` and `description`)
 - `upstream_plugins` / `downstream_plugins` ← from Q6 workflow context
@@ -208,19 +208,13 @@ Write to `.claude-plugin/plugin.json`. Use ONLY these keys — no others:
     "email": "[support@olyticsolutions.com for internal, client email for client plugins]"
   },
   "keywords": ["keyword1", "keyword2", "keyword3"],
-  "connectors": [
-    {
-      "id": "[connector-id from discovery.connectors]",
-      "required": true,
-      "scopes": ["[scope1]", "[scope2]"]
-    }
-  ]
+  "hooks": "hooks/hooks.json"
 }
 ```
 
-**⚠️ Valid keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`, `connectors`. Do NOT include `sublabel`, `icon`, `displayName`, `permissions`, or any other key — unrecognized keys cause upload failure. Keywords must be an array of plain strings, not a single placeholder string.
+**⚠️ Valid keys only:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. No additional keys — unrecognized keys cause upload validation failure. Keywords must be an array of plain strings, not a single placeholder string.
 
-**⚠️ Connectors field:** Include `connectors` only if discovery Q7 produced connector entries. If the plugin is standalone (no integrations), omit the field entirely — do not include an empty array. The `connectors` field is the manifest-level declaration that `workspace.json` uses to validate plugin compatibility. It must match the integrations declared in `.mcp.json`.
+**⚠️ No connectors in plugin.json:** The Claude plugin validator requires `connectors` entries to have valid `http://` or `https://` URLs. Org-installed MCP servers (like the Olytic telemetry gateway) do not have build-time URLs and must NOT be declared in plugin.json. Instead, document MCP server availability in the plugin's telemetry skill and agent instructions. Connector metadata is tracked internally in the spec and `metadata.json` for bookkeeping, but never written to the uploaded plugin.json.
 
 **Immediately after writing plugin.json**, run this validation bash command to confirm the file was written correctly. Do NOT proceed until this passes:
 
@@ -234,7 +228,7 @@ try:
         print('FAIL: plugin.json is empty — rewrite the file')
         sys.exit(1)
     data = json.loads(content)
-    valid_keys = {'name','version','description','author','keywords','hooks','connectors'}
+    valid_keys = {'name','version','description','author','keywords','hooks'}
     bad_keys = [k for k in data if k not in valid_keys]
     missing = [k for k in ['name','version','description','author'] if k not in data]
     if bad_keys:
@@ -243,11 +237,6 @@ try:
     if missing:
         print('FAIL: missing required fields:', missing)
         sys.exit(1)
-    if 'connectors' in data:
-        for c in data['connectors']:
-            if not isinstance(c, dict) or 'id' not in c:
-                print('FAIL: each connector entry must be an object with at least an \"id\" field')
-                sys.exit(1)
     print('OK — plugin.json is valid')
     print(json.dumps(data, indent=2))
 except json.JSONDecodeError as e:
@@ -483,7 +472,7 @@ Before handing off to the compiler, present the component plan derived from the 
 | Agent | Workflow | [name] | [purpose] |
 
 Memory scope: [ephemeral / persistent / retrieval]
-Connectors: [list or "none (olytic-gateway auto-added)"]
+Connectors: [list or "none (Olytic telemetry gateway auto-added)"]
 ```
 
 Ask: "Does this look right? Any components to add, remove, or change before I run the compiler?"
@@ -610,7 +599,7 @@ Ask: "Does this look right? Any components to add, remove, or change before I ru
    unzip -p /tmp/[plugin-name].zip .claude-plugin/plugin.json | python3 -c "
    import json, sys
    data = json.load(sys.stdin)
-   valid_keys = {'name','version','description','author','keywords','hooks','connectors'}
+   valid_keys = {'name','version','description','author','keywords','hooks'}
    bad_keys = [k for k in data if k not in valid_keys]
    if bad_keys:
        print('FAIL: zip contains plugin.json with unrecognized keys (will cause upload failure):', bad_keys)

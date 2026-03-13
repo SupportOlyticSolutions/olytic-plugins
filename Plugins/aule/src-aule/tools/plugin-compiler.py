@@ -47,7 +47,7 @@ from plugin_spec import PluginSpec, MemoryScope, ComponentType, Platform, parse_
 
 COMPILER_VERSION = "1.1.0"
 AULE_VERSION     = "0.3.0"
-# Telemetry and vault writes use the olytic-gateway MCP connector (org-installed, optional).
+# Telemetry and vault writes use the Olytic Gateway MCP connector (org-installed, optional).
 # No hardcoded gateway URL — the MCP server resolves transport and auth from the session.
 
 
@@ -65,6 +65,21 @@ def today_str() -> str:
 
 def indent(text: str, n: int = 2) -> str:
     return textwrap.indent(text, " " * n)
+
+
+def sanitize_frontmatter(text: str) -> str:
+    """Strip XML-like angle-bracket tags from text destined for YAML frontmatter.
+
+    The Claude plugin validator rejects SKILL.md files whose frontmatter
+    description contains anything that looks like an XML tag (e.g., <name>,
+    <example>, <html>).  This replaces <word> patterns with the word alone
+    and strips any remaining bare < or > characters.
+    """
+    # Replace <word> and <word-phrase> with just the inner text
+    text = re.sub(r"<([a-zA-Z][a-zA-Z0-9_-]*)>", r"\1", text)
+    # Strip any remaining bare angle brackets
+    text = text.replace("<", "").replace(">", "")
+    return text
 
 
 def write_file(path: Path, content: str, dry_run: bool = False) -> None:
@@ -89,11 +104,11 @@ def gen_plugin_json(spec: PluginSpec) -> str:
         "keywords":    spec.keywords,
         "hooks":       "hooks/hooks.json",
     }
-    if spec.connectors:
-        manifest["connectors"] = [
-            {"id": c.id, "required": c.required, "scopes": c.scopes}
-            for c in spec.connectors
-        ]
+    # NOTE: connectors (like Olytic Gateway) are org-installed MCP servers,
+    # not plugin-bundled. The Claude plugin validator requires connectors entries
+    # to have valid http/https URLs, which org-installed servers don't have at
+    # build time. Connector availability is documented in skill/agent instructions
+    # instead of declared in plugin.json.
     return json.dumps(manifest, indent=2, ensure_ascii=False)
 
 
@@ -171,13 +186,16 @@ def gen_skill(spec: PluginSpec, component) -> str:
         constraints_block = "\n## Constraints\n\nThis plugin must NOT be used to:\n" + \
                             "\n".join(f"- {c}" for c in spec.constraints)
 
+    safe_purpose = sanitize_frontmatter(component.purpose)
+    safe_triggers = [sanitize_frontmatter(t) for t in component.trigger_phrases]
+
     return f"""---
 name: {component.name}
 description: >
-  {component.purpose}
-  Use this skill when the user says: "{component.trigger_phrases[0]}", "{component.trigger_phrases[1]}",
-  "{component.trigger_phrases[2]}", "{component.trigger_phrases[3]}"
-  {("or: " + ", ".join(f'"{p}"' for p in component.trigger_phrases[4:])) if len(component.trigger_phrases) > 4 else ""}
+  {safe_purpose}
+  Use this skill when the user says: "{safe_triggers[0]}", "{safe_triggers[1]}",
+  "{safe_triggers[2]}", "{safe_triggers[3]}"
+  {("or: " + ", ".join(f'"{p}"' for p in safe_triggers[4:])) if len(safe_triggers) > 4 else ""}
 version: {spec.version}
 ---
 
@@ -218,12 +236,15 @@ Telemetry: This skill logs all invocations via {spec.plugin_name}-telemetry.
 
 def gen_agent(spec: PluginSpec, component) -> str:
     trigger_phrases = "\n  ".join(component.trigger_phrases)
+    safe_purpose = sanitize_frontmatter(component.purpose)
+    safe_triggers = [sanitize_frontmatter(t) for t in component.trigger_phrases]
+
     return f"""---
 name: {component.name}
 description: >
-  {component.purpose}
-  Invoke when the user says: "{component.trigger_phrases[0]}", "{component.trigger_phrases[1]}",
-  "{component.trigger_phrases[2]}", "{component.trigger_phrases[3]}"
+  {safe_purpose}
+  Invoke when the user says: "{safe_triggers[0]}", "{safe_triggers[1]}",
+  "{safe_triggers[2]}", "{safe_triggers[3]}"
 version: {spec.version}
 ---
 
@@ -271,12 +292,15 @@ Telemetry: This agent logs all invocations via {spec.plugin_name}-telemetry.
 
 def gen_command(spec: PluginSpec, component) -> str:
     trigger_phrases = "\n  ".join(component.trigger_phrases)
+    safe_purpose = sanitize_frontmatter(component.purpose)
+    safe_triggers = [sanitize_frontmatter(t) for t in component.trigger_phrases]
+
     return f"""---
 name: {component.name}
 description: >
-  {component.purpose}
-  Use when: "{component.trigger_phrases[0]}", "{component.trigger_phrases[1]}",
-  "{component.trigger_phrases[2]}", "{component.trigger_phrases[3]}"
+  {safe_purpose}
+  Use when: "{safe_triggers[0]}", "{safe_triggers[1]}",
+  "{safe_triggers[2]}", "{safe_triggers[3]}"
 ---
 
 # {component.name}
@@ -340,7 +364,7 @@ schema: telemetry-event
 
 ## Transport
 
-Call the **`log_telemetry` tool** via the `olytic-gateway` MCP connector.
+Call the **`log_telemetry` tool** via the `Olytic Gateway` MCP connector.
 The connector is org-installed and optional — if absent, skip silently and continue.
 Do NOT include `user_id`, `org_id`, or `client_id` in the payload; the MCP server
 resolves and injects them from the active session. No credentials in skill files.
@@ -401,7 +425,7 @@ Additional field: `description`.
 ```
 
 `platform` is a build-time constant — hardcoded at plugin generation time, never inferred at runtime.
-`user_id`, `org_id`, and `client_id` are injected server-side by the olytic-gateway MCP connector — do NOT include them in the payload.
+`user_id`, `org_id`, and `client_id` are injected server-side by the Olytic Gateway MCP connector — do NOT include them in the payload.
 
 Telemetry logging is always silent. Never surface a log write to the user.
 """
@@ -413,7 +437,7 @@ def gen_session_summarizer(spec: PluginSpec) -> str:
 name: {spec.plugin_name}-session-summarizer
 description: >
   Auto-invoked at SessionClose for {spec.plugin_name}. Writes a structured session summary
-  to the vault via olytic-gateway. Silent operation — no user action required.
+  to the vault via Olytic Gateway. Silent operation — no user action required.
   Only active when memory_scope=persistent.
 version: {spec.version}
 hook: SessionClose
@@ -483,7 +507,7 @@ This works whether olytic-core is a mounted workspace folder or an installed Org
 `loop` defaults to `"plugin"` for auto-generated session summaries.
 `entry_type` uses underscores to match `memory_entries.entity_type` exactly.
 
-**Step 7:** Call the **`write_vault_entry` tool** via the `olytic-gateway` MCP connector.
+**Step 7:** Call the **`write_vault_entry` tool** via the `Olytic Gateway` MCP connector.
 The connector is org-installed and optional — if absent, skip silently and continue.
 Do NOT include `user_id` or `client_id`; the gateway resolves and injects them server-side via `auth.uid()`.
 
@@ -671,7 +695,7 @@ def validate_output(src: Path, spec: PluginSpec) -> list[str]:
         try:
             manifest = json.loads(plugin_json_path.read_text())
             valid_keys = {"name", "version", "description", "author", "keywords",
-                          "hooks", "connectors"}
+                          "hooks"}
             extra = set(manifest.keys()) - valid_keys
             if extra:
                 failures.append(f"plugin.json has invalid keys: {extra}")
@@ -690,7 +714,7 @@ def extract_spec_from_dir(plugin_dir: Path) -> tuple[dict, list[str]]:
     Reconstruct a PluginSpec-compatible dict from an existing plugin directory.
 
     Reads:
-      .claude-plugin/plugin.json  → identity fields, connectors
+      .claude-plugin/plugin.json  → identity fields (no connectors — those are internal metadata only)
       README.md                   → purpose, constraints, memory scope hints
       hooks/hooks.json            → memory scope (SessionClose → persistent)
       skills/*/SKILL.md           → component entries (skill type)
@@ -719,8 +743,8 @@ def extract_spec_from_dir(plugin_dir: Path) -> tuple[dict, list[str]]:
         raw["plugin_name"]  = pj.get("name", "")
         raw["version"]      = pj.get("version", "0.1.0")
         raw["description"]  = pj.get("description", "")
-        raw["sublabel"]     = pj.get("sublabel", "Plugin")
-        raw["icon"]         = pj.get("icon", "🔌")
+        raw["sublabel"]     = pj.get("sublabel", "Plugin")   # Not in plugin.json — falls back to default
+        raw["icon"]         = pj.get("icon", "🔌")            # Not in plugin.json — falls back to default
         raw["keywords"]     = pj.get("keywords", [])
 
         author_raw = pj.get("author", {})
@@ -732,16 +756,10 @@ def extract_spec_from_dir(plugin_dir: Path) -> tuple[dict, list[str]]:
         else:
             raw["author"] = {"name": str(author_raw), "email": "support@olyticsolutions.com"}
 
-        # Connectors — exclude olytic-gateway (auto-injected by validator)
-        raw_connectors = []
-        for c in pj.get("connectors", []):
-            if isinstance(c, dict) and c.get("id") != "olytic-gateway":
-                raw_connectors.append({
-                    "id":       c.get("id", "unknown"),
-                    "required": c.get("required", True),
-                    "scopes":   c.get("scopes", []),
-                })
-        raw["connectors"] = raw_connectors
+        # Connectors are NOT in plugin.json (validator rejects them).
+        # The PluginSpec model still has a connectors field for internal metadata,
+        # but plugin.json never contains it. Default to empty list.
+        raw["connectors"] = []
 
     # ── README.md ─────────────────────────────
     readme_path = plugin_dir / "README.md"
@@ -1010,16 +1028,17 @@ def validate_dir(plugin_dir: Path) -> None:
         if not path.exists():
             structural_failures.append(f"MISSING required file: {path.relative_to(plugin_dir)}")
 
-    # Validate agent frontmatter: no <example> inside --- block
+    # Validate agent frontmatter: no XML-like tags inside --- block
     agents_dir = plugin_dir / "agents"
     if agents_dir.exists():
         for agent_md in agents_dir.glob("*.md"):
             text = agent_md.read_text(encoding="utf-8")
             fm = re.match(r"^---\s*\n(.*?)\n---", text, re.DOTALL)
-            if fm and "<example>" in fm.group(1):
+            if fm and re.search(r"<[a-zA-Z][a-zA-Z0-9_-]*>", fm.group(1)):
+                tags = re.findall(r"<[a-zA-Z][a-zA-Z0-9_-]*>", fm.group(1))
                 structural_failures.append(
-                    f"YAML ERROR: {agent_md.name} has <example> tags inside frontmatter block — "
-                    f"move them to after the closing ---"
+                    f"YAML ERROR: {agent_md.name} has XML-like tags in frontmatter: {tags} — "
+                    f"the plugin validator rejects descriptions containing angle-bracket tags"
                 )
             # Check for unquoted colons in single-line description
             if fm:
@@ -1028,6 +1047,20 @@ def validate_dir(plugin_dir: Path) -> None:
                     structural_failures.append(
                         f"YAML ERROR: {agent_md.name} description contains ': ' on a single line — "
                         f"use 'description: >' block scalar format"
+                    )
+
+    # Validate command frontmatter: no XML-like tags
+    commands_dir = plugin_dir / "commands"
+    if commands_dir.exists():
+        for cmd_md in commands_dir.glob("*.md"):
+            text = cmd_md.read_text(encoding="utf-8")
+            fm = re.match(r"^---\s*\n(.*?)\n---", text, re.DOTALL)
+            if fm:
+                xml_tags = re.findall(r"<[a-zA-Z][a-zA-Z0-9_-]*>", fm.group(1))
+                if xml_tags:
+                    structural_failures.append(
+                        f"commands/{cmd_md.name}: frontmatter contains XML-like tags: {xml_tags} — "
+                        f"the plugin validator rejects descriptions containing angle-bracket tags"
                     )
 
     # Validate skill frontmatter: name, description, version present
@@ -1048,6 +1081,13 @@ def validate_dir(plugin_dir: Path) -> None:
                         structural_failures.append(
                             f"skills/{skill_dir.name}/SKILL.md: frontmatter missing '{required_key[:-1]}' field"
                         )
+                # Check for XML-like tags in skill frontmatter
+                xml_tags = re.findall(r"<[a-zA-Z][a-zA-Z0-9_-]*>", fm.group(1))
+                if xml_tags:
+                    structural_failures.append(
+                        f"skills/{skill_dir.name}/SKILL.md: frontmatter contains XML-like tags: {xml_tags} — "
+                        f"the plugin validator rejects descriptions containing angle-bracket tags"
+                    )
 
     if structural_failures:
         print("❌ Structural validation failed:\n")

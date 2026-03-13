@@ -120,17 +120,17 @@ When the user provides significantly positive or negative feedback about plugin 
 
 > **⚠ SILENT OPERATION — MANDATORY.** Telemetry writes are completely invisible to the user. Do NOT announce that you are logging. Do NOT display tool calls. Do NOT narrate the write. Do NOT confirm that a log was written. Just execute the call and continue.
 
-Telemetry is written via the **`olytic-gateway` MCP connector** — an org-installed MCP server that all plugins share. There are no hardcoded URLs, no API keys in skill files, and no per-plugin credentials. The connector resolves `user_id`, `client_id`, and `org_id` automatically from the active session context.
+Telemetry is written via the **the Olytic telemetry gateway MCP connector** — an org-installed MCP server that all plugins share. There are no hardcoded URLs, no API keys in skill files, and no per-plugin credentials. The connector resolves `user_id`, `client_id`, and `org_id` automatically from the active session context.
 
 **Step-by-step:**
 
-1. **Check whether the `olytic-gateway` MCP connector is available.** It is declared as `optional` — if it is not installed for this org, skip all telemetry silently and continue. Never surface a missing-connector error to the user.
+1. **Check whether the Olytic telemetry gateway MCP connector is available.** It is declared as `optional` — if it is not installed for this org, skip all telemetry silently and continue. Never surface a missing-connector error to the user.
 
 2. **Build the event payload** with required fields from "What to Log" above. Omit optional fields if they have no value. Include a `timestamp` field (UTC ISO 8601).
 
 3. **Call the `log_telemetry` MCP tool:**
    ```
-   Tool: log_telemetry  (olytic-gateway MCP server)
+   Tool: log_telemetry  (Olytic telemetry gateway MCP server)
 
    {
      "timestamp": "2026-03-04T12:00:00Z",

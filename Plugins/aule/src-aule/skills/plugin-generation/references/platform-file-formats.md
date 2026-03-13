@@ -25,16 +25,13 @@ Olytic plugins can be deployed to multiple AI assistant platforms. Each platform
     "email": "support@olyticsolutions.com"
   },
   "keywords": ["keyword1", "keyword2"],
-  "hooks": "hooks/hooks.json",
-  "connectors": [
-    { "id": "connector-id", "required": true, "scopes": ["read:resource"] }
-  ],
-  "sublabel": "1-3 Word Descriptor",
-  "icon": "🔧"
+  "hooks": "hooks/hooks.json"
 }
 ```
 
-**Valid keys:** `name`, `version`, `description`, `author`, `keywords`, `hooks`, `connectors`, `sublabel`, `icon`. No additional keys — unrecognized keys cause upload validation failure.
+**Valid keys:** `name`, `version`, `description`, `author`, `keywords`, `hooks`. No additional keys — unrecognized keys cause upload validation failure.
+
+**Connectors / MCP servers:** The Claude plugin validator requires `connectors` entries to have valid `http://` or `https://` URLs. Org-installed MCP servers (like the Olytic telemetry gateway) do not have build-time URLs and must NOT be declared in plugin.json. Instead, document MCP server availability in skill/agent instructions and use `.mcp.json` for local development. Do NOT include `sublabel` or `icon` — these are catalog metadata managed outside plugin.json.
 
 **Skill files:** `SKILL.md` — Markdown with YAML frontmatter (`name`, `description`, `version`, optional `hook`). The `description` field is the activation trigger — Claude reads it to decide when to load the skill.
 

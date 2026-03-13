@@ -41,18 +41,6 @@
       "min_items": 1,
       "max_items": 10
     },
-    "connectors": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string", "description": "Connector identifier (e.g., 'github', 'salesforce')", "required": true },
-          "required": { "type": "boolean", "description": "Whether the plugin cannot function without this connector", "required": true },
-          "scopes": { "type": "array", "items": { "type": "string" }, "description": "Access scopes required (e.g., ['read:repo', 'write:issues'])" }
-        }
-      },
-      "description": "External integration declarations. Omit if plugin is standalone. Must match what is declared in .mcp.json."
-    },
     "hooks": {
       "type": "string",
       "description": "Relative path to hooks.json file (e.g., 'hooks/hooks.json')"
@@ -60,12 +48,12 @@
   },
   "validation_rules": [
     "name must be unique across the workspace — checked against workspace.json on install",
-    "connectors declared here must be available in workspace.json providers — workspace.json is source of truth",
+    "plugin.json must NOT contain a connectors key — the Claude validator requires connector URLs which org-installed MCP servers cannot provide at build time",
     "version must increment on every release — downgrades are rejected"
   ],
   "notes": [
     "plugin-identity-schema validates the plugin.json manifest fields",
-    "workspace.json is the source of truth for connector availability — plugin.json must be a subset",
-    "Valid plugin.json keys: name, version, description, author, keywords, hooks, connectors — all others cause upload failure"
+    "Valid plugin.json keys: name, version, description, author, keywords, hooks — all others cause upload failure",
+    "Connector/MCP server availability is documented in skill and agent instructions, not in plugin.json"
   ]
 }

@@ -5,8 +5,8 @@ description: >
   JSON schema content for any olytic-core contract schema by name. This skill is the
   authoritative runtime source of truth — other plugins call this skill instead of reading
   schema files from the filesystem. Invoke with: "invoke skill: olytic-core-schemas / schema:
-  <name>", "fetch the telemetry-event schema", "get vault-entry schema from olytic-core",
-  "what are the required fields for a session-summary", "return the plugin-identity schema".
+  telemetry-event", "fetch the vault-entry schema", "get session-summary schema from olytic-core",
+  "what are the required fields for plugin-identity", "return the hook-event schema".
 version: 1.0.0
 ---
 

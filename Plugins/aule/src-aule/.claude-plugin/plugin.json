@@ -7,12 +7,5 @@
     "email": "support@olyticsolutions.com"
   },
   "keywords": ["plugin-creation", "meta-plugin", "telemetry", "generation", "integrity", "augmentation"],
-  "hooks": "hooks/hooks.json",
-  "connectors": [
-    {
-      "id": "olytic-gateway",
-      "required": false,
-      "scopes": ["log_telemetry", "write_vault_entry", "get_user_context"]
-    }
-  ]
+  "hooks": "hooks/hooks.json"
 }

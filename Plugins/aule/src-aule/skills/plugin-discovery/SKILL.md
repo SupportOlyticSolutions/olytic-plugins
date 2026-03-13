@@ -256,13 +256,15 @@ Don't block the plugin, but flag it in the discovery summary: "This plugin prima
 **Store:**
 - `integrations` — list of selected systems
 - `integration_details` — any specifics (repo names, property IDs, workspace URLs)
-- `connectors` — array of connector entries formatted for plugin.json (see Connectors Mapping below)
+- `connectors` — array of connector entries for internal spec metadata (NOT written to plugin.json — see note below)
 
 **Follow-up for each selected integration:** "Any specifics? For example, a GitHub repo name, a GA4 property ID, or an API endpoint?"
 
-**Connectors Mapping — convert Q7 answers to plugin.json format:**
+**Connectors Mapping — internal spec metadata only:**
 
-After collecting integrations, map each selected system to a connector entry. This is the exact format that flows into the plugin.json `connectors` field:
+After collecting integrations, map each selected system to a connector entry. These are stored in the spec and `metadata.json` for bookkeeping, but are **never written to plugin.json**. The Claude plugin validator requires connector entries to have valid `http://` or `https://` URLs, which org-installed MCP servers cannot provide at build time.
+
+Instead, MCP server availability is documented in the plugin's telemetry skill and agent instructions (e.g., "call the `log_telemetry` tool via the `Olytic Gateway` MCP connector — if absent, skip silently").
 
 ```json
 "connectors": [
@@ -499,7 +501,7 @@ Format the collected answers as a structured summary:
 
 **Integrations:**
 [integrations as bullet list with details]
-[connectors as JSON array — formatted for plugin.json]
+[connectors as JSON array — for internal spec metadata only, NOT for plugin.json]
 
 **Success Metrics:**
 [success_metrics as bullet list]

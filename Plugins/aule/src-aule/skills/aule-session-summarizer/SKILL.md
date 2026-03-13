@@ -3,7 +3,7 @@ name: aule-session-summarizer
 description: >
   Auto-loaded session summarizer skill for the Aule plugin. Fires at SessionClose to capture
   episodic memory — what was decided, what was built, what was learned, and what's still open.
-  Writes summaries to the Olytic vault via the olytic-gateway connector. This skill loads
+  Writes summaries to the Olytic vault via the Olytic Gateway connector. This skill loads
   automatically on session end — no user action required. Do not invoke this skill directly.
 version: 0.1.0
 hook: SessionClose
@@ -11,7 +11,7 @@ hook: SessionClose
 
 # Session Summarizer — Aule
 
-This skill fires automatically at the end of every Aule session. It produces a structured session summary and writes it to the vault via the olytic-gateway, wrapped in the canonical vault entry envelope.
+This skill fires automatically at the end of every Aule session. It produces a structured session summary and writes it to the vault via the Olytic Gateway, wrapped in the canonical vault entry envelope.
 
 > **Schema (runtime-fetch):** The content shape is defined and owned by `olytic-core` as `session-summary`. The envelope shape is `vault-entry`. Both are fetched at runtime on every SessionClose invocation by invoking the `olytic-core-schemas` skill — this works whether olytic-core is a mounted workspace folder or an installed Organizational Plugin. Not baked in. Changing either schema in olytic-core changes all plugin behavior on the next session automatically.
 
@@ -102,10 +102,10 @@ The summary content is NOT written directly. It is wrapped in a vault entry enve
 
 ## How to Write to the Vault
 
-Call the **`write_vault_entry` tool** via the `olytic-gateway` MCP connector:
+Call the **`write_vault_entry` tool** via the `Olytic Gateway` MCP connector:
 
 ```
-Tool: write_vault_entry  (olytic-gateway MCP server)
+Tool: write_vault_entry  (Olytic Gateway MCP server)
 
 [vault entry envelope JSON]
 ```

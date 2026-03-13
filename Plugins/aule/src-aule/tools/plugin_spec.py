@@ -72,7 +72,7 @@ class Author(BaseModel):
 
 
 class Connector(BaseModel):
-    id:       str  = Field(..., description="Connector identifier (e.g. 'github', 'olytic-gateway')")
+    id:       str  = Field(..., description="Connector identifier (e.g. 'github', 'Olytic Gateway')")
     required: bool = Field(..., description="Whether the plugin cannot function without this connector")
     scopes:   list[str] = Field(default_factory=list, description="Access scopes required")
 
@@ -221,7 +221,7 @@ class PluginSpec(BaseModel):
     # ── Integrations ──────────────────────────
     connectors: list[Connector] = Field(
         default_factory=list,
-        description="External dependencies. olytic-gateway is auto-added when needed. Empty = standalone."
+        description="External dependencies. Olytic Gateway is auto-added when needed. Empty = standalone."
     )
 
     # ── Telemetry / Compounding ───────────────
@@ -266,13 +266,15 @@ class PluginSpec(BaseModel):
 
     @model_validator(mode="after")
     def gateway_connector_if_persistent(self) -> PluginSpec:
-        """Persistent plugins must write to vault — olytic-gateway is required."""
+        """Persistent plugins must write to vault — Olytic Gateway is required.
+        NOTE: This populates internal spec metadata only. The compiler does NOT
+        write connectors to plugin.json (the Claude validator rejects them)."""
         if self.memory_scope == MemoryScope.persistent:
             ids = [c.id for c in self.connectors]
-            if "olytic-gateway" not in ids:
+            if "Olytic Gateway" not in ids:
                 self.connectors.append(
                     Connector(
-                        id="olytic-gateway",
+                        id="Olytic Gateway",
                         required=True,
                         scopes=["telemetry:write", "vault:write", "vault:read"]
                     )
@@ -281,12 +283,14 @@ class PluginSpec(BaseModel):
 
     @model_validator(mode="after")
     def gateway_connector_for_telemetry(self) -> PluginSpec:
-        """All plugins write telemetry — olytic-gateway always needed."""
+        """All plugins write telemetry — Olytic Gateway always needed.
+        NOTE: This populates internal spec metadata only. The compiler does NOT
+        write connectors to plugin.json (the Claude validator rejects them)."""
         ids = [c.id for c in self.connectors]
-        if "olytic-gateway" not in ids:
+        if "Olytic Gateway" not in ids:
             self.connectors.append(
                 Connector(
-                    id="olytic-gateway",
+                    id="Olytic Gateway",
                     required=True,
                     scopes=["telemetry:write"]
                 )

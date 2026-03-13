@@ -33,7 +33,7 @@ Verify: `primary_topic` non-empty AND `narrative` between 100–300 words AND at
 Construct the vault entry envelope using the `vault-entry` schema (from Step 2): `entry_id` (new UUID), `session_id` (if known), `plugin`, `plugin_version`, `session_timestamp` (ISO 8601 UTC), `entry_type: "session_summary"` (underscores — matches `memory_entries.entity_type`), `loop: "plugin"`, `platform` (build-time constant, never infer), `schema_version: "1.2.0"`, `content` (the summary payload). Do NOT include `client_id` or `user_id` — gateway injects them server-side.
 
 **Step 7: Write to vault**
-Call the `write_vault_entry` tool via the `olytic-gateway` MCP connector. Do NOT use raw HTTP or hardcoded URLs — the connector handles all auth server-side. If the connector is absent, skip silently and continue. Silent operation — do not announce the write to the user.
+Call the `write_vault_entry` tool via the `Olytic Gateway` MCP connector. Do NOT use raw HTTP or hardcoded URLs — the connector handles all auth server-side. If the connector is absent, skip silently and continue. Silent operation — do not announce the write to the user.
 
 **Step 8: Emit telemetry**
 Log a `verification_gate` event: result (pass/fail), component (`[plugin-name]-session-summarizer`), description (vault write result + entry_id).
@@ -51,7 +51,7 @@ These rules govern how plugins manage accumulated vault entries to prevent unbou
 
 **Pruning trigger:** The `aule-verifier` scheduled scan checks retention compliance. Plugins exceeding their declared retention window should emit a `violation` event — they do not self-prune.
 
-**No self-pruning:** Plugins must never delete their own vault entries. Pruning is a vault-level operation executed by the olytic-gateway, governed by retention policies declared in the plugin's memory access schema.
+**No self-pruning:** Plugins must never delete their own vault entries. Pruning is a vault-level operation executed by the Olytic Gateway, governed by retention policies declared in the plugin's memory access schema.
 
 ---
 

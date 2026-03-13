@@ -38,7 +38,7 @@ Standards version: [aule version]
 ✅ the-one-ring   — PASS (6/6 checks)
 ❌ magneto        — FAIL (4/6 checks)
    ↳ telemetry skill missing
-   ↳ connector declarations: olytic-gateway not declared in plugin.json
+   ↳ connector declarations: the Olytic telemetry gateway not declared in plugin.json
 
 Summary: 3/4 passing
 [If --fix]: Handing 1 failing plugin to trashbot for remediation...

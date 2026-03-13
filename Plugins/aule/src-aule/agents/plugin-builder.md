@@ -111,7 +111,7 @@ Required data points to collect:
 - Constraints and hard boundaries
 - Memory scope (ephemeral / persistent / retrieval) and access rules
 - Components: each needs a name, type (skill/agent/command), purpose, and ≥4 natural language trigger phrases
-- External integrations (connectors needed beyond olytic-gateway)
+- External integrations (MCP servers the plugin will call — documented in skill instructions, not in plugin.json)
 - Success metrics (2–5 measurable outcomes)
 - Workflow context: what plugins feed into this, what this feeds into
 
@@ -135,7 +135,7 @@ Translate the discovery output into a fully populated `PluginSpec` JSON object. 
 3. The JSON must conform to the `PluginSpec` model defined in `src-aule/tools/plugin_spec.py`
 
 **Notes on derived fields** (the compiler auto-handles these, but include them anyway so the spec is self-documenting):
-- `olytic-gateway` connector is auto-injected by the compiler — you don't need to add it manually
+- `Olytic Gateway` connector is auto-injected by the compiler — you don't need to add it manually
 - `version` defaults to `"0.1.0"` if not specified
 - `author` defaults to Olytic Solutions / support@olyticsolutions.com
 
@@ -249,7 +249,7 @@ try:
         print('FAIL: plugin.json is empty')
         sys.exit(1)
     data = json.loads(content)
-    valid_keys = {'name','version','description','author','keywords','hooks','connectors'}
+    valid_keys = {'name','version','description','author','keywords','hooks'}
     bad_keys = [k for k in data if k not in valid_keys]
     missing = [k for k in ['name','version','description','author'] if k not in data]
     if bad_keys:
@@ -258,11 +258,6 @@ try:
     if missing:
         print('FAIL: missing required fields:', missing)
         sys.exit(1)
-    if 'connectors' in data:
-        for c in data['connectors']:
-            if not isinstance(c, dict) or 'id' not in c:
-                print('FAIL: each connector entry must be an object with at least an \"id\" field')
-                sys.exit(1)
     print('OK:', json.dumps(data, indent=2))
 except Exception as e:
     print('FAIL:', e)
@@ -335,8 +330,8 @@ If the README declares `memory_scope: persistent`, verify:
 - If `shared`, a `memory_access_readers` list is present and non-empty
 - The declaration is consistent with what the plugin actually does
 
-**Check 13 — Connectors field consistency:**
-If the plugin's `.mcp.json` declares MCP servers, verify the `plugin.json` has a corresponding `connectors` array with matching entries. If `.mcp.json` exists but `connectors` is absent from `plugin.json`, flag as Medium severity (missing declaration, won't block upload but loses manifest validation).
+**Check 13 — No connectors in plugin.json:**
+Verify that `plugin.json` does NOT contain a `connectors` key. The Claude plugin validator requires connector entries to have valid `http://` or `https://` URLs, which org-installed MCP servers (like `Olytic Gateway`) cannot provide at build time. If `connectors` is present, flag as High severity (upload blocker). MCP server availability should be documented in skill/agent instructions instead.
 
 ## Update Phase 2: Present Audit Report
 
