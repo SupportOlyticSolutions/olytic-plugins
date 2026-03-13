@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vault-entry-schema",
+  "title": "Olytic Vault Entry",
+  "description": "Canonical envelope schema for all vault writes. Every piece of data written to the Olytic vault is wrapped in this envelope regardless of content type. The content field contains the payload — e.g., a session-summary-schema.json object, a document, or analysis results.",
+  "version": "1.1.0",
+  "owner": "aule",
+  "read_timing": "runtime — read at vault write time, not deploy time",
+  "relationship": "Envelope wrapper — wraps session-summary-schema.json (or other content payloads) for vault storage",
+  "properties": {
+    "entry_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this vault entry — generate per write",
+      "required": true
+    },
+    "plugin": {
+      "type": "string",
+      "description": "Kebab-case name of the plugin that created this entry",
+      "required": true
+    },
+    "plugin_version": {
+      "type": "string",
+      "description": "Semver version of the plugin at time of write",
+      "required": true
+    },
+    "session_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of when this entry was written (typically SessionClose time)",
+      "required": true
+    },
+    "entry_type": {
+      "type": "string",
+      "enum": ["session-summary", "document", "analysis", "preference", "fact"],
+      "description": "Type tag that determines vault routing and retention policy",
+      "required": true
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "Version of the content schema used (e.g., '1.0.0' from session-summary-schema.json)",
+      "required": true
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["claude", "chatgpt", "copilot", "other"],
+      "description": "The AI platform this vault entry was written from. Hardcoded per plugin at generation time — never inferred at runtime.",
+      "required": true
+    },
+    "content": {
+      "type": "object",
+      "description": "The actual payload — shape depends on entry_type. For session-summary, this is a session-summary-schema.json object.",
+      "required": true
+    }
+  },
+  "notes": [
+    "org_id is injected server-side by the vault gateway — never include it in the entry body",
+    "The entry_type tag determines vault partition and retention policy — choose carefully",
+    "content is untyped at the envelope level — validation against the content schema is done server-side using schema_version"
+  ]
+}

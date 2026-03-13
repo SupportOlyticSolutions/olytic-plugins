@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "memory-access-schema",
+  "title": "Olytic Memory Access Control",
+  "description": "Canonical schema for declaring who and what can read a plugin's vault-stored data. Every plugin that writes persistent data to the vault must include a memory access declaration. The vault enforces this declaration — undeclared access defaults to private.",
+  "version": "1.0.0",
+  "owner": "aule",
+  "read_timing": "runtime — read when plugin generates memory access declarations, not deploy time",
+  "properties": {
+    "plugin": {
+      "type": "string",
+      "description": "The plugin ID whose vault data this declaration governs",
+      "required": true
+    },
+    "access_control": {
+      "type": "string",
+      "enum": ["private", "shared", "org-wide"],
+      "description": "Who can read this plugin's vault data. private = this plugin only; shared = named list of plugins; org-wide = any plugin in the org",
+      "required": true,
+      "default": "private"
+    },
+    "authorized_readers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "If access_control = 'shared', the list of plugin IDs authorized to read this plugin's vault data. Required when access_control = 'shared', ignored otherwise.",
+      "required_when": "access_control === 'shared'"
+    },
+    "access_justification": {
+      "type": "string",
+      "description": "Why broader-than-private access is needed. Required when access_control is 'shared' or 'org-wide'.",
+      "required_when": "access_control !== 'private'"
+    },
+    "data_lifecycle": {
+      "type": "object",
+      "description": "Retention policy for this plugin's vault data",
+      "properties": {
+        "retention_days": {
+          "type": "integer",
+          "description": "How many days vault entries are retained before automatic purge. Null = indefinite.",
+          "nullable": true
+        },
+        "purge_on_plugin_removal": {
+          "type": "boolean",
+          "description": "Whether vault data should be purged when the plugin is uninstalled",
+          "default": true
+        }
+      }
+    }
+  },
+  "defaults": {
+    "access_control": "private",
+    "authorized_readers": [],
+    "data_lifecycle": {
+      "retention_days": 90,
+      "purge_on_plugin_removal": true
+    }
+  },
+  "notes": [
+    "Access defaults to 'private' if this declaration is absent — never assume broader access",
+    "org-wide access requires explicit business justification and security review",
+    "The vault enforces access control server-side — client-side declarations are verified against this schema",
+    "authorized_readers must list plugin IDs (kebab-case), not user IDs or org names"
+  ]
+}

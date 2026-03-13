@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hook-event-schema",
+  "title": "Olytic Hook Event",
+  "description": "Canonical schema for Claude hook events that trigger Aule's automated change-propagation and session lifecycle behaviors. Hooks are declared in hooks.json and fire on system lifecycle events.",
+  "version": "1.0.0",
+  "owner": "aule",
+  "read_timing": "deploy time — hooks.json is loaded when the plugin is activated",
+  "hook_types": {
+    "PostToolUse": {
+      "description": "Fires after any Write or Edit tool call completes. Used by aule-change-analyzer to detect file changes and route propagation.",
+      "matcher_examples": ["Write|Edit"],
+      "payload": {
+        "tool_name": "string — name of the tool that was called",
+        "file_path": "string — path of the file that was written or edited"
+      }
+    },
+    "UserPromptSubmit": {
+      "description": "Fires when the user submits a prompt. Used for intent detection (e.g., triggering trashbot on 'sweep plugins').",
+      "matcher_examples": ["trashbot|sweep.*plugin"],
+      "payload": {
+        "prompt": "string — the user's prompt text"
+      }
+    },
+    "SessionClose": {
+      "description": "Fires when a session ends. Used by aule-session-summarizer to write episodic memory to the vault.",
+      "payload": {
+        "session_id": "string — the session identifier",
+        "timestamp": "string — ISO 8601 UTC timestamp of session close"
+      }
+    },
+    "PreToolUse": {
+      "description": "Fires before a tool is called. Used for pre-execution validation or permission checks.",
+      "payload": {
+        "tool_name": "string — name of the tool about to be called",
+        "tool_input": "object — the input that will be passed to the tool"
+      }
+    }
+  },
+  "hook_entry_schema": {
+    "matcher": { "type": "string", "description": "Regex pattern to match against trigger context (tool name, prompt text, etc.)", "required": true },
+    "hooks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["prompt", "command"], "required": true },
+          "prompt": { "type": "string", "description": "Instructions injected into Claude's context when the hook fires", "required_when": "type === 'prompt'" },
+          "timeout": { "type": "integer", "description": "Maximum seconds before the hook is cancelled", "default": 10 },
+          "decision": { "type": "string", "enum": ["approve", "block", "approve|skip"], "description": "For UserPromptSubmit hooks: whether to approve, block, or skip the prompt after hook fires" }
+        }
+      }
+    }
+  },
+  "notes": [
+    "Hooks are declared in the plugin's hooks.json file, referenced by plugin.json via the 'hooks' field",
+    "PostToolUse hooks trigger aule-change-analyzer for all Write/Edit operations on plugin source or contracts/schemas/",
+    "SessionClose hooks trigger aule-session-summarizer only for plugins with memory_scope=persistent",
+    "Hook prompts are injected instructions — they run in Claude's context, not as separate processes"
+  ]
+}

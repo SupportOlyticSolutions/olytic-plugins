@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "session-summary-schema",
+  "title": "Olytic Session Summary",
+  "description": "Canonical schema for episodic session memory content. This is the CONTENT payload — it is wrapped in vault-entry-schema.json before being written to the vault. Skills read this file at runtime at SessionClose — do not bake field definitions into plugin source.",
+  "version": "1.1.0",
+  "owner": "aule",
+  "read_timing": "runtime — read at SessionClose invocation, not deploy time",
+  "relationship": "Content payload — wrapped in vault-entry-schema.json envelope before vault write",
+  "properties": {
+    "platform": {
+      "type": "string",
+      "enum": ["claude", "chatgpt", "copilot", "other"],
+      "description": "The AI platform this session ran on. Hardcoded per plugin at generation time — never inferred at runtime.",
+      "required": true
+    },
+    "primary_topic": {
+      "type": "string",
+      "description": "One sentence describing the main thing worked on this session",
+      "required": true,
+      "max_length": 200
+    },
+    "key_decisions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "2-6 decisions made this session that will affect future sessions. Choices and conclusions, not tactical steps.",
+      "required": true,
+      "min_items": 0,
+      "max_items": 6
+    },
+    "corrections": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Factual errors caught and corrected, or misunderstandings resolved this session",
+      "required": false
+    },
+    "new_knowledge": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Things discovered this session that weren't known before — patterns, constraints, user preferences, architectural insights",
+      "required": false
+    },
+    "open_threads": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Unresolved questions or tasks explicitly left for a future session",
+      "required": false
+    },
+    "narrative": {
+      "type": "string",
+      "description": "100-300 word plain-language summary of the session — what happened, why it mattered, what changed. Written as if briefing a colleague who missed the session.",
+      "required": true,
+      "min_words": 100,
+      "max_words": 300
+    }
+  },
+  "quality_gate": {
+    "required_non_empty": ["primary_topic", "narrative"],
+    "at_least_one_non_empty": ["key_decisions", "new_knowledge", "open_threads"],
+    "narrative_word_range": [100, 300]
+  },
+  "notes": [
+    "Never include PII, credentials, or confidential data in session summaries",
+    "Corrections and new_knowledge are optional but highly valuable for the compounding loop",
+    "This schema is the content — the envelope (vault-entry-schema.json) adds metadata like entry_id, plugin, and timestamp"
+  ]
+}

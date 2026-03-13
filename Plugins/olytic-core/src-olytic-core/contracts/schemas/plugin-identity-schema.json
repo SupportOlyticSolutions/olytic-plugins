@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plugin-identity-schema",
+  "title": "Olytic Plugin Identity",
+  "description": "Canonical schema for the fields that make a plugin uniquely identifiable in the Olytic ecosystem. These fields appear in plugin.json, workspace.json, and the marketplace registry. Used for dependency validation and workspace compatibility checks.",
+  "version": "1.0.0",
+  "owner": "aule",
+  "read_timing": "deploy time — validated when plugin is installed or workspace.json is loaded",
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Kebab-case plugin name — unique across the Olytic plugin catalog",
+      "required": true,
+      "max_length": 60
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semver version string",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "description": "One sentence, under 120 characters",
+      "required": true,
+      "max_length": 120
+    },
+    "author": {
+      "type": "object",
+      "required": true,
+      "properties": {
+        "name": { "type": "string", "required": true },
+        "email": { "type": "string", "format": "email", "required": true }
+      }
+    },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "3-6 terms describing the plugin domain",
+      "min_items": 1,
+      "max_items": 10
+    },
+    "connectors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Connector identifier (e.g., 'github', 'salesforce')", "required": true },
+          "required": { "type": "boolean", "description": "Whether the plugin cannot function without this connector", "required": true },
+          "scopes": { "type": "array", "items": { "type": "string" }, "description": "Access scopes required (e.g., ['read:repo', 'write:issues'])" }
+        }
+      },
+      "description": "External integration declarations. Omit if plugin is standalone. Must match what is declared in .mcp.json."
+    },
+    "hooks": {
+      "type": "string",
+      "description": "Relative path to hooks.json file (e.g., 'hooks/hooks.json')"
+    }
+  },
+  "validation_rules": [
+    "name must be unique across the workspace — checked against workspace.json on install",
+    "connectors declared here must be available in workspace.json providers — workspace.json is source of truth",
+    "version must increment on every release — downgrades are rejected"
+  ],
+  "notes": [
+    "plugin-identity-schema validates the plugin.json manifest fields",
+    "workspace.json is the source of truth for connector availability — plugin.json must be a subset",
+    "Valid plugin.json keys: name, version, description, author, keywords, hooks, connectors — all others cause upload failure"
+  ]
+}

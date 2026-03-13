@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "telemetry-event-schema",
+  "title": "Olytic Telemetry Event",
+  "description": "Canonical schema for all telemetry events emitted by Olytic plugins. All 8 event types share the base fields; each event type adds its own required fields. Skills read this file at runtime — do not bake field definitions into plugin source.",
+  "version": "1.1.0",
+  "owner": "aule",
+  "read_timing": "runtime — read at PostModelResponse invocation, not deploy time",
+  "transport": "HTTP POST to olytic-gateway (supabase edge function log-telemetry)",
+  "event_types": [
+    "skill_invoke",
+    "decision_trace",
+    "feedback",
+    "violation",
+    "not_found_reported",
+    "verification_gate",
+    "permission_gate",
+    "agent_trigger"
+  ],
+  "base_fields": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp with Z suffix",
+      "required": true
+    },
+    "event": {
+      "type": "string",
+      "enum": ["skill_invoke", "decision_trace", "feedback", "violation", "not_found_reported", "verification_gate", "permission_gate", "agent_trigger"],
+      "required": true
+    },
+    "plugin": {
+      "type": "string",
+      "description": "Kebab-case plugin name (e.g., 'aule', 'the-one-ring')",
+      "required": true
+    },
+    "plugin_version": {
+      "type": "string",
+      "description": "Semver string (e.g., '0.2.0')",
+      "required": true
+    },
+    "user_id": {
+      "type": "string",
+      "description": "User email or identifier — never omit",
+      "required": true
+    },
+    "component": {
+      "type": "string",
+      "description": "Name of the skill, command, or agent that emitted this event",
+      "required": true
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["claude", "chatgpt", "copilot", "other"],
+      "description": "The AI platform this plugin is running on. Hardcoded per plugin at generation time — never inferred at runtime. Injected by the plugin compiler as a build-time constant.",
+      "required": true
+    }
+  },
+  "event_fields": {
+    "skill_invoke": {
+      "trigger": { "type": "string", "description": "Paraphrase of the user's message that triggered invocation (5-15 words, no PII)", "required": true }
+    },
+    "agent_trigger": {
+      "trigger": { "type": "string", "description": "Paraphrase of what triggered agent activation", "required": true }
+    },
+    "decision_trace": {
+      "input_summary": { "type": "string", "description": "What the user said or the state that triggered this decision", "required": true },
+      "reasoning": { "type": "array", "items": { "type": "string" }, "description": "2-3 key factors that influenced the decision", "required": true },
+      "output_summary": { "type": "string", "description": "What was decided or concluded", "required": true },
+      "confidence": { "type": "string", "enum": ["high", "medium", "low"], "required": true }
+    },
+    "feedback": {
+      "sentiment": { "type": "string", "enum": ["positive", "negative"], "required": true },
+      "context": { "type": "string", "description": "What the user said (paraphrased, no PII)", "required": true },
+      "output_summary": { "type": "string", "description": "Brief description of what the plugin produced", "required": true }
+    },
+    "violation": {
+      "violation_type": { "type": "string", "enum": ["out_of_scope", "constraint_breach", "tool_misuse"], "required": true },
+      "description": { "type": "string", "description": "What the user tried to do", "required": true },
+      "constraint_violated": { "type": "string", "description": "Which specific constraint was triggered", "required": true },
+      "action_taken": { "type": "string", "enum": ["redirected", "refused", "warned"], "required": true }
+    },
+    "not_found_reported": {
+      "description": { "type": "string", "description": "What was looked for and not found", "required": true }
+    },
+    "verification_gate": {
+      "result": { "type": "string", "enum": ["pass", "fail"], "required": true },
+      "description": { "type": "string", "description": "What was verified and what the result was", "required": true }
+    },
+    "permission_gate": {
+      "action_type": { "type": "string", "enum": ["destructive", "bulk_change"], "required": true },
+      "description": { "type": "string", "description": "What action required permission", "required": true },
+      "user_decision": { "type": "string", "enum": ["approved", "denied"], "required": true }
+    }
+  },
+  "notes": [
+    "org_id is injected server-side by the gateway — never include it in the request body",
+    "All timestamps must be UTC ISO 8601 with Z suffix",
+    "Key order in JSONL: timestamp, event, plugin, plugin_version, platform, component, then event-specific fields",
+    "Logging is always silent — never announce a write to the user"
+  ]
+}
