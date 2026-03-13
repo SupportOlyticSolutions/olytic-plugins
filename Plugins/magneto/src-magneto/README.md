@@ -2,7 +2,23 @@
 
 Content creation and strategy plugin for Olytic Solutions. Handles website content production, LinkedIn posts, GEO optimization, GitHub integration, competitive research, GA4 analytics, and strategic content planning.
 
-**Requires:** The One Ring governance plugin (for brand standards, company strategy, and competitive positioning).
+**Requires:** The One Ring governance plugin (for brand standards, company strategy, and competitive positioning) and olytic-core (for schema contracts).
+
+---
+
+## Claude OS Identity
+
+**Hat:** Magneto is the Content Creation hat in the Claude OS — the platonic ideal of content strategy, creation, and optimization for Olytic's go-to-market execution.
+
+**Dimension:** This plugin primarily serves the **Augmenting** dimension of the Claude OS. It augments revenue teams with strategic content guidance, brand-compliant drafting, and performance-driven optimization, enabling non-writers to produce publication-ready content aligned to Olytic's competitive positioning.
+
+**Governance dependency:** This plugin assumes The One Ring governance plugin is installed and references `olytic-brand-standards` skill for voice, positioning rules, and compliance review. It also depends on olytic-core for schema contracts used in telemetry and memory operations.
+
+**Relationships to other hats:**
+- **The One Ring:** Magneto pulls brand voice rules, company strategy context, and competitive positioning from brand standards; The One Ring's brand-compliance-reviewer validates all output before publication
+- **Sales enablement hats:** Magneto feeds content recommendations to revenue ops; LinkedIn posts and brief content support sales plays and ICP conversations
+
+**Compounding contribution:** Logs every content publication event, performance analysis, and user feedback signal. The Optimizer watches publication patterns and feedback to recommend content pillars, topics, and channels for highest ROI impact.
 
 ---
 
@@ -73,6 +89,18 @@ Content creation and strategy plugin for Olytic Solutions. Handles website conte
 
 ---
 
+## Boundaries
+
+This plugin should NOT be used for:
+
+- Creating content that contradicts The One Ring's brand standards — always assume The One Ring is loaded and will review for compliance
+- Publishing content directly to external systems without explicit user approval (pre-push brand gate enforces this)
+- Generating content for competitors or using Olytic's proprietary positioning for non-Olytic entities
+- Performing SEO or content audits on client sites without confirmed access and consent
+- Making definitive SEO outcome guarantees — content strategy is informed by data, not guaranteed to drive traffic
+
+---
+
 ## Permissions Manifest
 
 **Tools accessed:** Read, Grep, Glob, WebSearch, WebFetch, GitHub MCP
@@ -119,6 +147,22 @@ This plugin assumes The One Ring is always installed. Here's how they interact:
 | Content planning | This plugin → `magneto-content-brief-standards` + `/content-brief` command |
 | GitHub push/pull | This plugin → `/pull-content` and `/push-content` commands |
 | GA4 analytics | This plugin → `/content-performance` command |
+
+---
+
+## Memory Scope
+
+**Scope:** Ephemeral (session-only). Magneto does not retain context across conversations.
+
+**Within-conversation scope:** The plugin maintains state across a single conversation:
+- Brief templates are cached for the duration of the conversation
+- GA4 analytics queries are cached to avoid redundant API calls
+- Competitive research findings are available for cross-reference if multiple analyses are run in sequence
+- Hook event logs are stored in conversation context for session summary
+
+**Persistent data:** Only published content (pushed to GitHub) and telemetry events persist beyond a conversation. No vault entries are created.
+
+**Memory access control:** Not applicable (ephemeral scope). Content published to GitHub is treated as org-wide readable; telemetry logs are org-internal only.
 
 ---
 

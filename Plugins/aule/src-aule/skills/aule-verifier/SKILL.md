@@ -89,6 +89,61 @@ For plugins with `memory_scope: persistent`:
 - Verify it invokes `olytic-core-schemas` skill with `schema: session-summary` at runtime
 - Verify it invokes `olytic-core-schemas` skill with `schema: vault-entry` at runtime
 
+### 8. Package Integrity
+
+For each plugin, locate the companion `.plugin` file (same directory as `src-[name]/`, named `[name].plugin`):
+
+- **File exists:** Verify `[name].plugin` is present alongside the source folder. If missing, flag as **High severity** — plugin cannot be uploaded as an org plugin without it.
+- **Exactly one `plugin.json`:** Unzip and count `plugin.json` entries. Must be exactly 1. If 2+ are found, the zip was built from the wrong directory level (parent instead of inside `src-[name]/`) — flag as **High severity** (upload blocker).
+- **Built from correct root:** Confirm the zip contains `.claude-plugin/plugin.json` at the root (not `src-[name]/.claude-plugin/plugin.json`). If the path includes the `src-[name]/` prefix, the zip is stale and must be rebuilt from inside `src-[name]/`.
+- **In sync with source:** Compare the `version` field inside the zipped `plugin.json` against `src-[name]/.claude-plugin/plugin.json`. If they differ, the package is stale — flag as **Medium severity**.
+- **Correct extension:** Warn if only a `.zip` exists and no `.plugin` file — the org plugin uploader requires the `.plugin` extension.
+
+```python
+import zipfile, json, os
+
+def check_package(plugin_path, plugin_name):
+    plugin_file = f"{plugin_path}/{plugin_name}.plugin"
+    src_json_path = f"{plugin_path}/src-{plugin_name}/.claude-plugin/plugin.json"
+
+    if not os.path.exists(plugin_file):
+        # Check if a .zip exists instead — softer warning
+        zip_file = f"{plugin_path}/{plugin_name}.zip"
+        if os.path.exists(zip_file):
+            return {"status": "warn", "reason": f"only {plugin_name}.zip found — rename to {plugin_name}.plugin for org plugin upload"}
+        return {"status": "fail", "reason": f"{plugin_name}.plugin not found — cannot upload as org plugin"}
+
+    with zipfile.ZipFile(plugin_file) as z:
+        names = z.namelist()
+        plugin_json_entries = [n for n in names if n.endswith('plugin.json')]
+
+        if len(plugin_json_entries) != 1:
+            return {"status": "fail", "reason": f"zip contains {len(plugin_json_entries)} plugin.json files (expected 1) — rebuild from inside src-{plugin_name}/"}
+
+        if any(f"src-{plugin_name}/" in e for e in plugin_json_entries):
+            return {"status": "fail", "reason": f"zip built from wrong directory — plugin.json path includes src-{plugin_name}/ prefix, rebuild from inside src-{plugin_name}/"}
+
+        with z.open(plugin_json_entries[0]) as f:
+            zipped_version = json.load(f).get('version')
+
+    if os.path.exists(src_json_path):
+        src_version = json.load(open(src_json_path)).get('version')
+        if zipped_version != src_version:
+            return {"status": "warn", "reason": f"package version {zipped_version} does not match source version {src_version} — rebuild needed"}
+
+    return {"status": "pass"}
+```
+
+Report output additions for this check:
+
+```json
+"package_integrity": "pass"
+// or
+"package_integrity": "fail — zip contains 2 plugin.json files; rebuild from inside src-magneto/"
+// or
+"package_integrity": "warn — package version 0.1.0 does not match source version 0.2.0"
+```
+
 ---
 
 ## How to Run a Scan
@@ -139,7 +194,8 @@ for plugin in plugins:
         "telemetry_compliance": "pass",
         "schema_conformance": "pass",
         "connector_declarations": "pass",
-        "hook_declarations": "pass"
+        "hook_declarations": "pass",
+        "package_integrity": "pass"
       }
     },
     {
@@ -151,11 +207,13 @@ for plugin in plugins:
         "telemetry_compliance": "fail",
         "schema_conformance": "pass",
         "connector_declarations": "pass",
-        "hook_declarations": "pass"
+        "hook_declarations": "pass",
+        "package_integrity": "fail"
       },
       "failures": [
         "required_components: telemetry skill missing",
-        "telemetry_compliance: cannot verify — telemetry skill absent"
+        "telemetry_compliance: cannot verify — telemetry skill absent",
+        "package_integrity: magneto.plugin not found — cannot upload as org plugin"
       ]
     }
   ]

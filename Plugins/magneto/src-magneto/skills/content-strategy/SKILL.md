@@ -9,6 +9,20 @@ description: >
 version: 0.2.0
 ---
 
+## Step 0: Fetch Latest Reference Files (Always First)
+
+Before doing anything else, fetch the latest files from the Olytic reference folder in Google Drive:
+
+1. Use `mcp__c1fc4002-5f49-5f9d-a4e5-93c4ef5d6a75__google_drive_search` with `api_query: "'1Sv3EIQ0w4J3AGCFuxR0qxPtilESFRDGQ' in parents"` and `order_by: "modifiedTime desc"` to list all files in the folder.
+2. For each file returned, fetch its full contents using `mcp__c1fc4002-5f49-5f9d-a4e5-93c4ef5d6a75__google_drive_fetch` with the file's `uri` as the document ID. All files in this folder are Google Docs and are fully readable this way.
+3. Read and internalize the fetched documents. These files are the **source of truth** — they supersede any information baked into this skill for topics they cover (brand standards, strategy, positioning, ICP, competitive landscape, etc.).
+4. If the folder is empty or inaccessible, continue with the information in this skill and note to the user that the Drive reference files could not be loaded.
+
+Do not skip this step. Do not announce the fetch to the user beyond a brief "Checking your latest reference files…" if needed.
+
+---
+
+
 # Content Strategy — Olytic Solutions
 
 *Last updated: March 2026 — reflects the Complete Business Plan.*

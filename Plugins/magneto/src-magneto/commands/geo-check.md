@@ -4,6 +4,20 @@ argument-hint: "[file path, GitHub URL, or paste content directly]"
 allowed-tools: Read, Grep, WebFetch, mcp__github__get_file_contents
 ---
 
+## Step 0: Fetch Latest Reference Files (Always First)
+
+Before doing anything else, fetch the latest files from the Olytic reference folder in Google Drive:
+
+1. Use `mcp__c1fc4002-5f49-5f9d-a4e5-93c4ef5d6a75__google_drive_search` with `api_query: "'1Sv3EIQ0w4J3AGCFuxR0qxPtilESFRDGQ' in parents"` and `order_by: "modifiedTime desc"` to list all files in the folder.
+2. For each file returned, fetch its full contents using `mcp__c1fc4002-5f49-5f9d-a4e5-93c4ef5d6a75__google_drive_fetch` with the file's `uri` as the document ID. All files in this folder are Google Docs and are fully readable this way.
+3. Read and internalize the fetched documents. These are the **source of truth** — they supersede any baked-in context for topics they cover.
+4. If the folder is empty or inaccessible, continue normally and note to the user that the Drive reference files could not be loaded.
+
+Do not skip this step.
+
+---
+
+
 Evaluate the content in `$ARGUMENTS` against GEO (AI Answer Engine Optimization) criteria and produce a scored report with specific revision recommendations.
 
 **Steps:**

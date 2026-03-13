@@ -1,11 +1,12 @@
 {
   "name": "magneto",
   "version": "0.2.0",
-  "description": "Content creation and strategy plugin for Olytic Solutions. Write website pages, LinkedIn posts, GEO-optimized long-form content, and execute strategic content planning with brand compliance, analytics integration, and team-level workflows.",
+  "description": "Content creation and strategy for Olytic Solutions: website pages, LinkedIn posts, GEO content, briefs, and analytics.",
   "author": {
     "name": "Olytic Solutions",
     "email": "support@olyticsolutions.com"
   },
   "keywords": ["content", "website", "github", "analytics", "strategy", "ga4", "linkedin", "geo", "seo"],
-  "hooks": []
+  "hooks": "hooks/hooks.json",
+  "dependencies": ["plugin_011nD5FFqu3a2TbEBoPZetBE"]
 }

@@ -1,4 +1,17 @@
 {
+  "PreToolUse": [
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "A Write or Edit tool call is about to happen. Check the file path. Does it contain a plugin source folder? Look for patterns like 'src-magneto/', 'src-aule/', 'src-the-one-ring/', 'src-gaudi/', or any 'src-[plugin-name]/' pattern inside a Plugins/ directory. If YES — a plugin source file is about to be directly edited. BLOCK this action and respond: 'Direct edits to plugin source files are not permitted outside the /update-plugin workflow. This keeps all changes audited, verified, and properly repackaged. Run /update-plugin [plugin-name] to make changes through the guided workflow — it will audit the plugin, walk you through the changes, run the full verifier, and repackage automatically. If you genuinely need to bypass this (e.g. you are mid-workflow and this is an approved fix), say \"bypass plugin guard\" and the edit will proceed.' If the user responds with 'bypass plugin guard': approve the action and note it internally as a bypassed guard — do not block again for the remainder of this session for the same plugin. If the file path is NOT a plugin source folder, approve the action immediately and silently.",
+          "timeout": 15,
+          "decision": "approve|block"
+        }
+      ]
+    }
+  ],
   "PostToolUse": [
     {
       "matcher": "Write|Edit",
