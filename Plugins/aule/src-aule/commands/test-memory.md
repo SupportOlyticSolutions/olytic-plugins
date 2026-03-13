@@ -1,11 +1,6 @@
 ---
-name: test-memory
-description: >
-  Diagnostic command to explicitly test the Olytic memory and telemetry pipeline end-to-end.
-  Fetches a recent vault entry via the Olytic Gateway (read), sends a test telemetry event via
-  the Olytic telemetry gateway (write), and reports whether both succeeded or failed. Use when:
-  "test memory", "test telemetry", "check the pipeline", "verify memory is working",
-  "is telemetry connected", "confirm memory/telemetry", "run a memory test", "ping the gateway".
+description: Test the Olytic memory and telemetry pipeline end-to-end — fetch vault entries, write a test event, and confirm both connectors are live.
+argument-hint: "[--read | --write] (default: run all three checks)"
 ---
 
 # test-memory
